@@ -900,6 +900,11 @@
             { bg: 'bg-purple-500', val: 'purple', hex: '#A855F7' },
             { bg: 'bg-pink-500', val: 'pink', hex: '#EC4899' },
         ];
+        
+        // Helper to format currency to 2 decimal places
+        function formatCurrency(value) {
+            return parseFloat(value).toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' zł';
+        }
 
         // --- Core Functions ---
 
@@ -1146,8 +1151,11 @@
                 }
                 totalIncome = net;
             }
+            
+            // Round the income total for display/budgeting consistency
+            totalIncome = Math.round(totalIncome * 100) / 100;
 
-            document.getElementById('budget-total-income').innerText = totalIncome.toLocaleString('pl-PL', {minimumFractionDigits: 2}) + ' zł';
+            document.getElementById('budget-total-income').innerText = formatCurrency(totalIncome);
             document.getElementById('budget-source-type').innerText = source;
 
             // 2. Get Expenses
@@ -1167,16 +1175,20 @@
             let sumPercentVal = 0;
             
             const processedPercentItems = percentExpenses.map(e => {
-                const calculatedVal = remainderAfterFixed * (e.val / 100);
+                // Calculate value, round to 2 decimals
+                const rawVal = remainderAfterFixed * (e.val / 100);
+                const calculatedVal = Math.round(rawVal * 100) / 100;
                 sumPercentVal += calculatedVal;
                 return { ...e, calculatedVal };
             });
 
             // 6. Final Remaining
             let finalRemaining = totalIncome - sumFixed - sumPercentVal;
+            // Round final remaining
+            finalRemaining = Math.round(finalRemaining * 100) / 100;
             
             document.getElementById('budget-remaining').innerText = finalRemaining.toLocaleString('pl-PL', {minimumFractionDigits: 2});
-            document.getElementById('sum-fixed').innerText = sumFixed.toLocaleString('pl-PL', {minimumFractionDigits: 2}) + ' zł';
+            document.getElementById('sum-fixed').innerText = formatCurrency(sumFixed);
             document.getElementById('base-for-percent').innerText = `Baza %: ${remainderAfterFixed.toLocaleString('pl-PL', {minimumFractionDigits:0})} zł`;
 
             // UI Mode Toggles
@@ -1190,7 +1202,7 @@
                 btnDetails.className = "px-2 py-1 rounded bg-gray-600 text-white shadow transition";
             }
 
-            // Render Lists (Same as before)
+            // Render Lists
             const listFixed = document.getElementById('list-fixed');
             listFixed.innerHTML = '';
             
@@ -1211,7 +1223,7 @@
                         <span class="font-bold text-gray-700 dark:text-gray-300 text-sm">${item.name}</span>
                     </div>
                     <div class="flex items-center gap-3">
-                        <span class="font-bold text-gray-900 dark:text-white">${item.val.toFixed(2)} zł</span>
+                        <span class="font-bold text-gray-900 dark:text-white">${formatCurrency(item.val)}</span>
                         <button onclick="deleteBudgetItem('${item.id}')" class="text-gray-300 hover:text-red-500 w-6 h-6 flex items-center justify-center"><i class="fas fa-trash-alt text-xs"></i></button>
                     </div>
                 `;
@@ -1233,7 +1245,7 @@
                             <span class="font-bold text-gray-700 dark:text-gray-300 text-sm">${item.name} (${item.val}%)</span>
                         </div>
                         <div class="flex items-center gap-3">
-                            <span class="font-bold text-gray-900 dark:text-white">${item.calculatedVal.toFixed(2)} zł</span>
+                            <span class="font-bold text-gray-900 dark:text-white">${formatCurrency(item.calculatedVal)}</span>
                             <button onclick="deleteBudgetItem('${item.id}')" class="text-gray-300 hover:text-red-500 w-6 h-6 flex items-center justify-center"><i class="fas fa-trash-alt text-xs"></i></button>
                         </div>
                     </div>
@@ -1354,7 +1366,8 @@
                 id: Date.now().toString(),
                 name: name,
                 type: newCategoryType,
-                val: val,
+                // Ensure input value is rounded to 2 decimals before saving
+                val: Math.round(val * 100) / 100,
                 color: newCategoryColor
             });
             
@@ -1381,6 +1394,18 @@
                 showToast("Wyczyszczono planer");
              });
         }
+        
+        function deleteMonthlyRecord(mKey) {
+             showConfirm("Usunąć całą historię wypłaty dla tego miesiąca?", () => {
+                delete state.monthlyRates[mKey];
+                delete state.paymentStatus[mKey];
+                delete state.actualSalary[mKey];
+                saveState();
+                renderHistory();
+                showToast("Usunięto wpis z historii");
+             });
+        }
+
 
         // --- History Logic ---
         function renderHistory() {
@@ -1442,17 +1467,17 @@
                         let tax = Math.round(taxBase * 0.12);
                         if(state.isPit2) tax -= 300;
                         if(tax < 0) tax = 0;
-                        net = gross - spoleczne - zdrav - tax;
+                        net = gross - spoleczne - zdrowotna - tax;
                       }
                       
-                      calculatedNet = net;
-                      estimatedEarningsDisplay = calculatedNet.toLocaleString('pl-PL', {minimumFractionDigits: 2}) + ' zł';
+                      calculatedNet = Math.round(net * 100) / 100; // Round final net value
+                      estimatedEarningsDisplay = formatCurrency(calculatedNet);
                 }
 
                 // Profit/Loss
                 let diffHtml = '';
                 if (actual > 0 && calculatedNet > 0) {
-                    const diff = actual - calculatedNet;
+                    const diff = Math.round((actual - calculatedNet) * 100) / 100;
                     if (Math.abs(diff) < 1) {
                         diffHtml = '<span class="text-gray-400 font-bold text-xs">Idealnie</span>';
                     } else if (diff > 0) {
@@ -1479,7 +1504,7 @@
                             </div>
                             <div class="flex justify-between items-center text-sm">
                                 <span class="text-gray-500 dark:text-gray-400">Do ręki</span>
-                                <span class="font-bold text-gray-900 dark:text-white">${actual.toLocaleString('pl-PL', {minimumFractionDigits: 2})} zł</span>
+                                <span class="font-bold text-gray-900 dark:text-white">${formatCurrency(actual)}</span>
                             </div>
                              <div class="flex justify-between items-center text-sm pt-2 border-t border-gray-200 dark:border-gray-700">
                                 <span class="text-gray-400 font-bold text-xs uppercase">Różnica</span>
@@ -1496,7 +1521,7 @@
                         <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl mt-2">
                              <div class="flex justify-between items-center mb-2">
                                 <span class="text-xs font-bold text-gray-400 uppercase">Kwota wpływu (PLN)</span>
-                                <input type="number" placeholder="0.00" step="0.01" value="${actual > 0 ? actual : ''}" id="actual-${mKey}" oninput="updateActualSalary('${mKey}', this.value)" class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-24 p-1 text-right font-bold outline-none tabular-nums">
+                                <input type="number" placeholder="0.00" step="0.01" value="${actual > 0 ? actual.toFixed(2) : ''}" id="actual-${mKey}" oninput="updateActualSalary('${mKey}', this.value)" class="bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 text-gray-900 dark:text-white text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 w-24 p-1 text-right font-bold outline-none tabular-nums">
                             </div>
                             <div class="flex justify-between items-center">
                                 <span class="text-xs text-gray-400">Wyliczono: ${estimatedEarningsDisplay}</span>
@@ -1532,6 +1557,9 @@
                              <button onclick="togglePaymentStatus('${mKey}')" class="w-8 h-8 rounded-full ${isPaid ? 'bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300' : 'bg-gray-100 text-gray-400 dark:bg-gray-700'} flex items-center justify-center transition">
                                 <i class="fas ${isPaid ? 'fa-check' : 'fa-hourglass-half'} text-xs"></i>
                             </button>
+                             <button onclick="deleteMonthlyRecord('${mKey}')" class="w-8 h-8 rounded-full bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-300 flex items-center justify-center hover:bg-red-100 transition">
+                                <i class="fas fa-trash-alt text-xs"></i>
+                            </button>
                         </div>
                     </div>
                     ${contentHTML}
@@ -1543,7 +1571,8 @@
         // --- Helper Functions ---
 
         function updateActualSalary(mKey, val) {
-            state.actualSalary[mKey] = parseFloat(val) || 0;
+            // Round immediately after input to ensure only 2 decimal places are saved
+            state.actualSalary[mKey] = Math.round(parseFloat(val) * 100) / 100 || 0;
             saveState();
         }
         
@@ -1551,8 +1580,8 @@
             const input = document.getElementById(`actual-${mKey}`);
             let val = 0;
             if(input) {
-                val = parseFloat(input.value) || 0;
-                state.actualSalary[mKey] = val;
+                // Read from state, which is already rounded by updateActualSalary
+                val = state.actualSalary[mKey];
                 saveState();
             }
             if (val > 0) showToast("Zapisano!");
@@ -2003,7 +2032,8 @@
                 if(tax < 0) tax = 0;
 
                 net = gross - spoleczne - zdrowotna - tax;
-
+                
+                // Round individual components for display consistency
                 document.getElementById('val-emerytalne').innerText = emerytalne.toFixed(2);
                 document.getElementById('val-rentowe').innerText = rentowe.toFixed(2);
                 document.getElementById('val-chorobowe').innerText = chorobowe.toFixed(2);
@@ -2013,7 +2043,10 @@
                  net = gross;
             }
             
-            document.getElementById('calc-result').innerText = net.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' zł';
+            // Final rounding of the Net result
+            net = Math.round(net * 100) / 100;
+            
+            document.getElementById('calc-result').innerText = formatCurrency(net);
         }
 
         function saveCalcToHistory() {
