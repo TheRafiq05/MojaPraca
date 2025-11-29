@@ -212,12 +212,12 @@
         }
         .dark .calendar-day:not(.selected):hover { background-color: #3f3f46; }
         .dark .calendar-day.empty { background: transparent; }
-        }
-        
-        /* TUTAJ WKLEJASZ TEN NOWY KOD */
+        /* Fix: Podświetlenie dzisiejszego dnia w trybie ciemnym */
         .dark .calendar-day.today:not(.selected) {
             border-color: var(--primary-color) !important;
-            /* ... reszta kodu ... */
+            color: var(--primary-color) !important;
+            background-color: rgba(249, 115, 22, 0.1);
+            box-shadow: 0 0 8px rgba(249, 115, 22, 0.3);
         }
 
 
