@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="pl" class="">
 <head>
     <meta charset="UTF-8">
@@ -44,19 +44,15 @@
         body {
             font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
-            /* Zwiększony padding dolny dla treści, aby nie chowała się pod nową wyższą stopką */
-            padding-bottom: calc(100px + env(safe-area-inset-bottom)); 
+            padding-bottom: 120px;
             overscroll-behavior-y: none;
-        }
-
-        /* FIX: Klasa dla bezpiecznego paddingu na dole (iPhone Home Indicator) */
-        .pb-safe {
-            padding-bottom: env(safe-area-inset-bottom);
         }
 
         .safe-pt {
             padding-top: calc(50px + env(safe-area-inset-top)) !important;
         }
+        .pb-safe {
+            padding-bottom: env(safe-area-inset-bottom) !important;
 
         /* Utilities */
         input::-webkit-outer-spin-button,
@@ -684,29 +680,28 @@
     </div>
 
     <!-- NEW FOOTER IMPLEMENTATION -->
-    <!-- FIX: bg applies to the wrapper which includes safe area padding -->
-    <div class="fixed bottom-0 left-0 w-full bg-white/90 dark:bg-[#1C1C1E]/95 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800 z-50 pb-safe transition-all duration-300">
+    <div class="fixed bottom-0 left-0 w-full bg-white/90 dark:bg-[#1C1C1E]/95 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800 z-50 transition-all duration-300 pb-safe pt-1">
         
-        <div class="flex justify-around items-center h-[70px] max-w-lg mx-auto">
+        <div class="max-w-md mx-auto flex justify-between items-center px-6 py-2"> 
             
-            <button onclick="switchTab('calendar')" id="nav-calendar" class="nav-item active-orange flex flex-col items-center gap-1.5 p-2 w-20 rounded-xl transition-transform active:scale-95">
+            <button onclick="switchTab('calendar')" id="nav-calendar" class="nav-item active-orange flex flex-col items-center gap-1 p-2 w-16 transition-transform active:scale-95">
                 <i class="fas fa-calendar-alt text-xl"></i>
-                <span class="text-[10px] font-bold">Grafik</span>
+                <span class="text-[10px] font-medium">Grafik</span>
             </button>
             
-            <button onclick="switchTab('history')" id="nav-history" class="nav-item flex flex-col items-center gap-1.5 p-2 w-20 rounded-xl transition-transform active:scale-95">
+            <button onclick="switchTab('history')" id="nav-history" class="nav-item flex flex-col items-center gap-1 p-2 w-16 transition-transform active:scale-95">
                 <i class="fas fa-wallet text-xl"></i>
-                <span class="text-[10px] font-bold">Wypłaty</span>
+                <span class="text-[10px] font-medium">Wypłaty</span>
             </button>
             
-            <button onclick="switchTab('budget')" id="nav-budget" class="nav-item flex flex-col items-center gap-1.5 p-2 w-20 rounded-xl transition-transform active:scale-95">
+            <button onclick="switchTab('budget')" id="nav-budget" class="nav-item flex flex-col items-center gap-1 p-2 w-16 transition-transform active:scale-95">
                 <i class="fas fa-chart-pie text-xl"></i>
-                <span class="text-[10px] font-bold">Planer</span>
+                <span class="text-[10px] font-medium">Planer</span>
             </button>
 
         </div>
     </div>
-
+ 
     <div id="toast">Komunikat</div>
 
     <script>
