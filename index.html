@@ -43,11 +43,11 @@
             overscroll-behavior-y: none; /* Prevents pull-to-refresh */
         }
 
-        /* FIX: Pancerne ustawienie odstępu od góry */
+        /* FIX: Standard iOS Safe Area + Odstęp */
+        /* Używamy env() aby pobrać wysokość notcha i dodajemy 30px ekstra odstępu */
         .safe-pt {
-            padding-top: 60px !important; /* Fallback */
-            padding-top: calc(40px + constant(safe-area-inset-top)) !important; /* Starsze iOS */
-            padding-top: calc(40px + env(safe-area-inset-top)) !important; /* Nowe iOS */
+            padding-top: 40px; /* Fallback dla starych urządzeń */
+            padding-top: calc(30px + env(safe-area-inset-top)) !important; 
         }
 
         /* Utilities */
