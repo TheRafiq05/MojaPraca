@@ -22,6 +22,15 @@
                     },
                     animation: {
                         'bounce-slow': 'bounce 3s infinite',
+                        'blob': 'blob 7s infinite',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        }
                     }
                 }
             }
@@ -41,7 +50,301 @@
             padding-bottom: calc(90px + env(safe-area-inset-bottom)); /* Safe area for iPhone */
             padding-top: 50px;
             overscroll-behavior-y: none; /* Prevents pull-to-refresh */
+            transition: background-color 0.3s ease;
         }
+
+        /* ================= LIQUID GLASS THEME CONFIGURATION ================= */
+        
+        /* KARTY W STYLU SZKŁA (Base Card) */
+        .liquid-theme .ios-card, 
+        .liquid-theme .modal-content {
+            background-color: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(25px) saturate(160%);
+            -webkit-backdrop-filter: blur(25px) saturate(160%);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.1);
+        }
+
+        html.dark body.liquid-theme .ios-card,
+        html.dark body.liquid-theme .modal-content {
+            background-color: rgba(30, 30, 35, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        /* PRZYCISKI (Buttons) w stylu Liquid */
+        .liquid-theme .ios-btn,
+        .liquid-theme button.w-10.h-10, /* ikony nagłówka */
+        .liquid-theme button.w-9.h-9,   /* nawigacja kalendarza */
+        .liquid-theme button.w-8.h-8    /* małe przyciski akcji */
+        {
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+        }
+
+        /* Przycisk "Dodaj wydatek" w Liquid */
+        .liquid-theme .ios-btn.bg-gray-900 {
+             background-color: rgba(0, 0, 0, 0.6) !important; /* Półprzezroczysty czarny */
+             border: 1px solid rgba(255, 255, 255, 0.2);
+             color: white !important;
+        }
+        html.dark body.liquid-theme .ios-btn.bg-gray-900, /* W dark mode to bg-darkcard */
+        html.dark body.liquid-theme .ios-btn.dark\:bg-darkcard {
+             background-color: rgba(255, 255, 255, 0.2) !important;
+             border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* Przyciski "Białe/Szare" stają się półprzezroczyste */
+        .liquid-theme .bg-white, 
+        .liquid-theme .bg-gray-100,
+        .liquid-theme .bg-gray-50 {
+            background-color: rgba(255, 255, 255, 0.3) !important;
+        }
+        html.dark body.liquid-theme .bg-gray-800, 
+        html.dark body.liquid-theme .bg-gray-700, 
+        html.dark body.liquid-theme .dark\:bg-darkcard {
+             background-color: rgba(0, 0, 0, 0.3) !important;
+        }
+
+        /* Przyciski "Kolorowe" (np. Orange, Blue) - zachowują kolor, ale z przezroczystością */
+        .liquid-theme .bg-orange-500 { background-color: rgba(249, 115, 22, 0.75) !important; border: 1px solid rgba(249, 115, 22, 0.4); }
+        .liquid-theme .bg-blue-600 { background-color: rgba(37, 99, 235, 0.75) !important; border: 1px solid rgba(37, 99, 235, 0.4); }
+        .liquid-theme .bg-green-500 { background-color: rgba(34, 197, 94, 0.75) !important; border: 1px solid rgba(34, 197, 94, 0.4); }
+
+        /* IMPROVED DARK LIQUID COLORS (Orange & Green) */
+        html.dark body.liquid-theme .bg-orange-500 {
+            background-color: rgba(234, 88, 12, 0.5) !important; /* Bardziej elegancki ciemny pomarańcz */
+            border: 1px solid rgba(251, 146, 60, 0.3);
+            color: #fff !important;
+        }
+        html.dark body.liquid-theme .bg-green-100 { /* Status wypłacono */
+             background-color: rgba(20, 83, 45, 0.5) !important; /* Ciemnozielone szkło */
+             border: 1px solid rgba(74, 222, 128, 0.2);
+             color: #86efac !important; /* Jasnozielony tekst */
+        }
+        /* Teksty w listach */
+        html.dark body.liquid-theme .text-orange-600 { color: #fdba74 !important; }
+        html.dark body.liquid-theme .text-green-600 { color: #86efac !important; }
+        html.dark body.liquid-theme .text-orange-500 { color: #fdba74 !important; }
+
+
+        /* WEWNĘTRZNE KONTENERY (Info Note, Edit Details, Toggles) */
+        .liquid-theme .ios-card .bg-gray-50,
+        .liquid-theme .ios-card .dark\:bg-gray-800,
+        .liquid-theme .ios-card .bg-blue-50 {
+            background-color: rgba(255, 255, 255, 0.15) !important;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        html.dark body.liquid-theme .ios-card .bg-gray-50,
+        html.dark body.liquid-theme .ios-card .dark\:bg-gray-800,
+        /* Obsługa kart w ustawieniach i historii */
+        html.dark body.liquid-theme .bg-blue-50, 
+        html.dark body.liquid-theme .bg-red-50 {
+            background-color: rgba(0, 0, 0, 0.2) !important;
+             border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        /* ---------- UJEDNOLICENIE PRZEŁĄCZNIKÓW ---------- */
+        /* Styl kontenera przełącznika w Liquid Mode (Grupuj/Szczegóły, Liczba/Zegar) */
+        .liquid-theme .bg-gray-200\/50,  /* Liczba/Zegar container */
+        .liquid-theme .bg-gray-700.rounded-lg.p-0\.5 /* Grupuj/Szczegóły container */
+        {
+             background-color: rgba(0, 0, 0, 0.2) !important; /* Ciemniejsze tło dla kontrastu w obu trybach */
+             border: 1px solid rgba(255, 255, 255, 0.2) !important;
+             backdrop-filter: blur(5px);
+        }
+        html.dark body.liquid-theme .bg-gray-200\/50,
+        html.dark body.liquid-theme .bg-gray-700.rounded-lg.p-0\.5
+        {
+             background-color: rgba(0, 0, 0, 0.4) !important;
+        }
+
+        /* Styl aktywnego przycisku w przełączniku */
+        .liquid-theme .bg-gray-600 /* Aktywny guzik Grupuj/Szczegóły */
+        {
+             background-color: rgba(255, 255, 255, 0.25) !important;
+             color: inherit !important;
+             border: 1px solid rgba(255, 255, 255, 0.3);
+             backdrop-filter: blur(4px);
+             box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        html.dark body.liquid-theme .bg-gray-600 {
+            background-color: rgba(255, 255, 255, 0.15) !important;
+            color: white !important;
+        }
+
+        /* Przełączniki Szybkiego Dodawania i inne Toggle Switch (tło szyny) */
+        .liquid-theme .w-11.h-6.bg-gray-300 {
+            background-color: rgba(0, 0, 0, 0.1) !important;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(4px);
+        }
+        html.dark body.liquid-theme .w-11.h-6.bg-gray-300 {
+             background-color: rgba(255, 255, 255, 0.15) !important;
+             border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+
+        /* PIE CHART HOLE - PRZEZROCZYSTY */
+        .liquid-theme .pie-chart::after {
+            background: rgba(255, 255, 255, 0.1) !important; /* Prawie przezroczysty */
+            backdrop-filter: blur(15px); /* Mocne rozmycie tła pod dziurą */
+            -webkit-backdrop-filter: blur(15px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        html.dark body.liquid-theme .pie-chart::after {
+            background: rgba(0, 0, 0, 0.2) !important;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        /* KALKULATOR - WYNIK (NETTO) W LIQUID */
+        /* Light Liquid: Jasne szkło zamiast czarnego, ciemny tekst */
+        body.liquid-theme:not(.dark) #view-calculator .bg-gray-900.text-white {
+            background-color: rgba(255, 255, 255, 0.4) !important;
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            color: #111827 !important; /* Ciemny tekst */
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+        body.liquid-theme:not(.dark) #view-calculator .bg-gray-900 p.text-gray-400,
+        body.liquid-theme:not(.dark) #view-calculator .bg-gray-900 p.text-gray-500 {
+             color: rgba(0, 0, 0, 0.6) !important;
+        }
+        body.liquid-theme:not(.dark) #view-calculator .bg-gray-900 h3 {
+             color: #000 !important;
+        }
+        
+        /* Dark Liquid: Ciemne szkło, JASNY TEKST (POPRAWKA) */
+        html.dark body.liquid-theme #view-calculator .bg-gray-900.text-white {
+            background-color: rgba(0, 0, 0, 0.4) !important;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #ffffff !important; /* Wymuszenie bieli */
+        }
+        /* Naprawiony selektor dla etykiet netto/brutto w Dark Liquid */
+        html.dark body.liquid-theme #view-calculator .bg-gray-900 p.text-gray-400,
+        html.dark body.liquid-theme #view-calculator .bg-gray-900 p.text-gray-500 {
+             color: rgba(255, 255, 255, 0.9) !important; /* Bardzo jasne podtytuły */
+        }
+        html.dark body.liquid-theme #view-calculator h3#calc-result {
+            color: #ffffff !important; /* Wymuszenie białego wyniku */
+        }
+        
+        /* Kalkulator - Input Godzin (Liquid) */
+        .liquid-theme #calc-hours {
+            background-color: rgba(255, 255, 255, 0.15) !important;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        }
+        html.dark body.liquid-theme #calc-hours {
+            background-color: rgba(0, 0, 0, 0.2) !important;
+            border: 1px solid rgba(255, 255, 255, 0.05) !important;
+            color: white !important;
+        }
+
+        /* ================= POPRAWKI KONTRASTU TEKSTU (DARK LIQUID) ================= */
+        html.dark body.liquid-theme .text-gray-400,
+        html.dark body.liquid-theme .text-gray-500,
+        html.dark body.liquid-theme label.block.text-\[10px\],
+        html.dark body.liquid-theme .grid.grid-cols-7.text-gray-400 
+        {
+            color: rgba(255, 255, 255, 0.7) !important;
+        }
+        /* Wymuszenie jasnego koloru dla napisu "Suma godzin" w Dark Liquid */
+        html.dark body.liquid-theme #header-label,
+        html.dark body.liquid-theme #header-hours + span {
+             color: rgba(255, 255, 255, 0.9) !important;
+        }
+        
+        html.dark body.liquid-theme .text-gray-300 {
+            color: rgba(255, 255, 255, 0.5) !important;
+        }
+        
+        html.dark body.liquid-theme .grid.grid-cols-7 div {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* ================= POPRAWKI KONTRASTU TEKSTU (LIGHT LIQUID) ================= */
+        body.liquid-theme:not(.dark) .text-gray-400,
+        body.liquid-theme:not(.dark) .text-gray-500 {
+            color: rgba(0, 0, 0, 0.65) !important;
+        }
+        body.liquid-theme:not(.dark) #header-label,
+        body.liquid-theme:not(.dark) #budget-source-type {
+             color: rgba(0, 0, 0, 0.75) !important;
+             font-weight: 600;
+        }
+
+        /* Pływające "blobs" */
+        .liquid-background-blobs {
+            display: none;
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1; overflow: hidden; pointer-events: none;
+        }
+        .liquid-theme .liquid-background-blobs { display: block; }
+        .blob-shape { position: absolute; border-radius: 50%; filter: blur(80px); opacity: 0.6; animation: blob 10s infinite ease-in-out; }
+        .blob-1 { top: -10%; left: -10%; width: 500px; height: 500px; background: #F97316; animation-delay: 0s; }
+        .blob-2 { bottom: -10%; right: -10%; width: 400px; height: 400px; background: #3B82F6; animation-delay: 2s; }
+        .blob-3 { top: 40%; left: 30%; width: 300px; height: 300px; background: #EC4899; animation-delay: 4s; }
+        html.dark .blob-1 { background: #ea580c; opacity: 0.3; }
+        html.dark .blob-2 { background: #1d4ed8; opacity: 0.3; }
+        html.dark .blob-3 { background: #be185d; opacity: 0.3; }
+
+        /* Kalendarz */
+        .liquid-theme .calendar-day { background-color: rgba(255,255,255,0.2) !important; backdrop-filter: blur(4px); }
+        
+        /* Zaznaczone kafelki w Liquid: też szkło (w tym WEEKENDY) - NOWE LEPSZE KOLORY */
+        .liquid-theme .calendar-day.selected,
+        .liquid-theme .calendar-day.selected.weekend-sat,
+        .liquid-theme .calendar-day.selected.weekend-sun {
+             background-color: rgba(249, 115, 22, 0.75) !important; /* Orange glass */
+             backdrop-filter: blur(8px);
+             border: 1px solid rgba(255, 255, 255, 0.3) !important;
+             box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+             color: white !important;
+        }
+        /* Dark Liquid Selected */
+        html.dark body.liquid-theme .calendar-day.selected,
+        html.dark body.liquid-theme .calendar-day.selected.weekend-sat,
+        html.dark body.liquid-theme .calendar-day.selected.weekend-sun {
+             background-color: rgba(234, 88, 12, 0.55) !important; /* Darker Orange */
+             border: 1px solid rgba(251, 146, 60, 0.3) !important;
+        }
+
+        /* ZAZNACZONA NOCKA (Night Shift) w Liquid - poprawka koloru */
+        .liquid-theme .calendar-day.selected.night-shift {
+             background: linear-gradient(135deg, rgba(249, 115, 22, 0.85) 60%, rgba(79, 70, 229, 0.8) 100%) !important;
+             backdrop-filter: blur(8px);
+             border: 1px solid rgba(255, 255, 255, 0.3) !important;
+             box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+             color: white !important;
+        }
+        
+        /* Dark Mode Fix for Selected Night Shift in Liquid */
+        html.dark body.liquid-theme .calendar-day.selected.night-shift {
+             background: linear-gradient(135deg, rgba(234, 88, 12, 0.55) 60%, rgba(79, 70, 229, 0.55) 100%) !important;
+             border: 1px solid rgba(251, 146, 60, 0.3) !important;
+             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        /* Niezaznaczona nocka w Liquid */
+        .liquid-theme .calendar-day.night-shift:not(.selected) {
+            background: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(99, 102, 241, 0.2) 100%) !important;
+            backdrop-filter: blur(4px);
+            border: 1px solid rgba(99, 102, 241, 0.25) !important;
+        }
+        html.dark body.liquid-theme .calendar-day.night-shift:not(.selected) {
+            background: linear-gradient(135deg, rgba(0,0,0,0.2) 0%, rgba(49, 46, 129, 0.4) 100%) !important;
+            border: 1px solid rgba(129, 140, 248, 0.2) !important;
+        }
+
+        html.dark body.liquid-theme .calendar-day:not(.selected):not(.night-shift) {
+             background-color: rgba(255,255,255,0.05) !important; border-color: rgba(255,255,255,0.05);
+        }
+
+        /* ================= END LIQUID CONFIG ================= */
+
 
         /* Utilities */
         input::-webkit-outer-spin-button,
@@ -201,19 +504,19 @@
         }
 
         /* Dark Mode Calendar Overrides */
-        .dark .calendar-day:not(.selected) {
+        .dark:not(.liquid-theme) .calendar-day:not(.selected) {
             background-color: #2C2C2E;
             color: #E5E7EB;
             border-color: #3f3f46;
         }
-        .dark .calendar-day.weekend-sat { background-color: #27272a; color: #9ca3af; }
-        .dark .calendar-day.weekend-sun { background-color: #271c1c; color: #f87171; }
-        .dark .calendar-day.night-shift:not(.selected) {
+        .dark:not(.liquid-theme) .calendar-day.weekend-sat { background-color: #27272a; color: #9ca3af; }
+        .dark:not(.liquid-theme) .calendar-day.weekend-sun { background-color: #271c1c; color: #f87171; }
+        .dark:not(.liquid-theme) .calendar-day.night-shift:not(.selected) {
             background: linear-gradient(135deg, #2C2C2E 60%, #312e81 100%);
             border-color: #4338ca;
         }
-        .dark .calendar-day:not(.selected):hover { background-color: #3f3f46; }
-        .dark .calendar-day.empty { background: transparent; }
+        .dark:not(.liquid-theme) .calendar-day:not(.selected):hover { background-color: #3f3f46; }
+        .dark:not(.liquid-theme) .calendar-day.empty { background: transparent; }
 
 
         /* Hours badge on calendar day */
@@ -237,6 +540,18 @@
         .dark .nav-item.active-dark { color: #ffffff; }
         .dark .nav-item { color: #6b7280; }
         .dark .nav-item.active-orange { color: #F97316; }
+        
+        /* Liquid Nav */
+        .liquid-theme .fixed.bottom-0 {
+             background-color: rgba(255, 255, 255, 0.5);
+             backdrop-filter: blur(20px);
+             -webkit-backdrop-filter: blur(20px);
+             border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        html.dark body.liquid-theme .fixed.bottom-0 {
+             background-color: rgba(20, 20, 20, 0.5);
+             border-top: 1px solid rgba(255, 255, 255, 0.05);
+        }
 
         .view-section { display: none; animation: fadeIn 0.2s ease-out; }
         .view-section.active { display: block; }
@@ -276,7 +591,19 @@
         }
         .dark .modal-content { background-color: #1C1C1E; border: 1px solid #2C2C2E; }
         
-        .modal-overlay.show .modal-content { transform: scale(1); }
+        /* Liquid Modal Overrides */
+        .liquid-theme .modal-content {
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+        }
+        html.dark body.liquid-theme .modal-content {
+            background-color: rgba(30, 30, 35, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            color: #fff;
+        }
+
 
         /* Toast */
         #toast {
@@ -297,6 +624,7 @@
             opacity: 0;
             transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
             backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
         #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
@@ -311,7 +639,7 @@
             position: relative;
             margin: 0 auto;
             box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-            transition: background 0.5s ease;
+            /* transition: background 0.5s ease; */
         }
         .pie-chart::after {
             content: '';
@@ -324,6 +652,9 @@
         .dark .pie-chart::after {
             background: #111827; 
         }
+        /* Liquid Pie Hole */
+        .liquid-theme .pie-chart::after { background: rgba(255,255,255,0.1) !important; backdrop-filter: blur(15px); border: 1px solid rgba(255,255,255,0.2); }
+        html.dark body.liquid-theme .pie-chart::after { background: rgba(0,0,0,0.2) !important; border: 1px solid rgba(255,255,255,0.05); }
         
         /* Toggle Switch */
         .toggle-checkbox:checked {
@@ -344,6 +675,13 @@
     </style>
 </head>
 <body class="bg-[#F5F5F7] text-[#1D1D1F] dark:bg-darkbg dark:text-gray-100 transition-colors duration-300">
+
+    <!-- Liquid Background Elements (Visible only in Liquid mode to provide blur content) -->
+    <div class="liquid-background-blobs">
+        <div class="blob-shape blob-1"></div>
+        <div class="blob-shape blob-2"></div>
+        <div class="blob-shape blob-3"></div>
+    </div>
 
     <!-- ================= SPLASH SCREEN ================= -->
     <div id="splash-screen">
@@ -472,8 +810,10 @@
                 <p class="text-xs text-orange-500 font-bold uppercase tracking-wide">Moje</p>
                 <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white">Wypłaty</h1>
             </div>
-            <div class="w-10 h-10 bg-orange-100 dark:bg-gray-700 text-orange-600 dark:text-orange-400 rounded-full flex items-center justify-center shadow-sm">
-                <i class="fas fa-wallet text-lg"></i>
+            <div class="flex gap-3">
+                <button onclick="openSettings()" class="ios-btn w-10 h-10 bg-white dark:bg-darkcard border border-gray-100 dark:border-gray-800 text-gray-500 dark:text-gray-300 rounded-full flex items-center justify-center hover:text-gray-800 transition shadow-sm">
+                    <i class="fas fa-cog"></i>
+                </button>
             </div>
         </header>
 
@@ -505,8 +845,10 @@
                 <p class="text-xs text-orange-500 font-bold uppercase tracking-wide">Mój</p>
                 <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white">Planer</h1>
             </div>
-            <div class="w-10 h-10 bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 rounded-full flex items-center justify-center shadow-sm">
-                <i class="fas fa-chart-pie text-lg"></i>
+            <div class="flex gap-3">
+                <button onclick="openSettings()" class="ios-btn w-10 h-10 bg-white dark:bg-darkcard border border-gray-100 dark:border-gray-800 text-gray-500 dark:text-gray-300 rounded-full flex items-center justify-center hover:text-gray-800 transition shadow-sm">
+                    <i class="fas fa-cog"></i>
+                </button>
             </div>
         </header>
 
@@ -588,8 +930,10 @@
                 <p class="text-xs text-blue-600 font-bold uppercase tracking-wide">Finanse</p>
                 <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white">Kalkulator</h1>
             </div>
-            <div class="w-10 h-10 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-200 rounded-full flex items-center justify-center shadow-sm">
-                <i class="fas fa-calculator text-lg"></i>
+            <div class="flex gap-3">
+                <button onclick="openSettings()" class="ios-btn w-10 h-10 bg-white dark:bg-darkcard border border-gray-100 dark:border-gray-800 text-gray-500 dark:text-gray-300 rounded-full flex items-center justify-center hover:text-gray-800 transition shadow-sm">
+                    <i class="fas fa-cog"></i>
+                </button>
             </div>
         </header>
 
@@ -713,17 +1057,34 @@
             </div>
             
             <div class="space-y-4">
-                 <!-- Theme Toggle -->
+                 <!-- Motyw Ciemny - Przełącznik dla 'dark' (klasyczny ciemny) -->
                  <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3 rounded-xl">
                     <div class="flex items-center gap-3">
                         <div class="w-8 h-8 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full flex items-center justify-center">
                             <i class="fas fa-moon text-xs"></i>
                         </div>
-                        <span class="text-sm font-bold text-gray-800 dark:text-white">Tryb ciemny</span>
+                        <span class="text-sm font-bold text-gray-800 dark:text-white">Tryb ciemny (Klasyczny)</span>
                     </div>
                     <label class="relative inline-flex items-center cursor-pointer">
                         <input type="checkbox" id="theme-toggle" class="sr-only peer" onchange="toggleTheme()">
                         <div class="w-11 h-6 bg-gray-300 dark:bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gray-800 shadow-inner"></div>
+                    </label>
+                 </div>
+
+                 <!-- Motyw Liquid Glass - Nowy przełącznik -->
+                 <div class="flex items-center justify-between bg-blue-50/50 dark:bg-indigo-900/20 p-3 rounded-xl border border-blue-100 dark:border-indigo-800">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-indigo-100 dark:bg-indigo-800 text-indigo-600 dark:text-indigo-200 rounded-full flex items-center justify-center">
+                            <i class="fas fa-magic text-xs"></i>
+                        </div>
+                        <div>
+                            <span class="text-sm font-bold text-gray-800 dark:text-white">Liquid Glass (Beta)</span>
+                            <span class="text-[10px] text-gray-500 dark:text-gray-400 block leading-tight mt-0.5">Styl rozmytych kart</span>
+                        </div>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="liquid-toggle" class="sr-only peer" onchange="toggleLiquidStyle()">
+                        <div class="w-11 h-6 bg-gray-300 dark:bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-indigo-600 shadow-inner"></div>
                     </label>
                  </div>
 
@@ -905,6 +1266,7 @@
             isPit2: true, 
             budgetData: {},
             theme: 'light', // 'light' or 'dark'
+            themeStyle: 'classic', // 'classic' or 'liquid' <--- NOWA ZMIENNA STANU
             chartMode: 'groups' // 'groups' or 'details'
         };
         
@@ -952,6 +1314,7 @@
                     if(!state.budgetData) state.budgetData = {};
                     if(state.isPit2 === undefined) state.isPit2 = true;
                     if(!state.theme) state.theme = 'light';
+                    if(!state.themeStyle) state.themeStyle = 'classic'; // Inicjalizacja nowego stanu
                     if(!state.chartMode) state.chartMode = 'groups';
                 } catch (e) { console.error("Data load error", e); }
             }
@@ -981,8 +1344,11 @@
             
             // Sync calc toggles
             document.getElementById('calc-pit2').checked = state.isPit2;
-            document.getElementById('theme-toggle').checked = state.theme === 'dark';
             
+            // Ustawienie stanów przełączników w UI
+            document.getElementById('theme-toggle').checked = state.theme === 'dark';
+            document.getElementById('liquid-toggle').checked = state.themeStyle === 'liquid';
+
             renderCalendar();
             calculateTotalWorkHours();
             updateCalcContextLabel(); 
@@ -1124,22 +1490,68 @@
         }
 
         // --- Theme Logic ---
+
+        // Przełącza KLASYCZNY motyw ciemny/jasny
         function toggleTheme() {
-            // Read checkbox state directly to avoid desync
             const isChecked = document.getElementById('theme-toggle').checked;
-            state.theme = isChecked ? 'dark' : 'light';
+            
+            if (isChecked) {
+                state.theme = 'dark';
+            } else {
+                state.theme = 'light';
+            }
+            applyTheme();
+            saveState();
+        }
+
+        // Przełącza motyw Liquid Glass
+        function toggleLiquidStyle() {
+            const isChecked = document.getElementById('liquid-toggle').checked;
+
+            if (isChecked) {
+                // Włącz Liquid Style
+                state.themeStyle = 'liquid';
+            } else {
+                // Wróć do klasycznego
+                state.themeStyle = 'classic';
+            }
             applyTheme();
             saveState();
         }
 
         function applyTheme() {
             const html = document.documentElement;
+            const body = document.body;
+            
+            // 1. Ustawienie trybu kolorów (dark/light)
             if (state.theme === 'dark') {
                 html.classList.add('dark');
             } else {
                 html.classList.remove('dark');
             }
+
+            // 2. Ustawienie stylu Liquid Glass
+            if (state.themeStyle === 'liquid') {
+                body.classList.add('liquid-theme');
+                // Dodaj klasę Liquid Glass do wszystkich kart, gdzie chcemy efekt rozmycia
+                document.querySelectorAll('.ios-card').forEach(card => {
+                    card.classList.add('liquid-glass-card');
+                });
+            } else {
+                body.classList.remove('liquid-theme');
+                // Usuń klasę Liquid Glass
+                 document.querySelectorAll('.ios-card').forEach(card => {
+                    card.classList.remove('liquid-glass-card');
+                });
+            }
+            
+            // Upewnij się, że motyw Liquid jest zsynchronizowany z przełącznikiem
+            document.getElementById('liquid-toggle').checked = state.themeStyle === 'liquid';
+            document.getElementById('theme-toggle').checked = state.theme === 'dark';
         }
+
+        // --- Reszta logiki ---
+        // (Pozostałe funkcje JS zostają bez zmian, używając nowych funkcji applyTheme)
 
         // --- Budget Logic ---
 
@@ -1179,7 +1591,7 @@
                     let tax = Math.round(taxBase * 0.12);
                     if(state.isPit2) tax -= 300;
                     if(tax < 0) tax = 0;
-                    net = gross - spoleczne - zdrav - tax;
+                    net = gross - spoleczne - zdrowotna - tax;
                 }
                 totalIncome = net;
             }
@@ -1248,7 +1660,10 @@
 
             fixedExpenses.forEach(item => {
                 const el = document.createElement('div');
-                el.className = "flex justify-between items-center bg-white dark:bg-darkcard p-3 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm";
+                // Use the ios-card liquid-glass-card logic by reusing standard classes + specific JS addition?
+                // Actually, the previous fix was to add bg-white dark:bg-darkcard. 
+                // To support Liquid Glass properly here, we need the liquid-glass-card class which handles overrides.
+                el.className = "flex justify-between items-center ios-card liquid-glass-card bg-white dark:bg-darkcard p-3 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm"; 
                 el.innerHTML = `
                     <div class="flex items-center gap-3">
                         <div class="w-2.5 h-2.5 rounded-full ${bgColors[item.color]}"></div>
@@ -1269,7 +1684,8 @@
 
             processedPercentItems.forEach(item => {
                  const el = document.createElement('div');
-                el.className = "flex flex-col bg-white dark:bg-darkcard p-3 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm";
+                 // Same fix here: ensure bg-white dark:bg-darkcard AND liquid-glass-card are present
+                el.className = "flex flex-col ios-card liquid-glass-card bg-white dark:bg-darkcard p-3 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm"; 
                 el.innerHTML = `
                     <div class="flex justify-between items-center mb-1">
                         <div class="flex items-center gap-3">
@@ -2115,6 +2531,7 @@
                     isPit2: true, 
                     budgetData: {},
                     theme: 'light',
+                    themeStyle: 'classic', // Reset nowej zmiennej
                     chartMode: 'groups'
                 };
                 
