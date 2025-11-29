@@ -344,11 +344,9 @@
 </head>
 <body class="bg-[#F5F5F7] text-[#1D1D1F] dark:bg-darkbg dark:text-gray-100 transition-colors duration-300">
 
-    <!-- ================= SPLASH SCREEN ================= -->
-    <div id="splash-screen">
+        <div id="splash-screen">
         <div class="splash-logo-container">
-            <!-- Modern Minimalist Abstract "M" / Pulse Logo -->
-            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M4 12H7L10 6L14 18L17 12H20" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         </div>
@@ -360,8 +358,7 @@
         </div>
     </div>
 
-    <!-- ================= VIEW 1: GRAFIK (CALENDAR) ================= -->
-    <div id="view-calendar" class="view-section active max-w-lg mx-auto p-4 safe-pt">
+        <div id="view-calendar" class="view-section active max-w-lg mx-auto p-4 safe-pt">
         <header class="flex justify-between items-center mb-6">
             <div>
                 <p class="text-xs text-orange-500 font-bold uppercase tracking-wide">Ewidencja czasu</p>
@@ -374,8 +371,7 @@
             </div>
         </header>
 
-        <!-- Summary Card -->
-        <div class="ios-card bg-gray-900 dark:bg-darkcard text-white p-5 mb-5 shadow-xl relative overflow-hidden">
+                <div class="ios-card bg-gray-900 dark:bg-darkcard text-white p-5 mb-5 shadow-xl relative overflow-hidden">
             <div class="absolute -right-6 -top-6 w-32 h-32 bg-orange-500 rounded-full opacity-10 blur-xl"></div>
             <div class="absolute -left-6 -bottom-6 w-32 h-32 bg-blue-500 rounded-full opacity-10 blur-xl"></div>
             
@@ -390,8 +386,7 @@
             </div>
         </div>
 
-        <!-- Fixed Hours Toggle -->
-        <div class="ios-card dark:bg-darkcard p-4 mb-4 border border-orange-100 dark:border-gray-800 bg-orange-50/50 dark:bg-gray-800/30">
+                <div class="ios-card dark:bg-darkcard p-4 mb-4 border border-orange-100 dark:border-gray-800 bg-orange-50/50 dark:bg-gray-800/30">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-full bg-orange-100 dark:bg-gray-700 text-orange-500 flex items-center justify-center text-sm shadow-sm"><i class="fas fa-magic"></i></div>
@@ -406,13 +401,11 @@
                 </label>
             </div>
             
-            <!-- Manual Mode Hint (Visible when quick add is OFF) -->
-            <div id="manual-mode-hint" class="hidden mt-3 pt-2 border-t border-orange-200/50 dark:border-gray-700 text-center">
+                        <div id="manual-mode-hint" class="hidden mt-3 pt-2 border-t border-orange-200/50 dark:border-gray-700 text-center">
                 <p class="text-[10px] font-bold text-orange-600 dark:text-orange-400"><i class="fas fa-hand-pointer mr-1"></i> Tryb ręczny. Kliknij dzień, aby otworzyć edycję.</p>
             </div>
 
-            <!-- Settings for Fixed Hours -->
-            <div id="fixed-hours-settings" class="hidden mt-4 pt-3 border-t border-orange-200/50 dark:border-gray-700">
+                        <div id="fixed-hours-settings" class="hidden mt-4 pt-3 border-t border-orange-200/50 dark:border-gray-700">
                  <div class="flex justify-center bg-gray-200/50 dark:bg-gray-700 rounded-lg p-1 text-xs mb-3 mx-auto max-w-[220px]">
                     <button onclick="setFixedType('simple')" id="fixed-type-simple" class="flex-1 py-1.5 rounded-md transition font-bold text-center">Liczba</button>
                     <button onclick="setFixedType('range')" id="fixed-type-range" class="flex-1 py-1.5 rounded-md transition font-bold text-center">Zegar</button>
@@ -433,8 +426,7 @@
             </div>
         </div>
 
-        <!-- Calendar -->
-        <div class="ios-card dark:bg-darkcard p-4 mb-4">
+                <div class="ios-card dark:bg-darkcard p-4 mb-4">
             <div class="flex justify-between items-center mb-5 px-1">
                 <button onclick="changeMonth(-1)" class="w-9 h-9 flex items-center justify-center rounded-full bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 transition text-gray-600 dark:text-gray-300"><i class="fas fa-chevron-left"></i></button>
                 <div class="text-center">
@@ -449,23 +441,20 @@
             <div id="calendar-grid" class="grid grid-cols-7 gap-1.5"></div>
         </div>
 
-        <!-- List Header -->
-        <div class="flex justify-between items-end mt-8 mb-3 px-2">
+                <div class="flex justify-between items-end mt-8 mb-3 px-2">
             <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider">Szczegóły dni</h3>
             <button onclick="toggleListCollapse()" class="text-orange-500 text-xs font-bold hover:text-orange-600 flex items-center gap-1 bg-orange-50 dark:bg-gray-800 px-3 py-1.5 rounded-lg transition">
                 <span id="collapse-text">Zwiń</span> <i id="collapse-icon" class="fas fa-chevron-up"></i>
             </button>
         </div>
 
-        <!-- Hours List -->
-        <div id="hours-list-container" class="space-y-3 pb-8"></div>
+                <div id="hours-list-container" class="space-y-3 pb-8"></div>
         <div id="hours-list-summary" class="hidden bg-white dark:bg-darkcard rounded-xl p-6 text-center border border-gray-200 dark:border-gray-800 text-gray-500 text-sm shadow-sm">
             Lista zwinięta. <span class="font-bold text-gray-900 dark:text-white" id="hidden-count">0</span> dni pracy.
         </div>
     </div>
 
-    <!-- ================= VIEW 2: WYPŁATY (HISTORY) ================= -->
-    <div id="view-history" class="view-section max-w-lg mx-auto p-4 safe-pt">
+        <div id="view-history" class="view-section max-w-lg mx-auto p-4 safe-pt">
         <header class="flex justify-between items-center mb-6">
             <div>
                 <p class="text-xs text-orange-500 font-bold uppercase tracking-wide">Moje</p>
@@ -490,8 +479,7 @@
         </div>
     </div>
 
-    <!-- ================= VIEW 4: PLANER (BUDGET) ================= -->
-    <div id="view-budget" class="view-section max-w-lg mx-auto p-4 safe-pt">
+        <div id="view-budget" class="view-section max-w-lg mx-auto p-4 safe-pt">
         <header class="flex justify-between items-center mb-6">
             <div>
                 <p class="text-xs text-orange-500 font-bold uppercase tracking-wide">Mój</p>
@@ -502,8 +490,7 @@
             </div>
         </header>
 
-        <!-- Context Info -->
-        <div class="mb-4 px-2 flex justify-between items-center">
+                <div class="mb-4 px-2 flex justify-between items-center">
             <div>
                 <h3 id="budget-month-label" class="text-lg font-bold text-gray-800 dark:text-white capitalize"></h3>
                 <p class="text-[10px] text-gray-400 mt-0.5 flex items-center gap-1">
@@ -516,18 +503,15 @@
             </div>
         </div>
 
-        <!-- Main Budget Card -->
-        <div class="ios-card bg-gray-800 dark:bg-gray-900 text-white p-6 mb-6 shadow-xl relative overflow-hidden">
-            <!-- Chart Toggle -->
-            <div class="absolute top-4 right-4 z-20 bg-gray-700 rounded-lg p-0.5 flex text-[10px] font-bold">
+                <div class="ios-card bg-gray-800 dark:bg-gray-900 text-white p-6 mb-6 shadow-xl relative overflow-hidden">
+                        <div class="absolute top-4 right-4 z-20 bg-gray-700 rounded-lg p-0.5 flex text-[10px] font-bold">
                 <button onclick="setChartMode('groups')" id="chart-mode-groups" class="px-2 py-1 rounded bg-gray-600 text-white shadow transition">Grupuj</button>
                 <button onclick="setChartMode('details')" id="chart-mode-details" class="px-2 py-1 rounded text-gray-400 hover:text-white transition">Szczegóły</button>
             </div>
 
             <div class="flex items-center gap-6 relative z-10 pt-4">
                 <div class="flex-shrink-0">
-                    <!-- Chart color logic handled in JS -->
-                    <div class="pie-chart" id="budget-pie-chart"></div>
+                                        <div class="pie-chart" id="budget-pie-chart"></div>
                 </div>
                 <div class="flex-grow">
                     <p class="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-1">Do rozdysponowania</p>
@@ -541,8 +525,7 @@
             </div>
         </div>
 
-        <!-- Controls -->
-        <div class="flex gap-2 mb-6">
+                <div class="flex gap-2 mb-6">
             <button onclick="openAddCategoryModal()" class="ios-btn flex-1 bg-gray-900 dark:bg-darkcard dark:border dark:border-gray-700 text-white py-3 rounded-xl font-bold text-sm shadow-md transition flex items-center justify-center gap-2 hover:bg-black">
                 <i class="fas fa-plus-circle"></i> Dodaj wydatek
             </button>
@@ -551,10 +534,8 @@
             </button>
         </div>
 
-        <!-- Categories List -->
-        <div id="budget-categories-list" class="space-y-6 pb-20">
-            <!-- Fixed Expenses Section -->
-            <div id="section-fixed">
+                <div id="budget-categories-list" class="space-y-6 pb-20">
+                        <div id="section-fixed">
                 <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 px-2 flex justify-between items-center">
                     <span class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-red-500"></div> Opłaty Stałe</span>
                     <span id="sum-fixed" class="text-gray-800 dark:text-gray-300 tabular-nums">0.00 zł</span>
@@ -562,8 +543,7 @@
                 <div id="list-fixed" class="space-y-2"></div>
             </div>
 
-            <!-- Percent Expenses Section -->
-            <div id="section-percent">
+                        <div id="section-percent">
                 <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 px-2 flex justify-between items-center">
                      <span class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-amber-500"></div> Budżety (%)</span>
                      <span id="base-for-percent" class="text-[10px] bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded font-bold">Baza: 0 zł</span>
@@ -573,8 +553,7 @@
         </div>
     </div>
 
-    <!-- ================= VIEW 3: KALKULATOR ================= -->
-    <div id="view-calculator" class="view-section max-w-lg mx-auto p-4 safe-pt">
+        <div id="view-calculator" class="view-section max-w-lg mx-auto p-4 safe-pt">
         <header class="flex justify-between items-center mb-6">
             <div>
                 <p class="text-xs text-blue-600 font-bold uppercase tracking-wide">Finanse</p>
@@ -586,8 +565,7 @@
         </header>
 
         <div class="ios-card dark:bg-darkcard p-6 space-y-6">
-            <!-- Inputs -->
-            <div class="grid grid-cols-2 gap-4">
+                        <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2">Stawka / h (Brutto)</label>
                     <div class="relative group">
@@ -601,10 +579,8 @@
                 </div>
             </div>
 
-            <!-- Toggles -->
-            <div class="space-y-3">
-                <!-- Student Toggle -->
-                <div class="flex items-center justify-between bg-blue-50/50 dark:bg-blue-900/20 p-3.5 rounded-xl border border-blue-100 dark:border-blue-800">
+                        <div class="space-y-3">
+                                <div class="flex items-center justify-between bg-blue-50/50 dark:bg-blue-900/20 p-3.5 rounded-xl border border-blue-100 dark:border-blue-800">
                     <div class="flex items-center gap-3">
                         <div class="w-8 h-8 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-200">
                             <i class="fas fa-user-graduate text-xs"></i>
@@ -620,8 +596,7 @@
                     </label>
                 </div>
 
-                <!-- ZUS Toggle -->
-                <div id="calc-zus-wrapper" class="hidden flex flex-col gap-3">
+                                <div id="calc-zus-wrapper" class="hidden flex flex-col gap-3">
                     <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3.5 rounded-xl border border-gray-200 dark:border-gray-700">
                         <div class="flex items-center gap-3">
                             <div class="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300">
@@ -638,8 +613,7 @@
                         </label>
                     </div>
 
-                    <!-- Ulga podatkowa -->
-                     <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3.5 rounded-xl border border-gray-200 dark:border-gray-700">
+                                         <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3.5 rounded-xl border border-gray-200 dark:border-gray-700">
                         <div class="flex items-center gap-3">
                             <div class="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300">
                                 <i class="fas fa-file-signature text-xs"></i>
@@ -657,8 +631,7 @@
                 </div>
             </div>
 
-            <!-- Breakdown -->
-            <div id="calc-breakdown" class="hidden text-xs text-gray-500 dark:text-gray-400 space-y-1.5 bg-gray-50 dark:bg-gray-800 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
+                        <div id="calc-breakdown" class="hidden text-xs text-gray-500 dark:text-gray-400 space-y-1.5 bg-gray-50 dark:bg-gray-800 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
                 <p class="font-bold text-gray-800 dark:text-gray-300 mb-2 border-b border-gray-200 dark:border-gray-600 pb-1">Szczegóły potrąceń:</p>
                 <div class="flex justify-between" id="row-emerytalne"><span>Emerytalne (9,76%):</span> <span id="val-emerytalne" class="font-mono text-gray-900 dark:text-white">0.00</span></div>
                 <div class="flex justify-between" id="row-rentowe"><span>Rentowe (1,5%):</span> <span id="val-rentowe" class="font-mono text-gray-900 dark:text-white">0.00</span></div>
@@ -672,16 +645,14 @@
                 </div>
             </div>
 
-            <!-- Result -->
-            <div class="bg-gray-900 dark:bg-black text-white rounded-2xl p-6 text-center shadow-xl shadow-gray-300 dark:shadow-none mt-4 relative overflow-hidden border border-gray-800">
+                        <div class="bg-gray-900 dark:bg-black text-white rounded-2xl p-6 text-center shadow-xl shadow-gray-300 dark:shadow-none mt-4 relative overflow-hidden border border-gray-800">
                 <div class="absolute top-0 right-0 w-20 h-20 bg-white opacity-5 rounded-full -mr-10 -mt-10"></div>
                 <p class="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-1">Do wypłaty (Netto)</p>
                 <h3 class="text-4xl font-bold tabular-nums tracking-tight" id="calc-result">0.00 zł</h3>
                 <p class="text-xs text-gray-500 mt-2 font-mono" id="calc-gross-preview">Brutto: 0.00 zł</p>
             </div>
             
-            <!-- Save to History Action -->
-            <div class="bg-gray-100 dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 text-center">
+                        <div class="bg-gray-100 dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 text-center">
                 <p id="calc-context-label" class="text-xs font-bold text-gray-500 mb-3">Obliczenia dla: -</p>
                 <button onclick="saveCalcToHistory()" class="ios-btn w-full bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm px-5 py-3 transition shadow-md shadow-blue-200">
                     <i class="fas fa-save mr-2"></i> Zapisz dla tego miesiąca
@@ -690,8 +661,7 @@
         </div>
     </div>
 
-    <!-- ================= MODALS ================= -->
-    <div id="settings-modal" class="modal-overlay">
+        <div id="settings-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-xl font-bold text-gray-900 dark:text-white">Ustawienia</h3>
@@ -701,8 +671,7 @@
             </div>
             
             <div class="space-y-4">
-                 <!-- Theme Toggle -->
-                 <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3 rounded-xl">
+                                  <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3 rounded-xl">
                     <div class="flex items-center gap-3">
                         <div class="w-8 h-8 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full flex items-center justify-center">
                             <i class="fas fa-moon text-xs"></i>
@@ -715,8 +684,7 @@
                     </label>
                  </div>
 
-                 <!-- iOS Install Button -->
-                 <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl flex items-center justify-between cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition" onclick="openIOSInstructions()">
+                                  <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl flex items-center justify-between cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition" onclick="openIOSInstructions()">
                     <div class="flex items-center gap-3">
                         <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 rounded-full flex items-center justify-center">
                             <i class="fab fa-apple text-sm"></i>
@@ -729,8 +697,7 @@
                  <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800">
                     <h4 class="font-bold text-blue-900 dark:text-blue-200 text-sm mb-2"><i class="fas fa-file-export mr-1"></i> Zarządzanie danymi</h4>
                     
-                    <!-- Separate Import Logic -->
-                    <div class="space-y-3">
+                                        <div class="space-y-3">
                         <button onclick="exportData()" class="w-full bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-300 text-xs font-bold py-2.5 rounded-lg border border-blue-200 dark:border-blue-800 shadow-sm flex items-center justify-center gap-2">
                             <i class="fas fa-download"></i> Pobierz kopię (Eksport)
                         </button>
@@ -741,8 +708,7 @@
                                 <input type="file" id="import-file" class="hidden" onchange="handleFileSelect(this)">
                             </label>
                             
-                            <!-- Import Button: Disabled by default -->
-                            <button id="btn-confirm-import" onclick="executeImport()" disabled class="w-full bg-gray-300 dark:bg-gray-700 text-white text-xs font-bold py-2.5 rounded-lg shadow-sm transition cursor-not-allowed">
+                                                        <button id="btn-confirm-import" onclick="executeImport()" disabled class="w-full bg-gray-300 dark:bg-gray-700 text-white text-xs font-bold py-2.5 rounded-lg shadow-sm transition cursor-not-allowed">
                                 <i class="fas fa-upload mr-1"></i> Wczytaj kopię
                             </button>
                         </div>
@@ -764,8 +730,7 @@
         </div>
     </div>
 
-    <!-- iOS Install Modal -->
-    <div id="ios-install-modal" class="modal-overlay">
+        <div id="ios-install-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="flex justify-between items-center mb-4">
                 <h3 class="text-xl font-bold text-gray-900 dark:text-white">Instalacja iOS</h3>
@@ -802,8 +767,7 @@
         </div>
     </div>
 
-    <!-- Add Category Modal -->
-    <div id="add-category-modal" class="modal-overlay">
+        <div id="add-category-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="flex justify-between items-center mb-6">
                 <h3 class="text-xl font-bold text-gray-900 dark:text-white">Nowy Wydatek</h3>
@@ -813,8 +777,7 @@
             </div>
 
             <div class="space-y-4">
-                <!-- Type Selection -->
-                <div class="bg-gray-100 dark:bg-gray-800 p-1 rounded-xl flex text-xs font-bold">
+                                <div class="bg-gray-100 dark:bg-gray-800 p-1 rounded-xl flex text-xs font-bold">
                     <button onclick="setCategoryType('fixed')" id="btn-cat-fixed" class="flex-1 py-2.5 rounded-lg shadow bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition">Kwota (Stała)</button>
                     <button onclick="setCategoryType('percent')" id="btn-cat-percent" class="flex-1 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-200 transition">Procent %</button>
                 </div>
@@ -841,8 +804,7 @@
         </div>
     </div>
 
-    <!-- Confirmation Modal -->
-    <div id="confirm-modal" class="modal-overlay">
+        <div id="confirm-modal" class="modal-overlay">
         <div class="modal-content text-center">
             <div class="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
                 <i class="fas fa-exclamation-triangle text-2xl"></i>
@@ -856,8 +818,7 @@
         </div>
     </div>
 
-    <!-- ================= BOTTOM NAVIGATION ================= -->
-    <div class="fixed bottom-0 left-0 w-full bg-white/80 dark:bg-darkcard/90 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800 z-50 safe-area-bottom">
+        <div class="fixed bottom-0 left-0 w-full bg-white/80 dark:bg-darkcard/90 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800 z-50 safe-area-bottom">
         <div class="flex justify-around items-center h-[70px] max-w-lg mx-auto pb-1">
             <button onclick="switchTab('calendar')" id="nav-calendar" class="nav-item active-orange flex flex-col items-center gap-1 p-2 w-20 rounded-xl">
                 <i class="fas fa-calendar-alt text-xl mb-0.5"></i>
@@ -1403,6 +1364,24 @@
         }
 
         // --- History Logic ---
+        
+        function deleteMonthHistory(mKey) {
+            const [year, month] = mKey.split('-');
+            const monthName = monthsNominative[parseInt(month) - 1];
+            
+            showConfirm(`Usunąć wszystkie dane wypłaty i budżetu dla miesiąca: ${monthName} ${year}?`, () => {
+                // Usuń wszystkie powiązane dane z historii
+                if (state.monthlyRates[mKey]) delete state.monthlyRates[mKey];
+                if (state.actualSalary[mKey]) delete state.actualSalary[mKey];
+                if (state.paymentStatus[mKey]) delete state.paymentStatus[mKey];
+                if (state.budgetData[mKey]) delete state.budgetData[mKey];
+                
+                saveState();
+                renderHistory();
+                showToast("Usunięto dane miesiąca!");
+            });
+        }
+        
         function renderHistory() {
             const container = document.getElementById('history-container');
             const dataByMonth = {};
@@ -1549,7 +1528,10 @@
                             <h2 class="text-xl font-bold text-gray-900 dark:text-white capitalize">${monthName}</h2>
                         </div>
                         <div class="flex items-center gap-2">
-                             <span class="text-xs font-bold ${isPaid ? 'text-green-600 dark:text-green-400' : 'text-gray-400'}">${statusText}</span>
+                                                        <button onclick="deleteMonthHistory('${mKey}')" class="ios-btn w-8 h-8 rounded-full bg-red-50 dark:bg-red-900/20 text-red-500 hover:bg-red-100 dark:hover:bg-red-900 flex items-center justify-center transition" title="Usuń dane miesiąca">
+                                <i class="fas fa-trash-alt text-xs"></i>
+                            </button>
+                                                        <span class="text-xs font-bold ${isPaid ? 'text-green-600 dark:text-green-400' : 'text-gray-400'}">${statusText}</span>
                              <button onclick="togglePaymentStatus('${mKey}')" class="w-8 h-8 rounded-full ${isPaid ? 'bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300' : 'bg-gray-100 text-gray-400 dark:bg-gray-700'} flex items-center justify-center transition">
                                 <i class="fas ${isPaid ? 'fa-check' : 'fa-hourglass-half'} text-xs"></i>
                             </button>
@@ -1873,12 +1855,12 @@
                     // Auto check night
                     const isNightRange = isRangeNight(state.workLog[key].start, state.workLog[key].end);
                     if(isNightRange && !state.workLog[key].isNight) state.workLog[key].isNight = true; // Auto enable
-                     
+                     
                     state.workLog[key].val = calcDiff(state.workLog[key].start, state.workLog[key].end, state.workLog[key].isNight);
                 }
             }
             saveState();
-            if (field !== 'val') renderHoursList(); 
+            if (field !== 'val') renderHoursList(); 
             calculateTotalWorkHours();
         }
 
