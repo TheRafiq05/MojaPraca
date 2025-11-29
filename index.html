@@ -43,9 +43,11 @@
             overscroll-behavior-y: none; /* Prevents pull-to-refresh */
         }
 
-        /* FIX: Zwiększony bezpieczny odstęp od góry (obniżenie napisów o 60px + notch) */
+        /* FIX: Pancerne ustawienie odstępu od góry */
         .safe-pt {
-            padding-top: calc(60px + env(safe-area-inset-top));
+            padding-top: 60px !important; /* Fallback */
+            padding-top: calc(40px + constant(safe-area-inset-top)) !important; /* Starsze iOS */
+            padding-top: calc(40px + env(safe-area-inset-top)) !important; /* Nowe iOS */
         }
 
         /* Utilities */
@@ -869,28 +871,28 @@
     <div id="toast">Komunikat</div>
 
     <script>
-        const STORAGE_KEY = "mojgrafik_app_v2_1"; 
+        const STORAGE_KEY = "mojgrafik_app_v2_1"; 
 
         // Global State
         let state = {
-            workLog: {}, 
+            workLog: {}, 
             fixedHours: { enabled: false, type: 'simple', val: 8, start: '08:00', end: '16:00' },
-            paymentStatus: {}, 
-            actualSalary: {}, 
-            monthlyRates: {}, 
+            paymentStatus: {}, 
+            actualSalary: {}, 
+            monthlyRates: {}, 
             listCollapsed: false,
             hourlyRate: "",
             isStudent: true,
             isZus: true,
-            isPit2: true, 
+            isPit2: true, 
             budgetData: {},
             theme: 'light', // 'light' or 'dark'
             chartMode: 'groups' // 'groups' or 'details'
         };
         
-        let editingState = {}; 
+        let editingState = {}; 
         let calendarDate = new Date();
-        let currentCalcMonth = ""; 
+        let currentCalcMonth = ""; 
         
         let newCategoryType = 'fixed';
         let newCategoryColor = 'blue';
@@ -905,10 +907,10 @@
         const colors = [
             { bg: 'bg-red-500', val: 'red', hex: '#EF4444' },
             { bg: 'bg-orange-500', val: 'orange', hex: '#F97316' },
-            { bg: 'bg-amber-500', val: 'amber', hex: '#F59E0B' }, 
-            { bg: 'bg-emerald-500', val: 'emerald', hex: '#10B981' }, 
+            { bg: 'bg-amber-500', val: 'amber', hex: '#F59E0B' }, 
+            { bg: 'bg-emerald-500', val: 'emerald', hex: '#10B981' }, 
             { bg: 'bg-blue-500', val: 'blue', hex: '#3B82F6' },
-            { bg: 'bg-indigo-500', val: 'indigo', hex: '#6366F1' }, 
+            { bg: 'bg-indigo-500', val: 'indigo', hex: '#6366F1' }, 
             { bg: 'bg-purple-500', val: 'purple', hex: '#A855F7' },
             { bg: 'bg-pink-500', val: 'pink', hex: '#EC4899' },
         ];
@@ -921,8 +923,8 @@
                 try {
                     const parsed = JSON.parse(stored);
                     state = { ...state, ...parsed };
-                    if(!state.paymentStatus) state.paymentStatus = {}; 
-                    if(!state.actualSalary) state.actualSalary = {}; 
+                    if(!state.paymentStatus) state.paymentStatus = {}; 
+                    if(!state.actualSalary) state.actualSalary = {}; 
                     if(!state.monthlyRates) state.monthlyRates = {};
                     if(!state.budgetData) state.budgetData = {};
                     if(state.isPit2 === undefined) state.isPit2 = true;
@@ -948,19 +950,19 @@
                 }, 600);
             }, 2000);
         }
-         
+        
         // Unified UI Refresh Function
         function refreshUI() {
             applyTheme();
             updateFixedUI();
-             
+            
             // Sync calc toggles
             document.getElementById('calc-pit2').checked = state.isPit2;
             document.getElementById('theme-toggle').checked = state.theme === 'dark';
-             
+            
             renderCalendar();
             calculateTotalWorkHours();
-            updateCalcContextLabel(); 
+            updateCalcContextLabel(); 
             renderColorPicker();
             renderHistory(); // Ensure history is ready if we switch
             // If budget view is active, render it too
@@ -972,13 +974,13 @@
         function saveState() {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         }
-         
+        
         // Export Data Fix (Blob)
         function exportData() {
             const dataStr = JSON.stringify(state);
             const blob = new Blob([dataStr], {type: "application/json"});
             const url = URL.createObjectURL(blob);
-             
+            
             const linkElement = document.createElement('a');
             linkElement.setAttribute('href', url);
             linkElement.setAttribute('download', 'moj_grafik_backup.json');
@@ -986,7 +988,7 @@
             linkElement.click();
             document.body.removeChild(linkElement);
             URL.revokeObjectURL(url);
-             
+            
             showToast("Pobrano plik backupu");
         }
 
@@ -1013,12 +1015,12 @@
                     if(parsed && typeof parsed === 'object') {
                         state = parsed;
                         saveState();
-                         
+                        
                         // Full Reload of UI State without page reload
-                        refreshUI(); 
+                        refreshUI(); 
                         closeSettings();
                         switchTab('calendar');
-                         
+                        
                         showToast("Kopia wczytana pomyślnie");
                     } else {
                         showToast("Błąd: Nieprawidłowy plik");
@@ -1056,15 +1058,15 @@
         function switchTab(tabId) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.getElementById('view-' + tabId).classList.add('active');
-             
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active-orange', 'active-dark')); 
+            
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active-orange', 'active-dark')); 
             const btn = document.getElementById('nav-' + tabId);
-             
+            
             if(btn) {
-                if(tabId === 'budget') btn.classList.add('active-dark'); 
+                if(tabId === 'budget') btn.classList.add('active-dark'); 
                 else btn.classList.add('active-orange');
             }
-             
+            
             window.scrollTo(0, 0);
 
             if (tabId === 'calendar') {
@@ -1088,12 +1090,12 @@
             const y = calendarDate.getFullYear();
             const m = String(calendarDate.getMonth() + 1).padStart(2, '0');
             currentCalcMonth = `${y}-${m}`;
-             
+            
             calculateTotalWorkHours();
             const sum = document.getElementById('header-hours').innerText;
-             
+            
             switchTab('calculator');
-             
+            
             document.getElementById('calc-hours').value = sum;
             updateCalcUI();
         }
@@ -1127,11 +1129,11 @@
         function renderBudget() {
             const [y, m] = currentCalcMonth.split('-');
             document.getElementById('budget-month-label').innerText = `${monthsNominative[parseInt(m)-1]} ${y}`;
-             
+            
             // 1. Determine Total Income
             let totalIncome = 0;
             let source = "Kalkulator";
-             
+            
             if(state.actualSalary[currentCalcMonth] && state.actualSalary[currentCalcMonth] > 0) {
                 totalIncome = state.actualSalary[currentCalcMonth];
                 source = "Wypłata Rzeczywista";
@@ -1140,16 +1142,16 @@
                 const prefix = `${y}-${m}-`;
                 let sumHours = 0;
                 Object.keys(state.workLog).forEach(k => {
-                    if(k.startsWith(prefix)) sumHours += state.workLog[k].val || 0; 
+                   if(k.startsWith(prefix)) sumHours += state.workLog[k].val || 0; 
                 });
-                 
+                
                 const gross = sumHours * savedRate;
                 let net = gross;
                 if(!state.isStudent && state.isZus) {
                     const spoleczne = gross * 0.1371;
                     const baseHealth = gross - spoleczne;
                     const zdrav = baseHealth * 0.09;
-                    const kup = 250; 
+                    const kup = 250; 
                     const taxBase = Math.round(baseHealth - kup);
                     let tax = Math.round(taxBase * 0.12);
                     if(state.isPit2) tax -= 300;
@@ -1164,7 +1166,7 @@
 
             // 2. Get Expenses
             const expenses = state.budgetData[currentCalcMonth] || [];
-             
+            
             // 3. Process Fixed
             let sumFixed = 0;
             const fixedExpenses = expenses.filter(e => e.type === 'fixed');
@@ -1177,7 +1179,7 @@
             // 5. Process Percent
             const percentExpenses = expenses.filter(e => e.type === 'percent');
             let sumPercentVal = 0;
-             
+            
             const processedPercentItems = percentExpenses.map(e => {
                 const calculatedVal = remainderAfterFixed * (e.val / 100);
                 sumPercentVal += calculatedVal;
@@ -1186,7 +1188,7 @@
 
             // 6. Final Remaining
             let finalRemaining = totalIncome - sumFixed - sumPercentVal;
-             
+            
             document.getElementById('budget-remaining').innerText = finalRemaining.toLocaleString('pl-PL', {minimumFractionDigits: 2});
             document.getElementById('sum-fixed').innerText = sumFixed.toLocaleString('pl-PL', {minimumFractionDigits: 2}) + ' zł';
             document.getElementById('base-for-percent').innerText = `Baza %: ${remainderAfterFixed.toLocaleString('pl-PL', {minimumFractionDigits:0})} zł`;
@@ -1205,7 +1207,7 @@
             // Render Lists (Same as before)
             const listFixed = document.getElementById('list-fixed');
             listFixed.innerHTML = '';
-             
+            
             const bgColors = {
                 'red': 'bg-red-500', 'orange': 'bg-orange-500', 'amber': 'bg-amber-500', 'emerald': 'bg-emerald-500',
                 'green': 'bg-green-500', 'blue': 'bg-blue-500', 'purple': 'bg-purple-500', 'pink': 'bg-pink-500',
@@ -1232,11 +1234,11 @@
 
             const listPercent = document.getElementById('list-percent');
             listPercent.innerHTML = '';
-             
+            
             if(processedPercentItems.length === 0) listPercent.innerHTML = '<div class="text-xs text-center text-gray-400 py-2">Brak budżetów procentowych</div>';
 
             processedPercentItems.forEach(item => {
-                const el = document.createElement('div');
+                 const el = document.createElement('div');
                 el.className = "flex flex-col bg-white dark:bg-darkcard p-3 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm";
                 el.innerHTML = `
                     <div class="flex justify-between items-center mb-1">
@@ -1258,18 +1260,18 @@
 
             // 7. Pie Chart Logic - GRAY Remaining
             const chart = document.getElementById('budget-pie-chart');
-             
+            
             if(totalIncome > 0) {
                 let gradientStr = '';
-                 
+                
                 if (state.chartMode === 'groups') {
                     // Mode: Groups (Fixed Red, Percent Amber, Remaining Gray)
                     const fixedPercent = (sumFixed / totalIncome) * 100;
                     const dynamicPercent = (sumPercentVal / totalIncome) * 100;
-                     
+                    
                     const degFixed = (fixedPercent / 100) * 360;
                     const degPercent = degFixed + ((dynamicPercent / 100) * 360);
-                     
+                    
                     // Fixed (Red), Percent (Amber), Remaining (Gray)
                     gradientStr = `#EF4444 0deg ${degFixed}deg, #F59E0B ${degFixed}deg ${degPercent}deg, #6B7280 ${degPercent}deg 360deg`;
                 } else {
@@ -1277,28 +1279,28 @@
                     const allItems = [...fixedExpenses, ...processedPercentItems];
                     let currentDeg = 0;
                     const parts = [];
-                     
+                    
                     allItems.forEach(item => {
                         const val = item.calculatedVal !== undefined ? item.calculatedVal : item.val;
                         const percent = (val / totalIncome);
                         const deg = percent * 360;
                         const endDeg = currentDeg + deg;
-                         
+                        
                         const colorObj = colors.find(c => c.val === item.color);
                         const colorHex = colorObj ? colorObj.hex : '#9CA3AF';
-                         
+                        
                         parts.push(`${colorHex} ${currentDeg}deg ${endDeg}deg`);
                         currentDeg = endDeg;
                     });
-                     
+                    
                     // Remaining as Gray
                     parts.push(`#6B7280 ${currentDeg}deg 360deg`);
                     gradientStr = parts.join(', ');
                 }
-                 
+                
                 chart.style.setProperty('--chart-gradient', gradientStr);
             } else {
-                chart.style.setProperty('--chart-gradient', `#6B7280 0deg 360deg`); // Gray for empty/100% remaining
+                 chart.style.setProperty('--chart-gradient', `#6B7280 0deg 360deg`); // Gray for empty/100% remaining
             }
         }
 
@@ -1320,7 +1322,7 @@
             const btnFixed = document.getElementById('btn-cat-fixed');
             const btnPercent = document.getElementById('btn-cat-percent');
             const lblVal = document.getElementById('lbl-cat-val');
-             
+            
             if(type === 'fixed') {
                 btnFixed.className = "flex-1 py-2.5 rounded-lg shadow bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition";
                 btnPercent.className = "flex-1 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-200 transition";
@@ -1354,14 +1356,14 @@
         function addCategory() {
             const name = document.getElementById('new-cat-name').value;
             const val = parseFloat(document.getElementById('new-cat-val').value);
-             
+            
             if(!name || isNaN(val)) {
                 showToast("Wypełnij nazwę i wartość!");
                 return;
             }
 
             if(!state.budgetData[currentCalcMonth]) state.budgetData[currentCalcMonth] = [];
-             
+            
             state.budgetData[currentCalcMonth].push({
                 id: Date.now().toString(),
                 name: name,
@@ -1369,7 +1371,7 @@
                 val: val,
                 color: newCategoryColor
             });
-             
+            
             saveState();
             closeAddCategoryModal();
             renderBudget();
@@ -1398,20 +1400,20 @@
         function renderHistory() {
             const container = document.getElementById('history-container');
             const dataByMonth = {};
-            const recordedMonths = new Set(); 
+            const recordedMonths = new Set(); 
 
             Object.keys(state.workLog).forEach(dateKey => {
-                const monthKey = dateKey.substring(0, 7); 
+                const monthKey = dateKey.substring(0, 7); 
                 if (!dataByMonth[monthKey]) dataByMonth[monthKey] = 0;
                 dataByMonth[monthKey] += (state.workLog[dateKey].val || 0);
             });
-             
+            
             Object.keys(state.monthlyRates).forEach(mKey => recordedMonths.add(mKey));
             Object.keys(state.actualSalary).forEach(mKey => recordedMonths.add(mKey));
             Object.keys(dataByMonth).forEach(mKey => recordedMonths.add(mKey));
 
             const displayMonths = Array.from(recordedMonths).sort().reverse();
-             
+            
             if (displayMonths.length === 0) {
                 container.innerHTML = `
                     <div class="ios-card dark:bg-darkcard p-8 text-center border-2 border-dashed border-gray-200 dark:border-gray-800 shadow-none bg-transparent">
@@ -1426,26 +1428,26 @@
             }
 
             container.innerHTML = '';
-             
+            
             displayMonths.forEach(mKey => {
                 const [year, month] = mKey.split('-');
                 const monthName = monthsNominative[parseInt(month) - 1];
-                const totalHours = (dataByMonth[mKey] || 0).toFixed(2); 
-                 
+                const totalHours = (dataByMonth[mKey] || 0).toFixed(2); 
+                
                 const actual = state.actualSalary[mKey] || 0;
                 let isPaid = state.paymentStatus[mKey] === 'paid';
                 let statusText = isPaid ? "Wypłacono" : "Oczekująca";
-                 
+                
                 let calculatedNet = 0;
                 let estimatedEarningsDisplay = "---";
-                 
+                
                 const rateToUse = state.monthlyRates[mKey] ? parseFloat(state.monthlyRates[mKey]) : 0;
-                 
+                
                 if(rateToUse > 0) {
-                    const gross = rateToUse * parseFloat(totalHours);
-                    let net = gross;
-                    
-                    if(!state.isStudent && state.isZus) {
+                      const gross = rateToUse * parseFloat(totalHours);
+                      let net = gross;
+                      
+                      if(!state.isStudent && state.isZus) {
                         const spoleczne = gross * 0.1371;
                         const baseHealth = gross - spoleczne;
                         const zdrav = baseHealth * 0.09;
@@ -1455,18 +1457,18 @@
                         if(state.isPit2) tax -= 300;
                         if(tax < 0) tax = 0;
                         net = gross - spoleczne - zdrav - tax;
-                    }
-                    
-                    // FIX: Rounding to 2 decimal places here
-                    calculatedNet = Math.round(net * 100) / 100;
-                    estimatedEarningsDisplay = calculatedNet.toLocaleString('pl-PL', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' zł';
+                      }
+                      
+                      // FORCE ROUNDING HERE
+                      calculatedNet = Math.round(net * 100) / 100;
+                      estimatedEarningsDisplay = calculatedNet.toLocaleString('pl-PL', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' zł';
                 }
 
                 // Profit/Loss
                 let diffHtml = '';
                 if (actual > 0 && calculatedNet > 0) {
                     const diff = actual - calculatedNet;
-                    if (Math.abs(diff) < 0.01) { // FIX: Smaller tolerance for float comparison
+                    if (Math.abs(diff) < 0.01) { // Tolerance for float
                         diffHtml = '<span class="text-gray-400 font-bold text-xs">Idealnie</span>';
                     } else if (diff > 0) {
                         diffHtml = `<span class="text-green-600 font-bold text-xs">+${diff.toLocaleString('pl-PL', {minimumFractionDigits:2, maximumFractionDigits: 2})} zł</span>`;
@@ -1474,13 +1476,13 @@
                         diffHtml = `<span class="text-red-500 font-bold text-xs">${diff.toLocaleString('pl-PL', {minimumFractionDigits:2, maximumFractionDigits: 2})} zł</span>`;
                     }
                 }
-                 
+                
                 const rateSummary = rateToUse > 0 ? `${totalHours}h × ${rateToUse.toFixed(2)}` : `${totalHours}h (brak stawki)`;
                 const isFinalized = isPaid && actual > 0;
 
                 const div = document.createElement('div');
                 div.className = "ios-card dark:bg-darkcard p-5 border border-gray-100 dark:border-gray-800 flex flex-col gap-3";
-                 
+                
                 let contentHTML = '';
 
                 if (isFinalized) {
