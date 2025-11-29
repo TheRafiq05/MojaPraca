@@ -1,12 +1,8 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pl" class="">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    
-    <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" href="icon-192.png">       
-    <link rel="apple-touch-icon" href="icon-192.png">            
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#ffffff">
@@ -36,20 +32,11 @@
             --primary-color: #F97316; /* Orange-500 */
         }
 
-        html, body {
-            height: 100%;
-            overflow-x: hidden;
-        }
-
         body {
             font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
-            padding-bottom: calc(90px + env(safe-area-inset-bottom));
-            overscroll-behavior-y: none;
-        }
-
-        .safe-pt {
-            padding-top: calc(50px + env(safe-area-inset-top)) !important;
+            padding-bottom: calc(90px + env(safe-area-inset-bottom)); /* Safe area for iPhone */
+            overscroll-behavior-y: none; /* Prevents pull-to-refresh */
         }
 
         /* Utilities */
@@ -71,28 +58,65 @@
             transform: scale(0.96);
         }
 
-        button:focus { outline: none; }
+        /* Remove focus outline for buttons to prevent glitch */
+        button:focus {
+            outline: none;
+        }
+
         .tabular-nums { font-variant-numeric: tabular-nums; }
 
-        /* SPLASH SCREEN */
+        /* SPLASH SCREEN STYLES */
         #splash-screen {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100dvh;
-            background-color: #F5F5F7; z-index: 9999;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #F5F5F7; /* Light mode bg */
+            z-index: 9999;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
             transition: opacity 0.6s cubic-bezier(0.65, 0, 0.35, 1), visibility 0.6s;
         }
-        .dark #splash-screen { background-color: #000000; }
-        #splash-screen.hide-splash { opacity: 0; visibility: hidden; pointer-events: none; }
-
-        .splash-logo-container {
-            width: 96px; height: 96px;
-            background: linear-gradient(135deg, #F97316 0%, #EC4899 100%);
-            border-radius: 28px; display: flex; align-items: center; justify-content: center;
-            margin-bottom: 24px; box-shadow: 0 20px 40px -10px rgba(249, 115, 22, 0.5);
-            animation: logo-breathe 3s ease-in-out infinite; position: relative; overflow: hidden;
+        .dark #splash-screen {
+            background-color: #000000; /* Dark mode bg */
         }
+        
+        #splash-screen.hide-splash {
+            opacity: 0;
+            visibility: hidden;
+            pointer-events: none;
+        }
+
+        /* Minimalist Modern Logo Container */
+        .splash-logo-container {
+            width: 96px;
+            height: 96px;
+            /* Modern Gradient: Orange to Coral Red */
+            background: linear-gradient(135deg, #F97316 0%, #EC4899 100%);
+            border-radius: 28px; /* Squircle shape */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 24px;
+            /* Soft, colored shadow */
+            box-shadow: 0 20px 40px -10px rgba(249, 115, 22, 0.5);
+            /* Breathing animation */
+            animation: logo-breathe 3s ease-in-out infinite;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        /* Subtle shine effect overlay */
         .splash-logo-container::after {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: linear-gradient(to bottom right, rgba(255,255,255,0.2) 0%, rgba(255,255,255,0) 50%);
             pointer-events: none;
         }
@@ -104,116 +128,216 @@
 
         /* Calendar Styles */
         .calendar-day {
-            aspect-ratio: 1; display: flex; flex-direction: column; align-items: center; justify-content: center;
-            border-radius: 12px; font-size: 14px; font-weight: 500; cursor: pointer; transition: all 0.2s;
-            user-select: none; position: relative; background: white; border: 1px solid transparent;
+            aspect-ratio: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border-radius: 12px;
+            font-size: 14px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            user-select: none;
+            position: relative;
+            background: white;
+            border: 1px solid transparent;
         }
         .calendar-day.selected {
-            background-color: var(--primary-color) !important; color: white !important; font-weight: 700;
-            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3); border-color: transparent !important; z-index: 10;
+            background-color: var(--primary-color) !important;
+            color: white !important;
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
+            border-color: transparent !important;
+            z-index: 10;
         }
+        /* Weekend Styling */
         .calendar-day.weekend-sat { color: #9CA3AF; background-color: #F9FAFB; }
         .calendar-day.weekend-sun { color: #EF4444; background-color: #FEF2F2; }
-        .calendar-day.selected.weekend-sat, .calendar-day.selected.weekend-sun {
-            background-color: var(--primary-color) !important; color: white !important;
+        
+        /* Selected Weekend Ring Override */
+        .calendar-day.selected.weekend-sat,
+        .calendar-day.selected.weekend-sun {
+            background-color: var(--primary-color) !important; 
+            color: white !important;
             box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
         }
-        .calendar-day.today { border-color: var(--primary-color); color: var(--primary-color); }
-        .calendar-day.selected.today { border-color: transparent; color: white !important; }
-        .calendar-day.night-shift { background: linear-gradient(135deg, white 60%, #EEF2FF 100%); border: 1px solid #E0E7FF; }
-        .calendar-day.selected.night-shift { background: linear-gradient(135deg, #F97316 60%, #4F46E5 100%) !important; border: none; }
-        .calendar-day.night-shift::before {
-            content: '\f186'; font-family: "Font Awesome 6 Free"; font-weight: 900; position: absolute;
-            top: 4px; right: 4px; font-size: 8px; color: #6366f1;
+        
+        /* Today marker */
+        .calendar-day.today {
+            border-color: var(--primary-color);
+            color: var(--primary-color);
         }
-        .calendar-day.selected.night-shift::before { color: white; }
+        .calendar-day.selected.today {
+            border-color: transparent;
+            color: white !important;
+        }
 
-        .dark .calendar-day:not(.selected) { background-color: #2C2C2E; color: #E5E7EB; border-color: #3f3f46; }
+        /* Night Shift Marker (Moon Icon) */
+        .calendar-day.night-shift {
+            background: linear-gradient(135deg, white 60%, #EEF2FF 100%);
+            border: 1px solid #E0E7FF;
+        }
+        .calendar-day.selected.night-shift {
+            background: linear-gradient(135deg, #F97316 60%, #4F46E5 100%) !important;
+            border: none;
+        }
+        .calendar-day.night-shift::before {
+            content: '\f186'; /* Moon icon */
+            font-family: "Font Awesome 6 Free";
+            font-weight: 900;
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            font-size: 8px;
+            color: #6366f1;
+        }
+        .calendar-day.selected.night-shift::before {
+            color: white; 
+        }
+
+        /* Dark Mode Calendar Overrides */
+        .dark .calendar-day:not(.selected) {
+            background-color: #2C2C2E;
+            color: #E5E7EB;
+            border-color: #3f3f46;
+        }
         .dark .calendar-day.weekend-sat { background-color: #27272a; color: #9ca3af; }
         .dark .calendar-day.weekend-sun { background-color: #271c1c; color: #f87171; }
-        .dark .calendar-day.night-shift:not(.selected) { background: linear-gradient(135deg, #2C2C2E 60%, #312e81 100%); border-color: #4338ca; }
+        .dark .calendar-day.night-shift:not(.selected) {
+            background: linear-gradient(135deg, #2C2C2E 60%, #312e81 100%);
+            border-color: #4338ca;
+        }
         .dark .calendar-day:not(.selected):hover { background-color: #3f3f46; }
         .dark .calendar-day.empty { background: transparent; }
-        .dark .calendar-day.today:not(.selected) {
-            border-color: var(--primary-color) !important; color: var(--primary-color) !important;
-            background-color: rgba(249, 115, 22, 0.1); box-shadow: 0 0 8px rgba(249, 115, 22, 0.3);
+
+
+        /* Hours badge on calendar day */
+        .day-hours-badge {
+            font-size: 9px;
+            margin-top: 1px;
+            opacity: 0.95;
+            font-weight: 600;
         }
 
-        .day-hours-badge { font-size: 9px; margin-top: 1px; opacity: 0.95; font-weight: 600; }
         .calendar-day:not(.selected):hover { background-color: #F3F4F6; }
         .calendar-day.empty { pointer-events: none; background: transparent; }
 
         /* Navigation */
-        .nav-item { transition: all 0.2s; outline: none; }
-        .nav-item:active { transform: scale(0.9); }
+        .nav-item { transition: color 0.2s; outline: none; }
+        .nav-item:focus { outline: none; }
         .nav-item.active-orange { color: #F97316; } 
         .nav-item.active-dark { color: #111827; } 
+        
+        /* Nav Dark Mode */
         .dark .nav-item.active-dark { color: #ffffff; }
-        .dark .nav-item { color: #8E8E93; } /* iOS Gray */
+        .dark .nav-item { color: #6b7280; }
         .dark .nav-item.active-orange { color: #F97316; }
 
         .view-section { display: none; animation: fadeIn 0.2s ease-out; }
         .view-section.active { display: block; }
+
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         /* Modal */
         .modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); z-index: 90;
-            display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            z-index: 90; display: none; align-items: center; justify-content: center;
+            opacity: 0; transition: opacity 0.3s;
         }
+        /* Boost confirm modal z-index to ensure it is above settings */
         #confirm-modal { z-index: 120; }
         #ios-install-modal { z-index: 110; }
+
         .modal-overlay.show { display: flex; opacity: 1; }
         .modal-content {
-            background: white; width: 90%; max-width: 340px; border-radius: 28px; padding: 24px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2); transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            background: white; width: 90%; max-width: 340px;
+            border-radius: 28px; padding: 24px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            transform: scale(0.95); transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
         .dark .modal-content { background-color: #1C1C1E; border: 1px solid #2C2C2E; }
+        
         .modal-overlay.show .modal-content { transform: scale(1); }
 
         /* Toast */
         #toast {
-            visibility: hidden; min-width: 200px; background-color: rgba(30, 30, 30, 0.9); color: #fff; text-align: center;
-            border-radius: 50px; padding: 12px 24px; position: fixed; z-index: 100; left: 50%; bottom: 110px;
-            transform: translateX(-50%) translateY(20px); font-size: 14px; font-weight: 500; opacity: 0;
-            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55); backdrop-filter: blur(4px);
+            visibility: hidden;
+            min-width: 200px;
+            background-color: rgba(30, 30, 30, 0.9);
+            color: #fff;
+            text-align: center;
+            border-radius: 50px;
+            padding: 12px 24px;
+            position: fixed;
+            z-index: 100;
+            left: 50%;
+            bottom: 110px;
+            transform: translateX(-50%) translateY(20px);
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            backdrop-filter: blur(4px);
             box-shadow: 0 10px 30px rgba(0,0,0,0.15);
         }
         #toast.show { visibility: visible; opacity: 1; transform: translateX(-50%) translateY(0); }
 
         /* Pie Chart */
         .pie-chart {
-            width: 120px; height: 120px; border-radius: 50%;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            /* Gradient will be injected via style tag or JS */
             background: conic-gradient(var(--chart-gradient, #6B7280 0% 100%));
-            position: relative; margin: 0 auto; box-shadow: 0 10px 20px rgba(0,0,0,0.2); transition: background 0.5s ease;
+            position: relative;
+            margin: 0 auto;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            transition: background 0.5s ease;
         }
         .pie-chart::after {
-            content: ''; position: absolute; inset: 20px; background: #1F2937; border-radius: 50%; transition: background 0.3s;
+            content: '';
+            position: absolute;
+            inset: 20px;
+            background: #1F2937; /* Default Dark Card */
+            border-radius: 50%;
+            transition: background 0.3s;
         }
-        .dark .pie-chart::after { background: #111827; }
-
+        .dark .pie-chart::after {
+            background: #111827; 
+        }
+        
         /* Toggle Switch */
-        .toggle-checkbox:checked { right: 0; border-color: #F97316; }
-        .toggle-checkbox:checked + .toggle-label { background-color: #F97316; }
+        .toggle-checkbox:checked {
+            right: 0;
+            border-color: #F97316;
+        }
+        .toggle-checkbox:checked + .toggle-label {
+            background-color: #F97316;
+        }
     </style>
 </head>
 <body class="bg-[#F5F5F7] text-[#1D1D1F] dark:bg-darkbg dark:text-gray-100 transition-colors duration-300">
 
-    <!-- Splash Screen -->
+    <!-- ================= SPLASH SCREEN ================= -->
     <div id="splash-screen">
         <div class="splash-logo-container">
+            <!-- Modern Minimalist Abstract "M" / Pulse Logo -->
             <svg width="48" height="48" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M4 12H7L10 6L14 18L17 12H20" stroke="white" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
         </div>
         <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white tracking-tight mb-2">MojaPraca</h1>
         <p class="text-gray-400 text-xs font-bold uppercase tracking-widest">Aplikacja dla Pracowników</p>
-        <div class="absolute bottom-10 text-gray-300 text-[10px]">Ładowanie...</div>
+        
+        <div class="absolute bottom-10 text-gray-300 text-[10px]">
+            Ładowanie...
+        </div>
     </div>
 
-    <!-- View: Calendar -->
-    <div id="view-calendar" class="view-section active max-w-lg mx-auto p-4 safe-pt">
+    <!-- ================= VIEW 1: GRAFIK (CALENDAR) ================= -->
+    <div id="view-calendar" class="view-section active max-w-lg mx-auto p-4 pt-8">
         <header class="flex justify-between items-center mb-6">
             <div>
                 <p class="text-xs text-orange-500 font-bold uppercase tracking-wide">Ewidencja czasu</p>
@@ -226,6 +350,7 @@
             </div>
         </header>
 
+        <!-- Summary Card -->
         <div class="ios-card bg-gray-900 dark:bg-darkcard text-white p-5 mb-5 shadow-xl relative overflow-hidden">
             <div class="absolute -right-6 -top-6 w-32 h-32 bg-orange-500 rounded-full opacity-10 blur-xl"></div>
             <div class="absolute -left-6 -bottom-6 w-32 h-32 bg-blue-500 rounded-full opacity-10 blur-xl"></div>
@@ -241,6 +366,7 @@
             </div>
         </div>
 
+        <!-- Fixed Hours Toggle -->
         <div class="ios-card dark:bg-darkcard p-4 mb-4 border border-orange-100 dark:border-gray-800 bg-orange-50/50 dark:bg-gray-800/30">
             <div class="flex items-center justify-between">
                 <div class="flex items-center gap-3">
@@ -256,12 +382,14 @@
                 </label>
             </div>
             
+            <!-- Manual Mode Hint (Visible when quick add is OFF) -->
             <div id="manual-mode-hint" class="hidden mt-3 pt-2 border-t border-orange-200/50 dark:border-gray-700 text-center">
                 <p class="text-[10px] font-bold text-orange-600 dark:text-orange-400"><i class="fas fa-hand-pointer mr-1"></i> Tryb ręczny. Kliknij dzień, aby otworzyć edycję.</p>
             </div>
 
+            <!-- Settings for Fixed Hours -->
             <div id="fixed-hours-settings" class="hidden mt-4 pt-3 border-t border-orange-200/50 dark:border-gray-700">
-                <div class="flex justify-center bg-gray-200/50 dark:bg-gray-700 rounded-lg p-1 text-xs mb-3 mx-auto max-w-[220px]">
+                 <div class="flex justify-center bg-gray-200/50 dark:bg-gray-700 rounded-lg p-1 text-xs mb-3 mx-auto max-w-[220px]">
                     <button onclick="setFixedType('simple')" id="fixed-type-simple" class="flex-1 py-1.5 rounded-md transition font-bold text-center">Liczba</button>
                     <button onclick="setFixedType('range')" id="fixed-type-range" class="flex-1 py-1.5 rounded-md transition font-bold text-center">Zegar</button>
                 </div>
@@ -281,6 +409,7 @@
             </div>
         </div>
 
+        <!-- Calendar -->
         <div class="ios-card dark:bg-darkcard p-4 mb-4">
             <div class="flex justify-between items-center mb-5 px-1">
                 <button onclick="changeMonth(-1)" class="w-9 h-9 flex items-center justify-center rounded-full bg-gray-50 dark:bg-gray-700 hover:bg-gray-100 transition text-gray-600 dark:text-gray-300"><i class="fas fa-chevron-left"></i></button>
@@ -296,6 +425,7 @@
             <div id="calendar-grid" class="grid grid-cols-7 gap-1.5"></div>
         </div>
 
+        <!-- List Header -->
         <div class="flex justify-between items-end mt-8 mb-3 px-2">
             <h3 class="text-sm font-bold text-gray-500 uppercase tracking-wider">Szczegóły dni</h3>
             <button onclick="toggleListCollapse()" class="text-orange-500 text-xs font-bold hover:text-orange-600 flex items-center gap-1 bg-orange-50 dark:bg-gray-800 px-3 py-1.5 rounded-lg transition">
@@ -303,14 +433,15 @@
             </button>
         </div>
 
+        <!-- Hours List -->
         <div id="hours-list-container" class="space-y-3 pb-8"></div>
         <div id="hours-list-summary" class="hidden bg-white dark:bg-darkcard rounded-xl p-6 text-center border border-gray-200 dark:border-gray-800 text-gray-500 text-sm shadow-sm">
             Lista zwinięta. <span class="font-bold text-gray-900 dark:text-white" id="hidden-count">0</span> dni pracy.
         </div>
     </div>
 
-    <!-- View: History -->
-    <div id="view-history" class="view-section max-w-lg mx-auto p-4 safe-pt">
+    <!-- ================= VIEW 2: WYPŁATY (HISTORY) ================= -->
+    <div id="view-history" class="view-section max-w-lg mx-auto p-4 pt-8">
         <header class="flex justify-between items-center mb-6">
             <div>
                 <p class="text-xs text-orange-500 font-bold uppercase tracking-wide">Moje</p>
@@ -335,8 +466,8 @@
         </div>
     </div>
 
-    <!-- View: Budget -->
-    <div id="view-budget" class="view-section max-w-lg mx-auto p-4 safe-pt">
+    <!-- ================= VIEW 4: PLANER (BUDGET) ================= -->
+    <div id="view-budget" class="view-section max-w-lg mx-auto p-4 pt-8">
         <header class="flex justify-between items-center mb-6">
             <div>
                 <p class="text-xs text-orange-500 font-bold uppercase tracking-wide">Mój</p>
@@ -347,6 +478,7 @@
             </div>
         </header>
 
+        <!-- Context Info -->
         <div class="mb-4 px-2 flex justify-between items-center">
             <div>
                 <h3 id="budget-month-label" class="text-lg font-bold text-gray-800 dark:text-white capitalize"></h3>
@@ -360,7 +492,9 @@
             </div>
         </div>
 
+        <!-- Main Budget Card -->
         <div class="ios-card bg-gray-800 dark:bg-gray-900 text-white p-6 mb-6 shadow-xl relative overflow-hidden">
+            <!-- Chart Toggle -->
             <div class="absolute top-4 right-4 z-20 bg-gray-700 rounded-lg p-0.5 flex text-[10px] font-bold">
                 <button onclick="setChartMode('groups')" id="chart-mode-groups" class="px-2 py-1 rounded bg-gray-600 text-white shadow transition">Grupuj</button>
                 <button onclick="setChartMode('details')" id="chart-mode-details" class="px-2 py-1 rounded text-gray-400 hover:text-white transition">Szczegóły</button>
@@ -368,6 +502,7 @@
 
             <div class="flex items-center gap-6 relative z-10 pt-4">
                 <div class="flex-shrink-0">
+                    <!-- Chart color logic handled in JS -->
                     <div class="pie-chart" id="budget-pie-chart"></div>
                 </div>
                 <div class="flex-grow">
@@ -382,6 +517,7 @@
             </div>
         </div>
 
+        <!-- Controls -->
         <div class="flex gap-2 mb-6">
             <button onclick="openAddCategoryModal()" class="ios-btn flex-1 bg-gray-900 dark:bg-darkcard dark:border dark:border-gray-700 text-white py-3 rounded-xl font-bold text-sm shadow-md transition flex items-center justify-center gap-2 hover:bg-black">
                 <i class="fas fa-plus-circle"></i> Dodaj wydatek
@@ -391,7 +527,9 @@
             </button>
         </div>
 
+        <!-- Categories List -->
         <div id="budget-categories-list" class="space-y-6 pb-20">
+            <!-- Fixed Expenses Section -->
             <div id="section-fixed">
                 <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 px-2 flex justify-between items-center">
                     <span class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-red-500"></div> Opłaty Stałe</span>
@@ -400,6 +538,7 @@
                 <div id="list-fixed" class="space-y-2"></div>
             </div>
 
+            <!-- Percent Expenses Section -->
             <div id="section-percent">
                 <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 px-2 flex justify-between items-center">
                      <span class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-amber-500"></div> Budżety (%)</span>
@@ -410,8 +549,8 @@
         </div>
     </div>
 
-    <!-- View: Calculator -->
-    <div id="view-calculator" class="view-section max-w-lg mx-auto p-4 safe-pt">
+    <!-- ================= VIEW 3: KALKULATOR ================= -->
+    <div id="view-calculator" class="view-section max-w-lg mx-auto p-4 pt-8">
         <header class="flex justify-between items-center mb-6">
             <div>
                 <p class="text-xs text-blue-600 font-bold uppercase tracking-wide">Finanse</p>
@@ -423,6 +562,7 @@
         </header>
 
         <div class="ios-card dark:bg-darkcard p-6 space-y-6">
+            <!-- Inputs -->
             <div class="grid grid-cols-2 gap-4">
                 <div>
                     <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2">Stawka / h (Brutto)</label>
@@ -437,14 +577,16 @@
                 </div>
             </div>
 
+            <!-- Toggles -->
             <div class="space-y-3">
+                <!-- Student Toggle -->
                 <div class="flex items-center justify-between bg-blue-50/50 dark:bg-blue-900/20 p-3.5 rounded-xl border border-blue-100 dark:border-blue-800">
                     <div class="flex items-center gap-3">
                         <div class="w-8 h-8 bg-blue-100 dark:bg-blue-800 rounded-full flex items-center justify-center text-blue-600 dark:text-blue-200">
                             <i class="fas fa-user-graduate text-xs"></i>
                         </div>
                         <div>
-                            <p class="text-sm font-bold text-blue-900 dark:text-blue-200">Student / Uczeń < 26 lat</p>
+                            <p class="text-sm font-bold text-blue-900 dark:text-blue-200">Student < 26 lat</p>
                             <p class="text-[10px] text-blue-600 dark:text-blue-400 opacity-80">0% PIT, brak ZUS</p>
                         </div>
                     </div>
@@ -454,6 +596,7 @@
                     </label>
                 </div>
 
+                <!-- ZUS Toggle -->
                 <div id="calc-zus-wrapper" class="hidden flex flex-col gap-3">
                     <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3.5 rounded-xl border border-gray-200 dark:border-gray-700">
                         <div class="flex items-center gap-3">
@@ -471,7 +614,8 @@
                         </label>
                     </div>
 
-                    <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3.5 rounded-xl border border-gray-200 dark:border-gray-700">
+                    <!-- Ulga podatkowa -->
+                     <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3.5 rounded-xl border border-gray-200 dark:border-gray-700">
                         <div class="flex items-center gap-3">
                             <div class="w-8 h-8 bg-gray-200 dark:bg-gray-700 rounded-full flex items-center justify-center text-gray-600 dark:text-gray-300">
                                 <i class="fas fa-file-signature text-xs"></i>
@@ -489,6 +633,7 @@
                 </div>
             </div>
 
+            <!-- Breakdown -->
             <div id="calc-breakdown" class="hidden text-xs text-gray-500 dark:text-gray-400 space-y-1.5 bg-gray-50 dark:bg-gray-800 p-4 rounded-xl border border-gray-100 dark:border-gray-700">
                 <p class="font-bold text-gray-800 dark:text-gray-300 mb-2 border-b border-gray-200 dark:border-gray-600 pb-1">Szczegóły potrąceń:</p>
                 <div class="flex justify-between" id="row-emerytalne"><span>Emerytalne (9,76%):</span> <span id="val-emerytalne" class="font-mono text-gray-900 dark:text-white">0.00</span></div>
@@ -503,6 +648,7 @@
                 </div>
             </div>
 
+            <!-- Result -->
             <div class="bg-gray-900 dark:bg-black text-white rounded-2xl p-6 text-center shadow-xl shadow-gray-300 dark:shadow-none mt-4 relative overflow-hidden border border-gray-800">
                 <div class="absolute top-0 right-0 w-20 h-20 bg-white opacity-5 rounded-full -mr-10 -mt-10"></div>
                 <p class="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-1">Do wypłaty (Netto)</p>
@@ -510,6 +656,7 @@
                 <p class="text-xs text-gray-500 mt-2 font-mono" id="calc-gross-preview">Brutto: 0.00 zł</p>
             </div>
             
+            <!-- Save to History Action -->
             <div class="bg-gray-100 dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 text-center">
                 <p id="calc-context-label" class="text-xs font-bold text-gray-500 mb-3">Obliczenia dla: -</p>
                 <button onclick="saveCalcToHistory()" class="ios-btn w-full bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm px-5 py-3 transition shadow-md shadow-blue-200">
@@ -519,7 +666,7 @@
         </div>
     </div>
 
-    <!-- Modals -->
+    <!-- ================= MODALS ================= -->
     <div id="settings-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="flex justify-between items-center mb-6">
@@ -530,6 +677,7 @@
             </div>
             
             <div class="space-y-4">
+                 <!-- Theme Toggle -->
                  <div class="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3 rounded-xl">
                     <div class="flex items-center gap-3">
                         <div class="w-8 h-8 bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 rounded-full flex items-center justify-center">
@@ -543,6 +691,7 @@
                     </label>
                  </div>
 
+                 <!-- iOS Install Button -->
                  <div class="bg-gray-50 dark:bg-gray-800 p-3 rounded-xl flex items-center justify-between cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 transition" onclick="openIOSInstructions()">
                     <div class="flex items-center gap-3">
                         <div class="w-8 h-8 bg-blue-100 dark:bg-blue-900 text-blue-600 dark:text-blue-300 rounded-full flex items-center justify-center">
@@ -556,6 +705,7 @@
                  <div class="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-xl border border-blue-100 dark:border-blue-800">
                     <h4 class="font-bold text-blue-900 dark:text-blue-200 text-sm mb-2"><i class="fas fa-file-export mr-1"></i> Zarządzanie danymi</h4>
                     
+                    <!-- Separate Import Logic -->
                     <div class="space-y-3">
                         <button onclick="exportData()" class="w-full bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-300 text-xs font-bold py-2.5 rounded-lg border border-blue-200 dark:border-blue-800 shadow-sm flex items-center justify-center gap-2">
                             <i class="fas fa-download"></i> Pobierz kopię (Eksport)
@@ -567,6 +717,7 @@
                                 <input type="file" id="import-file" class="hidden" onchange="handleFileSelect(this)">
                             </label>
                             
+                            <!-- Import Button: Disabled by default -->
                             <button id="btn-confirm-import" onclick="executeImport()" disabled class="w-full bg-gray-300 dark:bg-gray-700 text-white text-xs font-bold py-2.5 rounded-lg shadow-sm transition cursor-not-allowed">
                                 <i class="fas fa-upload mr-1"></i> Wczytaj kopię
                             </button>
@@ -589,6 +740,7 @@
         </div>
     </div>
 
+    <!-- iOS Install Modal -->
     <div id="ios-install-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="flex justify-between items-center mb-4">
@@ -626,6 +778,7 @@
         </div>
     </div>
 
+    <!-- Add Category Modal -->
     <div id="add-category-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="flex justify-between items-center mb-6">
@@ -636,6 +789,7 @@
             </div>
 
             <div class="space-y-4">
+                <!-- Type Selection -->
                 <div class="bg-gray-100 dark:bg-gray-800 p-1 rounded-xl flex text-xs font-bold">
                     <button onclick="setCategoryType('fixed')" id="btn-cat-fixed" class="flex-1 py-2.5 rounded-lg shadow bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition">Kwota (Stała)</button>
                     <button onclick="setCategoryType('percent')" id="btn-cat-percent" class="flex-1 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-200 transition">Procent %</button>
@@ -663,6 +817,7 @@
         </div>
     </div>
 
+    <!-- Confirmation Modal -->
     <div id="confirm-modal" class="modal-overlay">
         <div class="modal-content text-center">
             <div class="w-16 h-16 bg-red-100 text-red-500 rounded-full flex items-center justify-center mx-auto mb-4 animate-pulse">
@@ -677,7 +832,7 @@
         </div>
     </div>
 
-    <!-- NEW FOOTER IMPLEMENTATION -->
+    <!-- ================= BOTTOM NAVIGATION ================= -->
     <div class="fixed bottom-0 left-0 w-full bg-white/80 dark:bg-darkcard/90 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800 z-50 safe-area-bottom">
         <div class="flex justify-around items-center h-[70px] max-w-lg mx-auto pb-1">
             <button onclick="switchTab('calendar')" id="nav-calendar" class="nav-item active-orange flex flex-col items-center gap-1 p-2 w-20 rounded-xl">
@@ -694,7 +849,7 @@
             </button>
         </div>
     </div>
- 
+
     <div id="toast">Komunikat</div>
 
     <script>
@@ -1224,24 +1379,6 @@
         }
 
         // --- History Logic ---
-        
-        function deleteMonthHistory(mKey) {
-            const [year, month] = mKey.split('-');
-            const monthName = monthsNominative[parseInt(month) - 1];
-            
-            showConfirm(`Usunąć wszystkie dane wypłaty i budżetu dla miesiąca: ${monthName} ${year}?`, () => {
-                // Usuń wszystkie powiązane dane z historii
-                if (state.monthlyRates[mKey]) delete state.monthlyRates[mKey];
-                if (state.actualSalary[mKey]) delete state.actualSalary[mKey];
-                if (state.paymentStatus[mKey]) delete state.paymentStatus[mKey];
-                if (state.budgetData[mKey]) delete state.budgetData[mKey];
-                
-                saveState();
-                renderHistory();
-                showToast("Usunięto dane miesiąca!");
-            });
-        }
-        
         function renderHistory() {
             const container = document.getElementById('history-container');
             const dataByMonth = {};
@@ -1304,21 +1441,20 @@
                         net = gross - spoleczne - zdrav - tax;
                       }
                       
-                      // FORCE ROUNDING HERE
-                      calculatedNet = Math.round(net * 100) / 100;
-                      estimatedEarningsDisplay = calculatedNet.toLocaleString('pl-PL', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' zł';
+                      calculatedNet = net;
+                      estimatedEarningsDisplay = calculatedNet.toLocaleString('pl-PL', {minimumFractionDigits: 2}) + ' zł';
                 }
 
                 // Profit/Loss
                 let diffHtml = '';
                 if (actual > 0 && calculatedNet > 0) {
                     const diff = actual - calculatedNet;
-                    if (Math.abs(diff) < 0.01) { // Tolerance for float
+                    if (Math.abs(diff) < 1) {
                         diffHtml = '<span class="text-gray-400 font-bold text-xs">Idealnie</span>';
                     } else if (diff > 0) {
-                        diffHtml = `<span class="text-green-600 font-bold text-xs">+${diff.toLocaleString('pl-PL', {minimumFractionDigits:2, maximumFractionDigits: 2})} zł</span>`;
+                        diffHtml = `<span class="text-green-600 font-bold text-xs">+${diff.toLocaleString('pl-PL', {minimumFractionDigits:2})} zł</span>`;
                     } else {
-                        diffHtml = `<span class="text-red-500 font-bold text-xs">${diff.toLocaleString('pl-PL', {minimumFractionDigits:2, maximumFractionDigits: 2})} zł</span>`;
+                        diffHtml = `<span class="text-red-500 font-bold text-xs">${diff.toLocaleString('pl-PL', {minimumFractionDigits:2})} zł</span>`;
                     }
                 }
                 
@@ -1339,7 +1475,7 @@
                             </div>
                             <div class="flex justify-between items-center text-sm">
                                 <span class="text-gray-500 dark:text-gray-400">Do ręki</span>
-                                <span class="font-bold text-gray-900 dark:text-white">${actual.toLocaleString('pl-PL', {minimumFractionDigits: 2, maximumFractionDigits: 2})} zł</span>
+                                <span class="font-bold text-gray-900 dark:text-white">${actual.toLocaleString('pl-PL', {minimumFractionDigits: 2})} zł</span>
                             </div>
                              <div class="flex justify-between items-center text-sm pt-2 border-t border-gray-200 dark:border-gray-700">
                                 <span class="text-gray-400 font-bold text-xs uppercase">Różnica</span>
@@ -1388,10 +1524,7 @@
                             <h2 class="text-xl font-bold text-gray-900 dark:text-white capitalize">${monthName}</h2>
                         </div>
                         <div class="flex items-center gap-2">
-                                                        <button onclick="deleteMonthHistory('${mKey}')" class="ios-btn w-8 h-8 rounded-full bg-red-50 dark:bg-red-900/20 text-red-500 hover:bg-red-100 dark:hover:bg-red-900 flex items-center justify-center transition" title="Usuń dane miesiąca">
-                                <i class="fas fa-trash-alt text-xs"></i>
-                            </button>
-                                                        <span class="text-xs font-bold ${isPaid ? 'text-green-600 dark:text-green-400' : 'text-gray-400'}">${statusText}</span>
+                             <span class="text-xs font-bold ${isPaid ? 'text-green-600 dark:text-green-400' : 'text-gray-400'}">${statusText}</span>
                              <button onclick="togglePaymentStatus('${mKey}')" class="w-8 h-8 rounded-full ${isPaid ? 'bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300' : 'bg-gray-100 text-gray-400 dark:bg-gray-700'} flex items-center justify-center transition">
                                 <i class="fas ${isPaid ? 'fa-check' : 'fa-hourglass-half'} text-xs"></i>
                             </button>
@@ -1713,9 +1846,9 @@
                 state.workLog[key][field] = val;
                 if (state.workLog[key].type === 'range') {
                     // Auto check night
-                    const isNightRange = isRangeNight(state.workLog[key].start, state.workLog[key].end);
-                    if(isNightRange && !state.workLog[key].isNight) state.workLog[key].isNight = true; // Auto enable
-                      
+                     const isNightRange = isRangeNight(state.workLog[key].start, state.workLog[key].end);
+                     if(isNightRange && !state.workLog[key].isNight) state.workLog[key].isNight = true; // Auto enable
+                     
                     state.workLog[key].val = calcDiff(state.workLog[key].start, state.workLog[key].end, state.workLog[key].isNight);
                 }
             }
@@ -1763,13 +1896,13 @@
             const isSimple = state.fixedHours.type === 'simple';
             document.getElementById('fixed-type-simple').className = `flex-1 py-1.5 rounded-md transition font-bold text-center ${isSimple ? 'bg-orange-500 text-white shadow' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'}`;
             document.getElementById('fixed-type-range').className = `flex-1 py-1.5 rounded-md transition font-bold text-center ${!isSimple ? 'bg-orange-500 text-white shadow' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'}`;
-             
+            
             document.getElementById('fixed-input-simple').classList.toggle('hidden', !isSimple);
             document.getElementById('fixed-input-range').classList.toggle('hidden', isSimple);
-             
+            
             const val = state.fixedHours.val;
             document.getElementById('fixed-val').value = val > 0 ? val : '';
-             
+            
             document.getElementById('fixed-start').value = state.fixedHours.start;
             document.getElementById('fixed-end').value = state.fixedHours.end;
         }
@@ -1786,20 +1919,20 @@
         // --- Calculator Logic ---
 
         function updateCalcContextLabel() {
-            const [y, m] = currentCalcMonth.split('-');
+             const [y, m] = currentCalcMonth.split('-');
             const mName = monthsNominative[parseInt(m)-1];
             document.getElementById('calc-context-label').innerText = `Obliczenia dla: ${mName} ${y}`;
         }
 
         function updateCalcUI() {
             if(!currentCalcMonth) return;
-             
+            
             updateCalcContextLabel();
-             
+            
             const savedRate = state.monthlyRates[currentCalcMonth];
             if(savedRate) document.getElementById('calc-rate').value = savedRate;
             else document.getElementById('calc-rate').value = state.hourlyRate;
-             
+            
             calculateSalary();
         }
 
@@ -1808,7 +1941,7 @@
             const studentInput = document.getElementById('calc-student');
             const zusInput = document.getElementById('calc-zus');
             const pit2Input = document.getElementById('calc-pit2');
-             
+            
             state.hourlyRate = rateInput.value;
             state.isStudent = studentInput.checked;
             state.isZus = zusInput.checked;
@@ -1817,7 +1950,7 @@
 
             const rate = parseFloat(rateInput.value) || 0;
             const hours = parseFloat(document.getElementById('calc-hours').value) || 0;
-             
+            
             const zusWrapper = document.getElementById('calc-zus-wrapper');
             const breakdown = document.getElementById('calc-breakdown');
 
@@ -1833,7 +1966,7 @@
             document.getElementById('calc-gross-preview').innerText = `Brutto: ${gross.toFixed(2)} zł`;
 
             let net = gross; 
-             
+            
             document.getElementById('val-emerytalne').innerText = (0).toFixed(2);
             document.getElementById('val-rentowe').innerText = (0).toFixed(2);
             document.getElementById('val-chorobowe').innerText = (0).toFixed(2);
@@ -1846,23 +1979,23 @@
                 const rentowe = gross * 0.015;
                 const chorobowe = gross * 0.0245; 
                 const spoleczne = emerytalne + rentowe + chorobowe; 
-                 
+                
                 const baseHealth = gross - spoleczne;
                 const zdrowotna = baseHealth * 0.09;
-                 
+                
                 // Koszty uzyskania przychodu (Standard 250zł)
                 const kup = 250; 
-                 
+                
                 const taxBase = Math.round(baseHealth - kup);
-                 
+                
                 // PIT 12% (New Scale)
                 let tax = Math.round(taxBase * 0.12);
-                 
+                
                 // Kwota wolna (Ulga 300zł miesięcznie)
                 if(state.isPit2) {
                     tax -= 300;
                 }
-                 
+                
                 if(tax < 0) tax = 0;
 
                 net = gross - spoleczne - zdrowotna - tax;
@@ -1873,11 +2006,9 @@
                 document.getElementById('val-zdrowotna').innerText = zdrowotna.toFixed(2);
                 document.getElementById('val-pit').innerText = tax.toFixed(2);
             } else if (!state.isStudent && !state.isZus) {
-                net = gross;
+                 net = gross;
             }
-             
-            // FIX: Rounding to 2 decimal places here
-            net = Math.round(net * 100) / 100;
+            
             document.getElementById('calc-result').innerText = net.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' zł';
         }
 
@@ -1894,11 +2025,45 @@
         function openSettings() { document.getElementById('settings-modal').classList.add('show'); }
         function closeSettings() { document.getElementById('settings-modal').classList.remove('show'); }
 
+        function openIOSInstructions() { document.getElementById('ios-install-modal').classList.add('show'); }
+        function closeIOSInstructions() { document.getElementById('ios-install-modal').classList.remove('show'); }
+
         function clearAllData() {
-            showConfirm("To usunie WSZYSTKIE dane. Kontynuować?", () => {
+             showConfirm("To usunie WSZYSTKIE dane. Kontynuować?", () => {
                 localStorage.removeItem(STORAGE_KEY);
-                location.reload();
-            });
+                
+                // Manual Reset State (Fix for environments where location.reload() is blocked)
+                state = {
+                    workLog: {}, 
+                    fixedHours: { enabled: false, type: 'simple', val: 8, start: '08:00', end: '16:00' },
+                    paymentStatus: {}, 
+                    actualSalary: {}, 
+                    monthlyRates: {}, 
+                    listCollapsed: false,
+                    hourlyRate: "",
+                    isStudent: true,
+                    isZus: true,
+                    isPit2: true, 
+                    budgetData: {},
+                    theme: 'light',
+                    chartMode: 'groups'
+                };
+                
+                // Reset Calendar
+                calendarDate = new Date();
+                const now = new Date();
+                currentCalcMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+                
+                // Refresh UI
+                refreshUI();
+                closeSettings();
+                switchTab('calendar');
+                
+                // Optional: Try reload, if it works, good. If not, we handled it.
+                // location.reload(); // Commented out to rely on soft reset which is smoother
+                
+                showToast("Aplikacja zresetowana");
+             });
         }
 
         // --- Helpers ---
@@ -1908,7 +2073,7 @@
             const end = e.split(':').map(Number);
             let startM = start[0] * 60 + start[1];
             let endM = end[0] * 60 + end[1];
-             
+            
             if (isNight) {
                 if (endM <= startM) {
                     endM += 24 * 60;
@@ -1917,7 +2082,7 @@
                 // If user didn't mark night but end time is smaller, assume next day logic only if difference is huge, otherwise standard logic
                 if (endM < startM) endM += 24 * 60;
             }
-             
+            
             let m = endM - startM;
             return Math.round((m / 60) * 100) / 100;
         }
