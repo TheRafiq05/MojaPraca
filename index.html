@@ -685,23 +685,23 @@
 
     <!-- NEW FOOTER IMPLEMENTATION -->
     <!-- FIX: bg applies to the wrapper which includes safe area padding -->
-    <div class="fixed bottom-0 left-0 w-full bg-white/90 dark:bg-[#1C1C1E]/95 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800 z-50 pb-safe transition-all duration-300">
+    <div class="fixed bottom-0 left-0 w-full z-50 border-t border-gray-200 dark:border-gray-800 bg-white dark:bg-[#1C1C1E] pb-safe transition-all duration-300">
         
-        <div class="flex justify-around items-center h-[70px] max-w-lg mx-auto">
+        <div class="flex justify-around items-center h-[50px] max-w-lg mx-auto">
             
-            <button onclick="switchTab('calendar')" id="nav-calendar" class="nav-item active-orange flex flex-col items-center gap-1.5 p-2 w-20 rounded-xl transition-transform active:scale-95">
-                <i class="fas fa-calendar-alt text-xl"></i>
-                <span class="text-[10px] font-bold">Grafik</span>
+            <button onclick="switchTab('calendar')" id="nav-calendar" class="nav-item active-orange flex flex-col items-center justify-center w-16 h-full transition-transform active:scale-95">
+                <i class="fas fa-calendar-alt text-lg mb-0.5"></i>
+                <span class="text-[9px] font-bold leading-none">Grafik</span>
             </button>
             
-            <button onclick="switchTab('history')" id="nav-history" class="nav-item flex flex-col items-center gap-1.5 p-2 w-20 rounded-xl transition-transform active:scale-95">
-                <i class="fas fa-wallet text-xl"></i>
-                <span class="text-[10px] font-bold">Wypłaty</span>
+            <button onclick="switchTab('history')" id="nav-history" class="nav-item flex flex-col items-center justify-center w-16 h-full transition-transform active:scale-95">
+                <i class="fas fa-wallet text-lg mb-0.5"></i>
+                <span class="text-[9px] font-bold leading-none">Wypłaty</span>
             </button>
             
-            <button onclick="switchTab('budget')" id="nav-budget" class="nav-item flex flex-col items-center gap-1.5 p-2 w-20 rounded-xl transition-transform active:scale-95">
-                <i class="fas fa-chart-pie text-xl"></i>
-                <span class="text-[10px] font-bold">Planer</span>
+            <button onclick="switchTab('budget')" id="nav-budget" class="nav-item flex flex-col items-center justify-center w-16 h-full transition-transform active:scale-95">
+                <i class="fas fa-chart-pie text-lg mb-0.5"></i>
+                <span class="text-[9px] font-bold leading-none">Planer</span>
             </button>
 
         </div>
