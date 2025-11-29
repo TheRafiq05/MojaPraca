@@ -44,15 +44,13 @@
         body {
             font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
-            padding-bottom: 75px;
+            padding-bottom: calc(90px + env(safe-area-inset-bottom));
             overscroll-behavior-y: none;
         }
 
         .safe-pt {
             padding-top: calc(50px + env(safe-area-inset-top)) !important;
         }
-        .pb-safe {
-            padding-top: calc(1px + env(safe-area-inset-top)) !important;
 
         /* Utilities */
         input::-webkit-outer-spin-button,
@@ -680,25 +678,20 @@
     </div>
 
     <!-- NEW FOOTER IMPLEMENTATION -->
-    <div class="fixed bottom-0 left-0 w-full bg-white/90 dark:bg-[#1C1C1E]/95 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800 z-50 transition-all duration-300 pb-safe pt-1">
-        
-        <div class="max-w-md mx-auto flex justify-between items-center px-6 py-2"> 
-            
-            <button onclick="switchTab('calendar')" id="nav-calendar" class="nav-item active-orange flex flex-col items-center gap-1 p-2 w-16 transition-transform active:scale-95">
-                <i class="fas fa-calendar-alt text-xl"></i>
-                <span class="text-[10px] font-medium">Grafik</span>
+    <div class="fixed bottom-0 left-0 w-full bg-white/80 dark:bg-darkcard/90 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800 z-50 safe-area-bottom">
+        <div class="flex justify-around items-center h-[70px] max-w-lg mx-auto pb-1">
+            <button onclick="switchTab('calendar')" id="nav-calendar" class="nav-item active-orange flex flex-col items-center gap-1 p-2 w-20 rounded-xl">
+                <i class="fas fa-calendar-alt text-xl mb-0.5"></i>
+                <span class="text-[10px] font-bold">Grafik</span>
             </button>
-            
-            <button onclick="switchTab('history')" id="nav-history" class="nav-item flex flex-col items-center gap-1 p-2 w-16 transition-transform active:scale-95">
-                <i class="fas fa-wallet text-xl"></i>
-                <span class="text-[10px] font-medium">Wypłaty</span>
+            <button onclick="switchTab('history')" id="nav-history" class="nav-item flex flex-col items-center gap-1 p-2 w-20 rounded-xl">
+                <i class="fas fa-wallet text-xl mb-0.5"></i>
+                <span class="text-[10px] font-bold">Wypłaty</span>
             </button>
-            
-            <button onclick="switchTab('budget')" id="nav-budget" class="nav-item flex flex-col items-center gap-1 p-2 w-16 transition-transform active:scale-95">
-                <i class="fas fa-chart-pie text-xl"></i>
-                <span class="text-[10px] font-medium">Planer</span>
+             <button onclick="switchTab('budget')" id="nav-budget" class="nav-item flex flex-col items-center gap-1 p-2 w-20 rounded-xl">
+                <i class="fas fa-chart-pie text-xl mb-0.5"></i>
+                <span class="text-[10px] font-bold">Planer</span>
             </button>
-
         </div>
     </div>
  
