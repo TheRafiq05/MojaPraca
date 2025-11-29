@@ -212,6 +212,13 @@
         }
         .dark .calendar-day:not(.selected):hover { background-color: #3f3f46; }
         .dark .calendar-day.empty { background: transparent; }
+        }
+        
+        /* TUTAJ WKLEJASZ TEN NOWY KOD */
+        .dark .calendar-day.today:not(.selected) {
+            border-color: var(--primary-color) !important;
+            /* ... reszta kodu ... */
+        }
 
 
         /* Hours badge on calendar day */
