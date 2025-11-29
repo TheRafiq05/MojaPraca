@@ -565,8 +565,8 @@
             </div>
         </header>
 
-        <!-- Zwiększyłem odstęp po Result (mt-8 zamiast mt-4) i padding wewnątrz Summary Card (p-8)
-             oraz odstęp przed Save Action (pt-6 zamiast pt-4) -->
+        <!-- Zwiększyłem odstęp po Result (mt-12) i padding wewnątrz Summary Card (p-10)
+             oraz odstęp przed Save Action (pt-8, mb-6) -->
         <div class="ios-card dark:bg-darkcard p-6 space-y-6"> 
             <!-- Inputs -->
             <div class="grid grid-cols-2 gap-4">
@@ -655,8 +655,8 @@
             </div>
 
             <!-- Result -->
-            <!-- Zmiana: Dodano mt-8 zamiast mt-4 dla większego odstępu od Breakdown -->
-            <div class="bg-gray-900 dark:bg-black text-white rounded-2xl p-8 text-center shadow-xl shadow-gray-300 dark:shadow-none mt-8 relative overflow-hidden border border-gray-800">
+            <!-- Zmiana: Zwiększenie do p-10 oraz mt-12 (było p-8, mt-8) -->
+            <div class="bg-gray-900 dark:bg-black text-white rounded-2xl p-10 text-center shadow-xl shadow-gray-300 dark:shadow-none mt-12 relative overflow-hidden border border-gray-800">
                 <div class="absolute top-0 right-0 w-20 h-20 bg-white opacity-5 rounded-full -mr-10 -mt-10"></div>
                 <p class="text-gray-400 text-[10px] font-bold uppercase tracking-widest mb-1">Do wypłaty (Netto)</p>
                 <h3 class="text-4xl font-bold tabular-nums tracking-tight" id="calc-result">0.00 zł</h3>
@@ -664,8 +664,8 @@
             </div>
             
             <!-- Save to History Action -->
-            <!-- Zmiana: Zwiększenie paddingu top do pt-6, dodanie odstępu mb-4 -->
-            <div class="bg-gray-100 dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 text-center pt-6 mb-4">
+            <!-- Zmiana: Zwiększenie paddingu top do pt-8, odstęp mb-6 (było pt-6, mb-4) -->
+            <div class="bg-gray-100 dark:bg-gray-800 rounded-xl p-4 border border-gray-200 dark:border-gray-700 text-center pt-8 mb-6">
                 <p id="calc-context-label" class="text-xs font-bold text-gray-500 mb-4">Obliczenia dla: -</p>
                 <button onclick="saveCalcToHistory()" class="ios-btn w-full bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-sm px-5 py-3 transition shadow-md shadow-blue-200">
                     <i class="fas fa-save mr-2"></i> Zapisz dla tego miesiąca
