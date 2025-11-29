@@ -36,6 +36,12 @@
             --primary-color: #F97316; /* Orange-500 */
         }
 
+        /* FIX: Stabilizacja wysokości strony, aby nie skakała przy ładowaniu */
+        html, body {
+            height: 100%;
+            overflow-x: hidden;
+        }
+
         body {
             font-family: 'Inter', sans-serif;
             -webkit-tap-highlight-color: transparent;
@@ -43,11 +49,10 @@
             overscroll-behavior-y: none; /* Prevents pull-to-refresh */
         }
 
-        /* FIX: Standard iOS Safe Area + Odstęp */
-        /* Używamy env() aby pobrać wysokość notcha i dodajemy 30px ekstra odstępu */
+        /* FIX: Jeszcze większy odstęp od góry i wymuszenie go */
         .safe-pt {
-            padding-top: 40px; /* Fallback dla starych urządzeń */
-            padding-top: calc(30px + env(safe-area-inset-top)) !important; 
+            padding-top: 60px; /* Bezpieczny start dla starszych */
+            padding-top: calc(50px + env(safe-area-inset-top)) !important; /* 50px + Notch */
         }
 
         /* Utilities */
@@ -82,7 +87,8 @@
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
+            height: 100vh; /* Standard */
+            height: 100dvh; /* FIX: Dynamic viewport height - zapobiega skokom na mobilkach */
             background-color: #F5F5F7; /* Light mode bg */
             z-index: 9999;
             display: flex;
@@ -1571,7 +1577,7 @@
                 saveState();
             }
             if (val > 0) showToast("Zapisano!");
-            renderHistory(); 
+            renderHistory(); 
         }
         
         function clearActualAndRevertStatus(mKey) {
@@ -1583,7 +1589,7 @@
         function togglePaymentStatus(mKey) {
             if(state.paymentStatus[mKey] === 'paid') {
                 state.paymentStatus[mKey] = 'pending';
-                state.actualSalary[mKey] = 0; 
+                state.actualSalary[mKey] = 0; 
             } else {
                 state.paymentStatus[mKey] = 'paid';
             }
@@ -1607,7 +1613,7 @@
             const [y, m] = mKey.split('-');
             calendarDate.setFullYear(parseInt(y));
             calendarDate.setMonth(parseInt(m) - 1);
-             
+            
             switchTab('budget');
         }
 
@@ -1622,7 +1628,7 @@
 
         function renderCalendar() {
             document.getElementById('calendar-month-year').innerText = `${monthsNominative[calendarDate.getMonth()]} ${calendarDate.getFullYear()}`;
-             
+            
             const mName = monthsNominative[calendarDate.getMonth()];
             const yVal = calendarDate.getFullYear();
             const headerLabel = document.getElementById('header-label');
@@ -1633,7 +1639,7 @@
 
             const daysInMonth = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0).getDate();
             let startDay = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), 1).getDay();
-            startDay = startDay === 0 ? 6 : startDay - 1; 
+            startDay = startDay === 0 ? 6 : startDay - 1; 
 
             for (let i = 0; i < startDay; i++) {
                 const div = document.createElement('div');
@@ -1650,22 +1656,22 @@
                 const data = state.workLog[key];
                 const isSelected = !!data;
                 const isNight = data && data.isNight;
-                 
+                
                 const dateObj = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), i);
                 const dayOfWeek = dateObj.getDay();
-                 
+                
                 let extraClass = '';
                 if (dayOfWeek === 0) extraClass = 'weekend-sun';
                 else if (dayOfWeek === 6) extraClass = 'weekend-sat';
                 if (isNight) extraClass += ' night-shift';
-                 
+                
                 if (isCurrentMonth && i === today.getDate()) extraClass += ' today';
 
                 div.className = `calendar-day ${extraClass} ${isSelected ? 'selected' : ''}`;
-                 
+                
                 // Content
                 div.innerHTML = `<span class="text-sm">${i}</span>`;
-                 
+                
                 if(isSelected && data.val > 0) {
                     div.innerHTML += `<span class="day-hours-badge">${data.val}h</span>`;
                 }
@@ -1689,7 +1695,7 @@
                         state.workLog[key] = { type: 'simple', val: state.fixedHours.val > 0 ? state.fixedHours.val : 8, start: '', end: '', isNight: false };
                     } else {
                         const h = calcDiff(state.fixedHours.start, state.fixedHours.end);
-                        const isNight = isRangeNight(state.fixedHours.start, state.fixedHours.end);
+                         const isNight = isRangeNight(state.fixedHours.start, state.fixedHours.end);
                         state.workLog[key] = { type: 'range', val: h, start: state.fixedHours.start, end: state.fixedHours.end, isNight: isNight };
                     }
                     editingState[key] = false; // Ensure edit mode is OFF for quick add
@@ -1704,12 +1710,12 @@
             saveState();
             renderCalendar();
         }
-         
+        
         function isRangeNight(s, e) {
-            if(!s || !e) return false;
-            const startH = parseInt(s.split(':')[0]);
-            const endH = parseInt(e.split(':')[0]);
-            return endH < startH;
+             if(!s || !e) return false;
+             const startH = parseInt(s.split(':')[0]);
+             const endH = parseInt(e.split(':')[0]);
+             return endH < startH;
         }
 
         function toggleListCollapse() {
@@ -1722,14 +1728,14 @@
             editingState[key] = !editingState[key];
             renderHoursList();
         }
-         
+        
         function saveDayEdit(key) {
             editingState[key] = false;
             saveState();
             renderHoursList();
             renderCalendar(); // Update badges immediately
         }
-         
+        
         function toggleNightShift(key) {
             const data = state.workLog[key];
             if(data) {
@@ -1739,7 +1745,7 @@
                 }
                 saveState();
                 renderHoursList();
-                renderCalendar(); 
+                renderCalendar(); 
                 calculateTotalWorkHours();
             }
         }
@@ -1768,8 +1774,8 @@
                 collapseIcon.className = "fas fa-chevron-up";
             }
 
-            container.innerHTML = days.length === 0 
-                ? '<div class="text-center py-10 text-gray-400 text-sm bg-white dark:bg-darkcard rounded-xl border border-dashed border-gray-200 dark:border-gray-700"><i class="fas fa-calendar-plus text-2xl mb-2 block opacity-50"></i>Wybierz dni w kalendarzu</div>' 
+            container.innerHTML = days.length === 0 
+                ? '<div class="text-center py-10 text-gray-400 text-sm bg-white dark:bg-darkcard rounded-xl border border-dashed border-gray-200 dark:border-gray-700"><i class="fas fa-calendar-plus text-2xl mb-2 block opacity-50"></i>Wybierz dni w kalendarzu</div>' 
                 : '';
 
             days.forEach((k, index) => {
@@ -1780,9 +1786,9 @@
 
                 const div = document.createElement('div');
                 div.className = "ios-card dark:bg-darkcard transition-all duration-200 border border-gray-100 dark:border-gray-800 overflow-hidden";
-                 
+                
                 const moonIcon = data.isNight ? '<i class="fas fa-moon text-indigo-500 ml-1 text-xs"></i>' : '';
-                 
+                
                 if(!isEditing) {
                     div.innerHTML = `
                         <div class="p-4 flex justify-between items-center bg-white dark:bg-darkcard hover:bg-gray-50 dark:hover:bg-gray-800 transition cursor-pointer" onclick="toggleEditDay('${k}')">
@@ -1813,7 +1819,7 @@
                                     <button onclick="changeDayType('${k}','range')" class="px-3 py-1.5 rounded-md transition ${!isSimple ? 'bg-gray-800 text-white shadow dark:bg-black' : 'text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600'}">Zegar</button>
                                 </div>
                             </div>
-                             
+                            
                             ${isSimple ? `
                                 <div class="flex items-center gap-3 mb-4">
                                     <div class="relative flex-grow">
@@ -1827,7 +1833,7 @@
                                     <span class="text-gray-400 font-bold">-</span>
                                     <input type="time" value="${data.end || '16:00'}" onchange="updateDayData('${k}','end',this.value)" class="bg-white dark:bg-gray-700 rounded-xl p-3 w-full text-center font-bold text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 outline-none shadow-sm text-sm">
                                 </div>
-                                 
+                                
                                 <div class="flex justify-between items-center mb-4">
                                      <button onclick="toggleNightShift('${k}')" class="text-xs font-bold px-3 py-2 rounded-lg border flex items-center gap-1.5 transition ${data.isNight ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200 border-indigo-200 dark:border-indigo-800' : 'bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-300 border-gray-200 dark:border-gray-600'}">
                                         <i class="fas fa-moon"></i> Nocka
@@ -1835,7 +1841,7 @@
                                      <span class="text-xs font-bold text-orange-600 bg-orange-100 px-3 py-2 rounded-lg">Razem: ${data.val}h</span>
                                 </div>
                             `}
-                             
+                            
                             <button onclick="saveDayEdit('${k}')" class="w-full py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl text-sm shadow-md transition flex items-center justify-center gap-2">
                                 <i class="fas fa-check"></i> Zatwierdź zmiany
                             </button>
