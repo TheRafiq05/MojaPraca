@@ -5,7 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" href="icon-192.png">       <link rel="apple-touch-icon" href="icon-192.png">            <meta name="apple-mobile-web-app-capable" content="yes">
+    <link rel="icon" type="image/png" href="icon-192.png">       
+    <link rel="apple-touch-icon" href="icon-192.png">            
+    <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#ffffff">
     <title>MojaPraca</title>
@@ -39,6 +41,11 @@
             -webkit-tap-highlight-color: transparent;
             padding-bottom: calc(90px + env(safe-area-inset-bottom)); /* Safe area for iPhone */
             overscroll-behavior-y: none; /* Prevents pull-to-refresh */
+        }
+
+        /* FIX: Zwiększony bezpieczny odstęp od góry (obniżenie napisów o 60px + notch) */
+        .safe-pt {
+            padding-top: calc(60px + env(safe-area-inset-top));
         }
 
         /* Utilities */
@@ -212,6 +219,7 @@
         }
         .dark .calendar-day:not(.selected):hover { background-color: #3f3f46; }
         .dark .calendar-day.empty { background: transparent; }
+
         /* Fix: Podświetlenie dzisiejszego dnia w trybie ciemnym */
         .dark .calendar-day.today:not(.selected) {
             border-color: var(--primary-color) !important;
@@ -219,7 +227,6 @@
             background-color: rgba(249, 115, 22, 0.1);
             box-shadow: 0 0 8px rgba(249, 115, 22, 0.3);
         }
-
 
         /* Hours badge on calendar day */
         .day-hours-badge {
@@ -346,7 +353,7 @@
     </div>
 
     <!-- ================= VIEW 1: GRAFIK (CALENDAR) ================= -->
-    <div id="view-calendar" class="view-section active max-w-lg mx-auto p-4 pt-8">
+    <div id="view-calendar" class="view-section active max-w-lg mx-auto p-4 safe-pt">
         <header class="flex justify-between items-center mb-6">
             <div>
                 <p class="text-xs text-orange-500 font-bold uppercase tracking-wide">Ewidencja czasu</p>
@@ -450,7 +457,7 @@
     </div>
 
     <!-- ================= VIEW 2: WYPŁATY (HISTORY) ================= -->
-    <div id="view-history" class="view-section max-w-lg mx-auto p-4 pt-8">
+    <div id="view-history" class="view-section max-w-lg mx-auto p-4 safe-pt">
         <header class="flex justify-between items-center mb-6">
             <div>
                 <p class="text-xs text-orange-500 font-bold uppercase tracking-wide">Moje</p>
@@ -476,7 +483,7 @@
     </div>
 
     <!-- ================= VIEW 4: PLANER (BUDGET) ================= -->
-    <div id="view-budget" class="view-section max-w-lg mx-auto p-4 pt-8">
+    <div id="view-budget" class="view-section max-w-lg mx-auto p-4 safe-pt">
         <header class="flex justify-between items-center mb-6">
             <div>
                 <p class="text-xs text-orange-500 font-bold uppercase tracking-wide">Mój</p>
@@ -559,7 +566,7 @@
     </div>
 
     <!-- ================= VIEW 3: KALKULATOR ================= -->
-    <div id="view-calculator" class="view-section max-w-lg mx-auto p-4 pt-8">
+    <div id="view-calculator" class="view-section max-w-lg mx-auto p-4 safe-pt">
         <header class="flex justify-between items-center mb-6">
             <div>
                 <p class="text-xs text-blue-600 font-bold uppercase tracking-wide">Finanse</p>
@@ -862,28 +869,28 @@
     <div id="toast">Komunikat</div>
 
     <script>
-        const STORAGE_KEY = "mojgrafik_app_v2_1"; 
+        const STORAGE_KEY = "mojgrafik_app_v2_1"; 
 
         // Global State
         let state = {
-            workLog: {}, 
+            workLog: {}, 
             fixedHours: { enabled: false, type: 'simple', val: 8, start: '08:00', end: '16:00' },
-            paymentStatus: {}, 
-            actualSalary: {}, 
-            monthlyRates: {}, 
+            paymentStatus: {}, 
+            actualSalary: {}, 
+            monthlyRates: {}, 
             listCollapsed: false,
             hourlyRate: "",
             isStudent: true,
             isZus: true,
-            isPit2: true, 
+            isPit2: true, 
             budgetData: {},
             theme: 'light', // 'light' or 'dark'
             chartMode: 'groups' // 'groups' or 'details'
         };
         
-        let editingState = {}; 
+        let editingState = {}; 
         let calendarDate = new Date();
-        let currentCalcMonth = ""; 
+        let currentCalcMonth = ""; 
         
         let newCategoryType = 'fixed';
         let newCategoryColor = 'blue';
@@ -898,10 +905,10 @@
         const colors = [
             { bg: 'bg-red-500', val: 'red', hex: '#EF4444' },
             { bg: 'bg-orange-500', val: 'orange', hex: '#F97316' },
-            { bg: 'bg-amber-500', val: 'amber', hex: '#F59E0B' }, 
-            { bg: 'bg-emerald-500', val: 'emerald', hex: '#10B981' }, 
+            { bg: 'bg-amber-500', val: 'amber', hex: '#F59E0B' }, 
+            { bg: 'bg-emerald-500', val: 'emerald', hex: '#10B981' }, 
             { bg: 'bg-blue-500', val: 'blue', hex: '#3B82F6' },
-            { bg: 'bg-indigo-500', val: 'indigo', hex: '#6366F1' }, 
+            { bg: 'bg-indigo-500', val: 'indigo', hex: '#6366F1' }, 
             { bg: 'bg-purple-500', val: 'purple', hex: '#A855F7' },
             { bg: 'bg-pink-500', val: 'pink', hex: '#EC4899' },
         ];
@@ -914,8 +921,8 @@
                 try {
                     const parsed = JSON.parse(stored);
                     state = { ...state, ...parsed };
-                    if(!state.paymentStatus) state.paymentStatus = {}; 
-                    if(!state.actualSalary) state.actualSalary = {}; 
+                    if(!state.paymentStatus) state.paymentStatus = {}; 
+                    if(!state.actualSalary) state.actualSalary = {}; 
                     if(!state.monthlyRates) state.monthlyRates = {};
                     if(!state.budgetData) state.budgetData = {};
                     if(state.isPit2 === undefined) state.isPit2 = true;
@@ -941,19 +948,19 @@
                 }, 600);
             }, 2000);
         }
-        
+         
         // Unified UI Refresh Function
         function refreshUI() {
             applyTheme();
             updateFixedUI();
-            
+             
             // Sync calc toggles
             document.getElementById('calc-pit2').checked = state.isPit2;
             document.getElementById('theme-toggle').checked = state.theme === 'dark';
-            
+             
             renderCalendar();
             calculateTotalWorkHours();
-            updateCalcContextLabel(); 
+            updateCalcContextLabel(); 
             renderColorPicker();
             renderHistory(); // Ensure history is ready if we switch
             // If budget view is active, render it too
@@ -965,13 +972,13 @@
         function saveState() {
             localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
         }
-        
+         
         // Export Data Fix (Blob)
         function exportData() {
             const dataStr = JSON.stringify(state);
             const blob = new Blob([dataStr], {type: "application/json"});
             const url = URL.createObjectURL(blob);
-            
+             
             const linkElement = document.createElement('a');
             linkElement.setAttribute('href', url);
             linkElement.setAttribute('download', 'moj_grafik_backup.json');
@@ -979,7 +986,7 @@
             linkElement.click();
             document.body.removeChild(linkElement);
             URL.revokeObjectURL(url);
-            
+             
             showToast("Pobrano plik backupu");
         }
 
@@ -1006,12 +1013,12 @@
                     if(parsed && typeof parsed === 'object') {
                         state = parsed;
                         saveState();
-                        
+                         
                         // Full Reload of UI State without page reload
-                        refreshUI(); 
+                        refreshUI(); 
                         closeSettings();
                         switchTab('calendar');
-                        
+                         
                         showToast("Kopia wczytana pomyślnie");
                     } else {
                         showToast("Błąd: Nieprawidłowy plik");
@@ -1049,15 +1056,15 @@
         function switchTab(tabId) {
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.getElementById('view-' + tabId).classList.add('active');
-            
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active-orange', 'active-dark')); 
+             
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active-orange', 'active-dark')); 
             const btn = document.getElementById('nav-' + tabId);
-            
+             
             if(btn) {
-                if(tabId === 'budget') btn.classList.add('active-dark'); 
+                if(tabId === 'budget') btn.classList.add('active-dark'); 
                 else btn.classList.add('active-orange');
             }
-            
+             
             window.scrollTo(0, 0);
 
             if (tabId === 'calendar') {
@@ -1081,12 +1088,12 @@
             const y = calendarDate.getFullYear();
             const m = String(calendarDate.getMonth() + 1).padStart(2, '0');
             currentCalcMonth = `${y}-${m}`;
-            
+             
             calculateTotalWorkHours();
             const sum = document.getElementById('header-hours').innerText;
-            
+             
             switchTab('calculator');
-            
+             
             document.getElementById('calc-hours').value = sum;
             updateCalcUI();
         }
@@ -1120,11 +1127,11 @@
         function renderBudget() {
             const [y, m] = currentCalcMonth.split('-');
             document.getElementById('budget-month-label').innerText = `${monthsNominative[parseInt(m)-1]} ${y}`;
-            
+             
             // 1. Determine Total Income
             let totalIncome = 0;
             let source = "Kalkulator";
-            
+             
             if(state.actualSalary[currentCalcMonth] && state.actualSalary[currentCalcMonth] > 0) {
                 totalIncome = state.actualSalary[currentCalcMonth];
                 source = "Wypłata Rzeczywista";
@@ -1133,16 +1140,16 @@
                 const prefix = `${y}-${m}-`;
                 let sumHours = 0;
                 Object.keys(state.workLog).forEach(k => {
-                   if(k.startsWith(prefix)) sumHours += state.workLog[k].val || 0; 
+                    if(k.startsWith(prefix)) sumHours += state.workLog[k].val || 0; 
                 });
-                
+                 
                 const gross = sumHours * savedRate;
                 let net = gross;
                 if(!state.isStudent && state.isZus) {
                     const spoleczne = gross * 0.1371;
                     const baseHealth = gross - spoleczne;
                     const zdrav = baseHealth * 0.09;
-                    const kup = 250; 
+                    const kup = 250; 
                     const taxBase = Math.round(baseHealth - kup);
                     let tax = Math.round(taxBase * 0.12);
                     if(state.isPit2) tax -= 300;
@@ -1157,7 +1164,7 @@
 
             // 2. Get Expenses
             const expenses = state.budgetData[currentCalcMonth] || [];
-            
+             
             // 3. Process Fixed
             let sumFixed = 0;
             const fixedExpenses = expenses.filter(e => e.type === 'fixed');
@@ -1170,7 +1177,7 @@
             // 5. Process Percent
             const percentExpenses = expenses.filter(e => e.type === 'percent');
             let sumPercentVal = 0;
-            
+             
             const processedPercentItems = percentExpenses.map(e => {
                 const calculatedVal = remainderAfterFixed * (e.val / 100);
                 sumPercentVal += calculatedVal;
@@ -1179,7 +1186,7 @@
 
             // 6. Final Remaining
             let finalRemaining = totalIncome - sumFixed - sumPercentVal;
-            
+             
             document.getElementById('budget-remaining').innerText = finalRemaining.toLocaleString('pl-PL', {minimumFractionDigits: 2});
             document.getElementById('sum-fixed').innerText = sumFixed.toLocaleString('pl-PL', {minimumFractionDigits: 2}) + ' zł';
             document.getElementById('base-for-percent').innerText = `Baza %: ${remainderAfterFixed.toLocaleString('pl-PL', {minimumFractionDigits:0})} zł`;
@@ -1198,7 +1205,7 @@
             // Render Lists (Same as before)
             const listFixed = document.getElementById('list-fixed');
             listFixed.innerHTML = '';
-            
+             
             const bgColors = {
                 'red': 'bg-red-500', 'orange': 'bg-orange-500', 'amber': 'bg-amber-500', 'emerald': 'bg-emerald-500',
                 'green': 'bg-green-500', 'blue': 'bg-blue-500', 'purple': 'bg-purple-500', 'pink': 'bg-pink-500',
@@ -1225,11 +1232,11 @@
 
             const listPercent = document.getElementById('list-percent');
             listPercent.innerHTML = '';
-            
+             
             if(processedPercentItems.length === 0) listPercent.innerHTML = '<div class="text-xs text-center text-gray-400 py-2">Brak budżetów procentowych</div>';
 
             processedPercentItems.forEach(item => {
-                 const el = document.createElement('div');
+                const el = document.createElement('div');
                 el.className = "flex flex-col bg-white dark:bg-darkcard p-3 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm";
                 el.innerHTML = `
                     <div class="flex justify-between items-center mb-1">
@@ -1251,18 +1258,18 @@
 
             // 7. Pie Chart Logic - GRAY Remaining
             const chart = document.getElementById('budget-pie-chart');
-            
+             
             if(totalIncome > 0) {
                 let gradientStr = '';
-                
+                 
                 if (state.chartMode === 'groups') {
                     // Mode: Groups (Fixed Red, Percent Amber, Remaining Gray)
                     const fixedPercent = (sumFixed / totalIncome) * 100;
                     const dynamicPercent = (sumPercentVal / totalIncome) * 100;
-                    
+                     
                     const degFixed = (fixedPercent / 100) * 360;
                     const degPercent = degFixed + ((dynamicPercent / 100) * 360);
-                    
+                     
                     // Fixed (Red), Percent (Amber), Remaining (Gray)
                     gradientStr = `#EF4444 0deg ${degFixed}deg, #F59E0B ${degFixed}deg ${degPercent}deg, #6B7280 ${degPercent}deg 360deg`;
                 } else {
@@ -1270,28 +1277,28 @@
                     const allItems = [...fixedExpenses, ...processedPercentItems];
                     let currentDeg = 0;
                     const parts = [];
-                    
+                     
                     allItems.forEach(item => {
                         const val = item.calculatedVal !== undefined ? item.calculatedVal : item.val;
                         const percent = (val / totalIncome);
                         const deg = percent * 360;
                         const endDeg = currentDeg + deg;
-                        
+                         
                         const colorObj = colors.find(c => c.val === item.color);
                         const colorHex = colorObj ? colorObj.hex : '#9CA3AF';
-                        
+                         
                         parts.push(`${colorHex} ${currentDeg}deg ${endDeg}deg`);
                         currentDeg = endDeg;
                     });
-                    
+                     
                     // Remaining as Gray
                     parts.push(`#6B7280 ${currentDeg}deg 360deg`);
                     gradientStr = parts.join(', ');
                 }
-                
+                 
                 chart.style.setProperty('--chart-gradient', gradientStr);
             } else {
-                 chart.style.setProperty('--chart-gradient', `#6B7280 0deg 360deg`); // Gray for empty/100% remaining
+                chart.style.setProperty('--chart-gradient', `#6B7280 0deg 360deg`); // Gray for empty/100% remaining
             }
         }
 
@@ -1313,7 +1320,7 @@
             const btnFixed = document.getElementById('btn-cat-fixed');
             const btnPercent = document.getElementById('btn-cat-percent');
             const lblVal = document.getElementById('lbl-cat-val');
-            
+             
             if(type === 'fixed') {
                 btnFixed.className = "flex-1 py-2.5 rounded-lg shadow bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition";
                 btnPercent.className = "flex-1 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-200 transition";
@@ -1347,14 +1354,14 @@
         function addCategory() {
             const name = document.getElementById('new-cat-name').value;
             const val = parseFloat(document.getElementById('new-cat-val').value);
-            
+             
             if(!name || isNaN(val)) {
                 showToast("Wypełnij nazwę i wartość!");
                 return;
             }
 
             if(!state.budgetData[currentCalcMonth]) state.budgetData[currentCalcMonth] = [];
-            
+             
             state.budgetData[currentCalcMonth].push({
                 id: Date.now().toString(),
                 name: name,
@@ -1362,7 +1369,7 @@
                 val: val,
                 color: newCategoryColor
             });
-            
+             
             saveState();
             closeAddCategoryModal();
             renderBudget();
@@ -1391,20 +1398,20 @@
         function renderHistory() {
             const container = document.getElementById('history-container');
             const dataByMonth = {};
-            const recordedMonths = new Set(); 
+            const recordedMonths = new Set(); 
 
             Object.keys(state.workLog).forEach(dateKey => {
-                const monthKey = dateKey.substring(0, 7); 
+                const monthKey = dateKey.substring(0, 7); 
                 if (!dataByMonth[monthKey]) dataByMonth[monthKey] = 0;
                 dataByMonth[monthKey] += (state.workLog[dateKey].val || 0);
             });
-            
+             
             Object.keys(state.monthlyRates).forEach(mKey => recordedMonths.add(mKey));
             Object.keys(state.actualSalary).forEach(mKey => recordedMonths.add(mKey));
             Object.keys(dataByMonth).forEach(mKey => recordedMonths.add(mKey));
 
             const displayMonths = Array.from(recordedMonths).sort().reverse();
-            
+             
             if (displayMonths.length === 0) {
                 container.innerHTML = `
                     <div class="ios-card dark:bg-darkcard p-8 text-center border-2 border-dashed border-gray-200 dark:border-gray-800 shadow-none bg-transparent">
@@ -1419,26 +1426,26 @@
             }
 
             container.innerHTML = '';
-            
+             
             displayMonths.forEach(mKey => {
                 const [year, month] = mKey.split('-');
                 const monthName = monthsNominative[parseInt(month) - 1];
-                const totalHours = (dataByMonth[mKey] || 0).toFixed(2); 
-                
+                const totalHours = (dataByMonth[mKey] || 0).toFixed(2); 
+                 
                 const actual = state.actualSalary[mKey] || 0;
                 let isPaid = state.paymentStatus[mKey] === 'paid';
                 let statusText = isPaid ? "Wypłacono" : "Oczekująca";
-                
+                 
                 let calculatedNet = 0;
                 let estimatedEarningsDisplay = "---";
-                
+                 
                 const rateToUse = state.monthlyRates[mKey] ? parseFloat(state.monthlyRates[mKey]) : 0;
-                
+                 
                 if(rateToUse > 0) {
-                      const gross = rateToUse * parseFloat(totalHours);
-                      let net = gross;
-                      
-                      if(!state.isStudent && state.isZus) {
+                    const gross = rateToUse * parseFloat(totalHours);
+                    let net = gross;
+                    
+                    if(!state.isStudent && state.isZus) {
                         const spoleczne = gross * 0.1371;
                         const baseHealth = gross - spoleczne;
                         const zdrav = baseHealth * 0.09;
@@ -1448,31 +1455,32 @@
                         if(state.isPit2) tax -= 300;
                         if(tax < 0) tax = 0;
                         net = gross - spoleczne - zdrav - tax;
-                      }
-                      
-                      calculatedNet = net;
-                      estimatedEarningsDisplay = calculatedNet.toLocaleString('pl-PL', {minimumFractionDigits: 2}) + ' zł';
+                    }
+                    
+                    // FIX: Rounding to 2 decimal places here
+                    calculatedNet = Math.round(net * 100) / 100;
+                    estimatedEarningsDisplay = calculatedNet.toLocaleString('pl-PL', {minimumFractionDigits: 2, maximumFractionDigits: 2}) + ' zł';
                 }
 
                 // Profit/Loss
                 let diffHtml = '';
                 if (actual > 0 && calculatedNet > 0) {
                     const diff = actual - calculatedNet;
-                    if (Math.abs(diff) < 1) {
+                    if (Math.abs(diff) < 0.01) { // FIX: Smaller tolerance for float comparison
                         diffHtml = '<span class="text-gray-400 font-bold text-xs">Idealnie</span>';
                     } else if (diff > 0) {
-                        diffHtml = `<span class="text-green-600 font-bold text-xs">+${diff.toLocaleString('pl-PL', {minimumFractionDigits:2})} zł</span>`;
+                        diffHtml = `<span class="text-green-600 font-bold text-xs">+${diff.toLocaleString('pl-PL', {minimumFractionDigits:2, maximumFractionDigits: 2})} zł</span>`;
                     } else {
-                        diffHtml = `<span class="text-red-500 font-bold text-xs">${diff.toLocaleString('pl-PL', {minimumFractionDigits:2})} zł</span>`;
+                        diffHtml = `<span class="text-red-500 font-bold text-xs">${diff.toLocaleString('pl-PL', {minimumFractionDigits:2, maximumFractionDigits: 2})} zł</span>`;
                     }
                 }
-                
+                 
                 const rateSummary = rateToUse > 0 ? `${totalHours}h × ${rateToUse.toFixed(2)}` : `${totalHours}h (brak stawki)`;
                 const isFinalized = isPaid && actual > 0;
 
                 const div = document.createElement('div');
                 div.className = "ios-card dark:bg-darkcard p-5 border border-gray-100 dark:border-gray-800 flex flex-col gap-3";
-                
+                 
                 let contentHTML = '';
 
                 if (isFinalized) {
@@ -1484,7 +1492,7 @@
                             </div>
                             <div class="flex justify-between items-center text-sm">
                                 <span class="text-gray-500 dark:text-gray-400">Do ręki</span>
-                                <span class="font-bold text-gray-900 dark:text-white">${actual.toLocaleString('pl-PL', {minimumFractionDigits: 2})} zł</span>
+                                <span class="font-bold text-gray-900 dark:text-white">${actual.toLocaleString('pl-PL', {minimumFractionDigits: 2, maximumFractionDigits: 2})} zł</span>
                             </div>
                              <div class="flex justify-between items-center text-sm pt-2 border-t border-gray-200 dark:border-gray-700">
                                 <span class="text-gray-400 font-bold text-xs uppercase">Różnica</span>
@@ -1561,7 +1569,7 @@
                 saveState();
             }
             if (val > 0) showToast("Zapisano!");
-            renderHistory(); 
+            renderHistory(); 
         }
         
         function clearActualAndRevertStatus(mKey) {
@@ -1573,7 +1581,7 @@
         function togglePaymentStatus(mKey) {
             if(state.paymentStatus[mKey] === 'paid') {
                 state.paymentStatus[mKey] = 'pending';
-                state.actualSalary[mKey] = 0; 
+                state.actualSalary[mKey] = 0; 
             } else {
                 state.paymentStatus[mKey] = 'paid';
             }
@@ -1597,7 +1605,7 @@
             const [y, m] = mKey.split('-');
             calendarDate.setFullYear(parseInt(y));
             calendarDate.setMonth(parseInt(m) - 1);
-            
+             
             switchTab('budget');
         }
 
@@ -1612,7 +1620,7 @@
 
         function renderCalendar() {
             document.getElementById('calendar-month-year').innerText = `${monthsNominative[calendarDate.getMonth()]} ${calendarDate.getFullYear()}`;
-            
+             
             const mName = monthsNominative[calendarDate.getMonth()];
             const yVal = calendarDate.getFullYear();
             const headerLabel = document.getElementById('header-label');
@@ -1623,7 +1631,7 @@
 
             const daysInMonth = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0).getDate();
             let startDay = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), 1).getDay();
-            startDay = startDay === 0 ? 6 : startDay - 1; 
+            startDay = startDay === 0 ? 6 : startDay - 1; 
 
             for (let i = 0; i < startDay; i++) {
                 const div = document.createElement('div');
@@ -1640,22 +1648,22 @@
                 const data = state.workLog[key];
                 const isSelected = !!data;
                 const isNight = data && data.isNight;
-                
+                 
                 const dateObj = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), i);
                 const dayOfWeek = dateObj.getDay();
-                
+                 
                 let extraClass = '';
                 if (dayOfWeek === 0) extraClass = 'weekend-sun';
                 else if (dayOfWeek === 6) extraClass = 'weekend-sat';
                 if (isNight) extraClass += ' night-shift';
-                
+                 
                 if (isCurrentMonth && i === today.getDate()) extraClass += ' today';
 
                 div.className = `calendar-day ${extraClass} ${isSelected ? 'selected' : ''}`;
-                
+                 
                 // Content
                 div.innerHTML = `<span class="text-sm">${i}</span>`;
-                
+                 
                 if(isSelected && data.val > 0) {
                     div.innerHTML += `<span class="day-hours-badge">${data.val}h</span>`;
                 }
@@ -1679,7 +1687,7 @@
                         state.workLog[key] = { type: 'simple', val: state.fixedHours.val > 0 ? state.fixedHours.val : 8, start: '', end: '', isNight: false };
                     } else {
                         const h = calcDiff(state.fixedHours.start, state.fixedHours.end);
-                         const isNight = isRangeNight(state.fixedHours.start, state.fixedHours.end);
+                        const isNight = isRangeNight(state.fixedHours.start, state.fixedHours.end);
                         state.workLog[key] = { type: 'range', val: h, start: state.fixedHours.start, end: state.fixedHours.end, isNight: isNight };
                     }
                     editingState[key] = false; // Ensure edit mode is OFF for quick add
@@ -1694,12 +1702,12 @@
             saveState();
             renderCalendar();
         }
-        
+         
         function isRangeNight(s, e) {
-             if(!s || !e) return false;
-             const startH = parseInt(s.split(':')[0]);
-             const endH = parseInt(e.split(':')[0]);
-             return endH < startH;
+            if(!s || !e) return false;
+            const startH = parseInt(s.split(':')[0]);
+            const endH = parseInt(e.split(':')[0]);
+            return endH < startH;
         }
 
         function toggleListCollapse() {
@@ -1712,14 +1720,14 @@
             editingState[key] = !editingState[key];
             renderHoursList();
         }
-        
+         
         function saveDayEdit(key) {
             editingState[key] = false;
             saveState();
             renderHoursList();
             renderCalendar(); // Update badges immediately
         }
-        
+         
         function toggleNightShift(key) {
             const data = state.workLog[key];
             if(data) {
@@ -1729,7 +1737,7 @@
                 }
                 saveState();
                 renderHoursList();
-                renderCalendar(); 
+                renderCalendar(); 
                 calculateTotalWorkHours();
             }
         }
@@ -1758,8 +1766,8 @@
                 collapseIcon.className = "fas fa-chevron-up";
             }
 
-            container.innerHTML = days.length === 0 
-                ? '<div class="text-center py-10 text-gray-400 text-sm bg-white dark:bg-darkcard rounded-xl border border-dashed border-gray-200 dark:border-gray-700"><i class="fas fa-calendar-plus text-2xl mb-2 block opacity-50"></i>Wybierz dni w kalendarzu</div>' 
+            container.innerHTML = days.length === 0 
+                ? '<div class="text-center py-10 text-gray-400 text-sm bg-white dark:bg-darkcard rounded-xl border border-dashed border-gray-200 dark:border-gray-700"><i class="fas fa-calendar-plus text-2xl mb-2 block opacity-50"></i>Wybierz dni w kalendarzu</div>' 
                 : '';
 
             days.forEach((k, index) => {
@@ -1770,9 +1778,9 @@
 
                 const div = document.createElement('div');
                 div.className = "ios-card dark:bg-darkcard transition-all duration-200 border border-gray-100 dark:border-gray-800 overflow-hidden";
-                
+                 
                 const moonIcon = data.isNight ? '<i class="fas fa-moon text-indigo-500 ml-1 text-xs"></i>' : '';
-                
+                 
                 if(!isEditing) {
                     div.innerHTML = `
                         <div class="p-4 flex justify-between items-center bg-white dark:bg-darkcard hover:bg-gray-50 dark:hover:bg-gray-800 transition cursor-pointer" onclick="toggleEditDay('${k}')">
@@ -1803,7 +1811,7 @@
                                     <button onclick="changeDayType('${k}','range')" class="px-3 py-1.5 rounded-md transition ${!isSimple ? 'bg-gray-800 text-white shadow dark:bg-black' : 'text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600'}">Zegar</button>
                                 </div>
                             </div>
-                            
+                             
                             ${isSimple ? `
                                 <div class="flex items-center gap-3 mb-4">
                                     <div class="relative flex-grow">
@@ -1817,7 +1825,7 @@
                                     <span class="text-gray-400 font-bold">-</span>
                                     <input type="time" value="${data.end || '16:00'}" onchange="updateDayData('${k}','end',this.value)" class="bg-white dark:bg-gray-700 rounded-xl p-3 w-full text-center font-bold text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 outline-none shadow-sm text-sm">
                                 </div>
-                                
+                                 
                                 <div class="flex justify-between items-center mb-4">
                                      <button onclick="toggleNightShift('${k}')" class="text-xs font-bold px-3 py-2 rounded-lg border flex items-center gap-1.5 transition ${data.isNight ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200 border-indigo-200 dark:border-indigo-800' : 'bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-300 border-gray-200 dark:border-gray-600'}">
                                         <i class="fas fa-moon"></i> Nocka
@@ -1825,7 +1833,7 @@
                                      <span class="text-xs font-bold text-orange-600 bg-orange-100 px-3 py-2 rounded-lg">Razem: ${data.val}h</span>
                                 </div>
                             `}
-                            
+                             
                             <button onclick="saveDayEdit('${k}')" class="w-full py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl text-sm shadow-md transition flex items-center justify-center gap-2">
                                 <i class="fas fa-check"></i> Zatwierdź zmiany
                             </button>
@@ -1855,14 +1863,14 @@
                 state.workLog[key][field] = val;
                 if (state.workLog[key].type === 'range') {
                     // Auto check night
-                     const isNightRange = isRangeNight(state.workLog[key].start, state.workLog[key].end);
-                     if(isNightRange && !state.workLog[key].isNight) state.workLog[key].isNight = true; // Auto enable
-                     
+                    const isNightRange = isRangeNight(state.workLog[key].start, state.workLog[key].end);
+                    if(isNightRange && !state.workLog[key].isNight) state.workLog[key].isNight = true; // Auto enable
+                     
                     state.workLog[key].val = calcDiff(state.workLog[key].start, state.workLog[key].end, state.workLog[key].isNight);
                 }
             }
             saveState();
-            if (field !== 'val') renderHoursList(); 
+            if (field !== 'val') renderHoursList(); 
             calculateTotalWorkHours();
         }
 
@@ -1905,13 +1913,13 @@
             const isSimple = state.fixedHours.type === 'simple';
             document.getElementById('fixed-type-simple').className = `flex-1 py-1.5 rounded-md transition font-bold text-center ${isSimple ? 'bg-orange-500 text-white shadow' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'}`;
             document.getElementById('fixed-type-range').className = `flex-1 py-1.5 rounded-md transition font-bold text-center ${!isSimple ? 'bg-orange-500 text-white shadow' : 'text-gray-500 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-600'}`;
-            
+             
             document.getElementById('fixed-input-simple').classList.toggle('hidden', !isSimple);
             document.getElementById('fixed-input-range').classList.toggle('hidden', isSimple);
-            
+             
             const val = state.fixedHours.val;
             document.getElementById('fixed-val').value = val > 0 ? val : '';
-            
+             
             document.getElementById('fixed-start').value = state.fixedHours.start;
             document.getElementById('fixed-end').value = state.fixedHours.end;
         }
@@ -1928,20 +1936,20 @@
         // --- Calculator Logic ---
 
         function updateCalcContextLabel() {
-             const [y, m] = currentCalcMonth.split('-');
+            const [y, m] = currentCalcMonth.split('-');
             const mName = monthsNominative[parseInt(m)-1];
             document.getElementById('calc-context-label').innerText = `Obliczenia dla: ${mName} ${y}`;
         }
 
         function updateCalcUI() {
             if(!currentCalcMonth) return;
-            
+             
             updateCalcContextLabel();
-            
+             
             const savedRate = state.monthlyRates[currentCalcMonth];
             if(savedRate) document.getElementById('calc-rate').value = savedRate;
             else document.getElementById('calc-rate').value = state.hourlyRate;
-            
+             
             calculateSalary();
         }
 
@@ -1950,7 +1958,7 @@
             const studentInput = document.getElementById('calc-student');
             const zusInput = document.getElementById('calc-zus');
             const pit2Input = document.getElementById('calc-pit2');
-            
+             
             state.hourlyRate = rateInput.value;
             state.isStudent = studentInput.checked;
             state.isZus = zusInput.checked;
@@ -1959,7 +1967,7 @@
 
             const rate = parseFloat(rateInput.value) || 0;
             const hours = parseFloat(document.getElementById('calc-hours').value) || 0;
-            
+             
             const zusWrapper = document.getElementById('calc-zus-wrapper');
             const breakdown = document.getElementById('calc-breakdown');
 
@@ -1974,8 +1982,8 @@
             const gross = rate * hours;
             document.getElementById('calc-gross-preview').innerText = `Brutto: ${gross.toFixed(2)} zł`;
 
-            let net = gross; 
-            
+            let net = gross; 
+             
             document.getElementById('val-emerytalne').innerText = (0).toFixed(2);
             document.getElementById('val-rentowe').innerText = (0).toFixed(2);
             document.getElementById('val-chorobowe').innerText = (0).toFixed(2);
@@ -1986,25 +1994,25 @@
             if (!state.isStudent && state.isZus) {
                 const emerytalne = gross * 0.0976;
                 const rentowe = gross * 0.015;
-                const chorobowe = gross * 0.0245; 
-                const spoleczne = emerytalne + rentowe + chorobowe; 
-                
+                const chorobowe = gross * 0.0245; 
+                const spoleczne = emerytalne + rentowe + chorobowe; 
+                 
                 const baseHealth = gross - spoleczne;
                 const zdrowotna = baseHealth * 0.09;
-                
+                 
                 // Koszty uzyskania przychodu (Standard 250zł)
-                const kup = 250; 
-                
+                const kup = 250; 
+                 
                 const taxBase = Math.round(baseHealth - kup);
-                
+                 
                 // PIT 12% (New Scale)
                 let tax = Math.round(taxBase * 0.12);
-                
+                 
                 // Kwota wolna (Ulga 300zł miesięcznie)
                 if(state.isPit2) {
                     tax -= 300;
                 }
-                
+                 
                 if(tax < 0) tax = 0;
 
                 net = gross - spoleczne - zdrowotna - tax;
@@ -2015,9 +2023,11 @@
                 document.getElementById('val-zdrowotna').innerText = zdrowotna.toFixed(2);
                 document.getElementById('val-pit').innerText = tax.toFixed(2);
             } else if (!state.isStudent && !state.isZus) {
-                 net = gross;
+                net = gross;
             }
-            
+             
+            // FIX: Rounding to 2 decimal places here
+            net = Math.round(net * 100) / 100;
             document.getElementById('calc-result').innerText = net.toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' zł';
         }
 
@@ -2027,52 +2037,18 @@
             state.monthlyRates[currentCalcMonth] = rate;
             saveState();
             showToast("Zapisano stawkę!");
-            switchTab('history'); 
+            switchTab('history'); 
         }
 
         // --- Settings ---
         function openSettings() { document.getElementById('settings-modal').classList.add('show'); }
         function closeSettings() { document.getElementById('settings-modal').classList.remove('show'); }
 
-        function openIOSInstructions() { document.getElementById('ios-install-modal').classList.add('show'); }
-        function closeIOSInstructions() { document.getElementById('ios-install-modal').classList.remove('show'); }
-
         function clearAllData() {
-             showConfirm("To usunie WSZYSTKIE dane. Kontynuować?", () => {
+            showConfirm("To usunie WSZYSTKIE dane. Kontynuować?", () => {
                 localStorage.removeItem(STORAGE_KEY);
-                
-                // Manual Reset State (Fix for environments where location.reload() is blocked)
-                state = {
-                    workLog: {}, 
-                    fixedHours: { enabled: false, type: 'simple', val: 8, start: '08:00', end: '16:00' },
-                    paymentStatus: {}, 
-                    actualSalary: {}, 
-                    monthlyRates: {}, 
-                    listCollapsed: false,
-                    hourlyRate: "",
-                    isStudent: true,
-                    isZus: true,
-                    isPit2: true, 
-                    budgetData: {},
-                    theme: 'light',
-                    chartMode: 'groups'
-                };
-                
-                // Reset Calendar
-                calendarDate = new Date();
-                const now = new Date();
-                currentCalcMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-                
-                // Refresh UI
-                refreshUI();
-                closeSettings();
-                switchTab('calendar');
-                
-                // Optional: Try reload, if it works, good. If not, we handled it.
-                // location.reload(); // Commented out to rely on soft reset which is smoother
-                
-                showToast("Aplikacja zresetowana");
-             });
+                location.reload();
+            });
         }
 
         // --- Helpers ---
@@ -2082,7 +2058,7 @@
             const end = e.split(':').map(Number);
             let startM = start[0] * 60 + start[1];
             let endM = end[0] * 60 + end[1];
-            
+             
             if (isNight) {
                 if (endM <= startM) {
                     endM += 24 * 60;
@@ -2091,7 +2067,7 @@
                 // If user didn't mark night but end time is smaller, assume next day logic only if difference is huge, otherwise standard logic
                 if (endM < startM) endM += 24 * 60;
             }
-            
+             
             let m = endM - startM;
             return Math.round((m / 60) * 100) / 100;
         }
