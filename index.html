@@ -147,34 +147,50 @@
              border: 1px solid rgba(255, 255, 255, 0.08);
         }
 
-        /* ---------- UJEDNOLICENIE PRZEŁĄCZNIKÓW ---------- */
-        /* Styl kontenera przełącznika w Liquid Mode (Grupuj/Szczegóły, Liczba/Zegar) */
+        /* ---------- UJEDNOLICENIE PRZEŁĄCZNIKÓW (TOGGLE SWITCHES) ---------- */
+        /* Styl kontenera przełącznika w Liquid Mode */
         .liquid-theme .bg-gray-200\/50,  /* Liczba/Zegar container */
-        .liquid-theme .bg-gray-700.rounded-lg.p-0\.5 /* Grupuj/Szczegóły container */
+        .liquid-theme .bg-gray-700.rounded-lg.p-0\.5, /* Grupuj/Szczegóły container */
+        .liquid-theme .toggle-container-style
         {
-             background-color: rgba(0, 0, 0, 0.2) !important; /* Ciemniejsze tło dla kontrastu w obu trybach */
-             border: 1px solid rgba(255, 255, 255, 0.2) !important;
+             background-color: rgba(255, 255, 255, 0.4) !important; /* Jaśniejsze tło dla lepszego kontrastu w Light */
+             border: 1px solid rgba(255, 255, 255, 0.4) !important;
              backdrop-filter: blur(5px);
         }
         html.dark body.liquid-theme .bg-gray-200\/50,
-        html.dark body.liquid-theme .bg-gray-700.rounded-lg.p-0\.5
+        html.dark body.liquid-theme .bg-gray-700.rounded-lg.p-0\.5,
+        html.dark body.liquid-theme .toggle-container-style
         {
-             background-color: rgba(0, 0, 0, 0.4) !important;
+             background-color: rgba(0, 0, 0, 0.3) !important; /* Ciemniejsze tło w Dark */
+             border: 1px solid rgba(255, 255, 255, 0.1) !important;
         }
 
-        /* Styl aktywnego przycisku w przełączniku */
-        .liquid-theme .bg-gray-600 /* Aktywny guzik Grupuj/Szczegóły */
+        /* Styl AKTYWNEGO przycisku w przełączniku (Liquid) */
+        .liquid-theme .toggle-active-style,
+        .liquid-theme .bg-gray-600 
         {
-             background-color: rgba(255, 255, 255, 0.25) !important;
-             color: inherit !important;
-             border: 1px solid rgba(255, 255, 255, 0.3);
+             background-color: rgba(20, 20, 20, 0.7) !important; /* Ciemny guzik w Light Liquid dla kontrastu */
+             color: white !important;
+             border: 1px solid rgba(255, 255, 255, 0.2);
              backdrop-filter: blur(4px);
              box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
-        html.dark body.liquid-theme .bg-gray-600 {
-            background-color: rgba(255, 255, 255, 0.15) !important;
+        html.dark body.liquid-theme .toggle-active-style,
+        html.dark body.liquid-theme .bg-gray-600 
+        {
+            background-color: rgba(255, 255, 255, 0.2) !important; /* Jasny guzik w Dark Liquid */
             color: white !important;
+            border: 1px solid rgba(255, 255, 255, 0.2);
         }
+
+        /* Styl NIEAKTYWNEGO przycisku w przełączniku (Liquid) */
+        .liquid-theme .toggle-inactive-style {
+            color: rgba(0, 0, 0, 0.6) !important;
+        }
+        html.dark body.liquid-theme .toggle-inactive-style {
+            color: rgba(255, 255, 255, 0.6) !important;
+        }
+
 
         /* Przełączniki Szybkiego Dodawania i inne Toggle Switch (tło szyny) */
         .liquid-theme .w-11.h-6.bg-gray-300 {
@@ -216,7 +232,7 @@
              color: #000 !important;
         }
         
-        /* Dark Liquid: Ciemne szkło, JASNY TEKST (POPRAWKA) */
+        /* Dark Liquid: Ciemne szkło, JASNY TEKST */
         html.dark body.liquid-theme #view-calculator .bg-gray-900.text-white {
             background-color: rgba(0, 0, 0, 0.4) !important;
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -265,6 +281,36 @@
             color: rgba(255, 255, 255, 0.8);
         }
 
+        /* Źródło w Planerze (Dark Liquid) */
+        html.dark body.liquid-theme #budget-source-type {
+            background-color: rgba(255, 255, 255, 0.2) !important;
+            color: white !important;
+            border: 1px solid rgba(255, 255, 255, 0.2) !important;
+        }
+
+        /* Przycisk Zwiń w Dark Liquid */
+        html.dark body.liquid-theme #hours-list-container + div, /* Summary */
+        html.dark body.liquid-theme #collapse-text,
+        html.dark body.liquid-theme button[onclick="toggleListCollapse()"] {
+             background-color: rgba(0, 0, 0, 0.2) !important;
+             backdrop-filter: blur(5px);
+             border: 1px solid rgba(255, 255, 255, 0.1) !important;
+             color: rgba(255, 255, 255, 0.8) !important;
+        }
+        html.dark body.liquid-theme button[onclick="toggleListCollapse()"] .text-orange-500 {
+             color: #fdba74 !important; /* Orange 300 equivalent */
+        }
+
+        /* POPRAWKA KOLORÓW W PLANERZE - DARK LIQUID */
+        html.dark body.liquid-theme #view-budget .ios-card p.text-gray-400,
+        html.dark body.liquid-theme #view-budget .ios-card h2,
+        html.dark body.liquid-theme #view-budget .ios-card #budget-total-income,
+        html.dark body.liquid-theme #view-budget .ios-card .text-sm.font-medium.text-gray-400 {
+            color: #ffffff !important;
+            text-shadow: 0 1px 4px rgba(0,0,0,0.5); /* Cień dla czytelności */
+        }
+
+
         /* ================= POPRAWKI KONTRASTU TEKSTU (LIGHT LIQUID) ================= */
         body.liquid-theme:not(.dark) .text-gray-400,
         body.liquid-theme:not(.dark) .text-gray-500 {
@@ -275,6 +321,20 @@
              color: rgba(0, 0, 0, 0.75) !important;
              font-weight: 600;
         }
+        /* Przyciemnienie kwot w Planerze (Light Liquid) */
+        body.liquid-theme:not(.dark) #view-budget .ios-card .text-white, /* Stary selektor */
+        body.liquid-theme:not(.dark) #view-budget .ios-card #budget-total-income,
+        body.liquid-theme:not(.dark) #view-budget .ios-card h2 {
+            color: #111827 !important; /* Ciemny, prawie czarny */
+        }
+        body.liquid-theme:not(.dark) #view-budget .ios-card p.text-gray-400 {
+            color: rgba(0, 0, 0, 0.7) !important;
+            font-weight: 700;
+        }
+        body.liquid-theme:not(.dark) #view-budget .ios-card span.text-gray-400 {
+             color: rgba(0, 0, 0, 0.6) !important;
+        }
+
 
         /* Pływające "blobs" */
         .liquid-background-blobs {
@@ -318,8 +378,18 @@
             backdrop-filter: blur(4px);
             border: 1px solid rgba(99, 102, 241, 0.25) !important;
         }
+        /* Dark Liquid Night Shift - Zaznaczona wersja Liquid */
+        html.dark body.liquid-theme .calendar-day.selected.night-shift {
+            background: linear-gradient(135deg, rgba(249, 115, 22, 0.7) 0%, rgba(79, 70, 229, 0.7) 100%) !important;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.3) !important;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.4);
+        }
+        
+        /* Dark Liquid Night Shift Niezaznaczona */
         html.dark body.liquid-theme .calendar-day.night-shift:not(.selected) {
-            background: linear-gradient(135deg, rgba(0,0,0,0.2) 0%, rgba(49, 46, 129, 0.4) 100%) !important;
+            background: rgba(49, 46, 129, 0.3) !important; /* Glassy Blue */
+            backdrop-filter: blur(4px);
             border: 1px solid rgba(129, 140, 248, 0.2) !important;
         }
 
@@ -340,6 +410,10 @@
             border-radius: 20px;
             box-shadow: 0 2px 8px rgba(0,0,0,0.04);
             transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.3s;
+        }
+        /* Fix for dark mode card background */
+        .dark .ios-card {
+            background-color: #1C1C1E;
         }
         
         .ios-btn {
@@ -840,8 +914,10 @@
         <div class="mb-4 px-2 flex justify-between items-center">
             <div>
                 <h3 id="budget-month-label" class="text-lg font-bold text-gray-800 dark:text-white capitalize"></h3>
-                <p class="text-[10px] text-gray-400 mt-0.5 flex items-center gap-1">
-                    <i class="fas fa-info-circle"></i> Dotyczy miesiąca wybranego w Grafiku.
+                <!-- Punkt 7: Dwie linijki notki -->
+                <p class="text-[10px] text-gray-400 mt-0.5 flex items-start gap-1">
+                    <i class="fas fa-info-circle mt-0.5"></i> 
+                    <span class="leading-tight">Dotyczy miesiąca<br/>wybranego w Grafiku.</span>
                 </p>
             </div>
             <div class="text-right">
@@ -851,11 +927,13 @@
         </div>
 
         <!-- Main Budget Card -->
-        <div class="ios-card bg-gray-800 dark:bg-gray-900 text-white p-6 mb-6 shadow-xl relative overflow-hidden">
+        <!-- Punkt 9: padding-bottom (pb-10) zwiększony, aby uniknąć nakładania -->
+        <div class="ios-card bg-gray-800 dark:bg-gray-900 text-white p-6 pb-10 mb-6 shadow-xl relative overflow-hidden">
             <!-- Chart Toggle -->
-            <div class="absolute top-4 right-4 z-20 bg-gray-700 rounded-lg p-0.5 flex text-[10px] font-bold">
-                <button onclick="setChartMode('groups')" id="chart-mode-groups" class="px-2 py-1 rounded bg-gray-600 text-white shadow transition">Grupuj</button>
-                <button onclick="setChartMode('details')" id="chart-mode-details" class="px-2 py-1 rounded text-gray-400 hover:text-white transition">Szczegóły</button>
+            <!-- Punkt 3: Styl toggle w Planerze taki sam jak w Grafiku (Liczba/Zegar) -->
+            <div class="absolute top-4 right-4 z-20 toggle-container-style bg-gray-200/50 dark:bg-gray-700 rounded-lg p-0.5 flex text-[10px] font-bold">
+                <button onclick="setChartMode('groups')" id="chart-mode-groups" class="px-2 py-1 rounded-md transition text-center">Grupuj</button>
+                <button onclick="setChartMode('details')" id="chart-mode-details" class="px-2 py-1 rounded-md transition text-center">Szczegóły</button>
             </div>
 
             <div class="flex items-center gap-6 relative z-10 pt-4">
@@ -863,7 +941,8 @@
                     <!-- Chart color logic handled in JS -->
                     <div class="pie-chart" id="budget-pie-chart"></div>
                 </div>
-                <div class="flex-grow">
+                <!-- Punkt 9: Kontener z tekstem 'Do rozdysponowania' lekko odsunięty w dół (pt-8) -->
+                <div class="flex-grow pt-8">
                     <p class="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-1">Do rozdysponowania</p>
                     <div class="flex items-baseline gap-1">
                         <h2 class="text-3xl font-bold tabular-nums" id="budget-remaining">0.00</h2>
@@ -900,7 +979,8 @@
             <div id="section-percent">
                 <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 px-2 flex justify-between items-center">
                      <span class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-amber-500"></div> Budżety (%)</span>
-                     <span id="base-for-percent" class="text-[10px] bg-gray-200 dark:bg-gray-700 text-gray-600 dark:text-gray-300 px-2 py-0.5 rounded font-bold">Baza: 0 zł</span>
+                     <!-- Punkt 8: Baza % ma teraz taki sam styl jak Suma Opłat Stałych (tylko tekst, bez tła) -->
+                     <span id="base-for-percent" class="text-gray-800 dark:text-gray-300 tabular-nums">Baza: 0 zł</span>
                 </h3>
                 <div id="list-percent" class="space-y-2"></div>
             </div>
@@ -1163,7 +1243,7 @@
     <div id="add-category-modal" class="modal-overlay">
         <div class="modal-content">
             <div class="flex justify-between items-center mb-6">
-                <h3 class="text-xl font-bold text-gray-900 dark:text-white">Nowy Wydatek</h3>
+                <h3 class="text-xl font-bold text-gray-900 dark:text-white" id="modal-category-title">Nowy Wydatek</h3>
                 <button onclick="closeAddCategoryModal()" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 flex items-center justify-center hover:bg-gray-200">
                     <i class="fas fa-times"></i>
                 </button>
@@ -1191,7 +1271,7 @@
                      <div class="flex gap-2 justify-between" id="color-picker"></div>
                 </div>
 
-                <button onclick="addCategory()" class="ios-btn w-full py-3.5 bg-gray-900 dark:bg-white hover:bg-black text-white dark:text-black font-bold rounded-xl shadow-lg shadow-gray-300/50 mt-2">
+                <button onclick="addCategory()" id="btn-save-category" class="ios-btn w-full py-3.5 bg-gray-900 dark:bg-white hover:bg-black text-white dark:text-black font-bold rounded-xl shadow-lg shadow-gray-300/50 mt-2">
                     Dodaj do listy
                 </button>
             </div>
@@ -1260,6 +1340,7 @@
         
         let newCategoryType = 'fixed';
         let newCategoryColor = 'blue';
+        let editingBudgetId = null; // Track expense being edited
 
         let pendingConfirmAction = null;
         let selectedImportFile = null;
@@ -1617,17 +1698,56 @@
             
             document.getElementById('budget-remaining').innerText = finalRemaining.toLocaleString('pl-PL', {minimumFractionDigits: 2});
             document.getElementById('sum-fixed').innerText = formatCurrency(sumFixed);
+            // Punkt 8: "Baza %" formatting fix
             document.getElementById('base-for-percent').innerText = `Baza %: ${remainderAfterFixed.toLocaleString('pl-PL', {minimumFractionDigits:0})} zł`;
 
-            // UI Mode Toggles
+            // UI Mode Toggles - Punkt 3: Match Calendar Toggle Styles
             const btnGroups = document.getElementById('chart-mode-groups');
             const btnDetails = document.getElementById('chart-mode-details');
-            if(state.chartMode === 'groups') {
-                btnGroups.className = "px-2 py-1 rounded bg-gray-600 text-white shadow transition";
-                btnDetails.className = "px-2 py-1 rounded text-gray-400 hover:text-white transition";
+            
+            // Logic for toggle classes based on theme & state
+            // We need to check theme mode here, which is tricky in pure JS without re-checking DOM or state
+            // Rely on 'dark' class on html element and 'liquid-theme' on body
+            
+            const isDark = document.documentElement.classList.contains('dark');
+            const isLiquid = document.body.classList.contains('liquid-theme');
+
+            let activeClass = "";
+            let inactiveClass = "";
+
+            if (isLiquid) {
+                // LIQUID MODE
+                if (isDark) {
+                    // DARK LIQUID (Best look: light translucent active)
+                    activeClass = "toggle-active-style"; // defined in CSS
+                    inactiveClass = "toggle-inactive-style"; // defined in CSS
+                } else {
+                    // LIGHT LIQUID (Dark translucent active for contrast)
+                    activeClass = "toggle-active-style"; // defined in CSS
+                    inactiveClass = "toggle-inactive-style"; // defined in CSS
+                }
             } else {
-                btnGroups.className = "px-2 py-1 rounded text-gray-400 hover:text-white transition";
-                btnDetails.className = "px-2 py-1 rounded bg-gray-600 text-white shadow transition";
+                // STANDARD MODE
+                if (isDark) {
+                    // DARK STANDARD
+                    activeClass = "bg-gray-600 text-white shadow";
+                    inactiveClass = "text-gray-400 hover:bg-gray-700";
+                } else {
+                    // LIGHT STANDARD
+                    activeClass = "bg-white text-gray-800 shadow";
+                    inactiveClass = "text-gray-500 hover:bg-gray-200";
+                }
+            }
+
+            // Base classes
+            const baseBtn = "px-2 py-1 rounded-md transition text-center text-[10px] font-bold";
+
+            if(state.chartMode === 'groups') {
+                btnGroups.className = `${baseBtn} ${activeClass}`;
+                btnDetails.className = `${baseBtn} ${inactiveClass}`;
+            } else {
+                btnGroups.className = `${baseBtn} ${inactiveClass}`;
+                btnDetails.className = `${baseBtn} ${activeClass}`;
             }
 
             // Render Lists
@@ -1644,7 +1764,8 @@
 
             fixedExpenses.forEach(item => {
                 const el = document.createElement('div');
-                el.className = "flex justify-between items-center ios-card liquid-glass-card p-3 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm"; // Dodano liquid-glass-card
+                // Punkt 1: Added dark:bg-darkcard to fix white background in classic dark mode
+                el.className = "flex justify-between items-center ios-card liquid-glass-card p-3 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm dark:bg-darkcard"; 
                 el.innerHTML = `
                     <div class="flex items-center gap-3">
                         <div class="w-2.5 h-2.5 rounded-full ${bgColors[item.color]}"></div>
@@ -1652,7 +1773,9 @@
                     </div>
                     <div class="flex items-center gap-3">
                         <span class="font-bold text-gray-900 dark:text-white">${formatCurrency(item.val)}</span>
-                        <button onclick="deleteBudgetItem('${item.id}')" class="text-gray-300 hover:text-red-500 w-6 h-6 flex items-center justify-center"><i class="fas fa-trash-alt text-xs"></i></button>
+                        <!-- Punkt 4: Edit Button -->
+                        <button onclick="editBudgetItem('${item.id}')" class="text-gray-400 hover:text-blue-500 w-6 h-6 flex items-center justify-center"><i class="fas fa-pen text-xs"></i></button>
+                        <button onclick="deleteBudgetItem('${item.id}')" class="text-gray-400 hover:text-red-500 w-6 h-6 flex items-center justify-center"><i class="fas fa-trash-alt text-xs"></i></button>
                     </div>
                 `;
                 listFixed.appendChild(el);
@@ -1665,7 +1788,8 @@
 
             processedPercentItems.forEach(item => {
                  const el = document.createElement('div');
-                el.className = "flex flex-col ios-card liquid-glass-card p-3 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm"; // Dodano liquid-glass-card
+                // Punkt 1: Added dark:bg-darkcard here too
+                el.className = "flex flex-col ios-card liquid-glass-card p-3 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm dark:bg-darkcard";
                 el.innerHTML = `
                     <div class="flex justify-between items-center mb-1">
                         <div class="flex items-center gap-3">
@@ -1674,7 +1798,9 @@
                         </div>
                         <div class="flex items-center gap-3">
                             <span class="font-bold text-gray-900 dark:text-white">${formatCurrency(item.calculatedVal)}</span>
-                            <button onclick="deleteBudgetItem('${item.id}')" class="text-gray-300 hover:text-red-500 w-6 h-6 flex items-center justify-center"><i class="fas fa-trash-alt text-xs"></i></button>
+                            <!-- Punkt 4: Edit Button -->
+                            <button onclick="editBudgetItem('${item.id}')" class="text-gray-400 hover:text-blue-500 w-6 h-6 flex items-center justify-center"><i class="fas fa-pen text-xs"></i></button>
+                            <button onclick="deleteBudgetItem('${item.id}')" class="text-gray-400 hover:text-red-500 w-6 h-6 flex items-center justify-center"><i class="fas fa-trash-alt text-xs"></i></button>
                         </div>
                     </div>
                     <div class="w-full bg-gray-100 dark:bg-gray-700 h-1.5 rounded-full overflow-hidden mt-1">
@@ -1736,6 +1862,24 @@
             document.getElementById('new-cat-name').value = '';
             document.getElementById('new-cat-val').value = '';
             setCategoryColor('blue');
+            editingBudgetId = null; // Reset editing state
+            document.getElementById('modal-category-title').innerText = "Nowy Wydatek";
+            document.getElementById('btn-save-category').innerText = "Dodaj do listy";
+            document.getElementById('add-category-modal').classList.add('show');
+        }
+
+        function editBudgetItem(id) {
+            const item = state.budgetData[currentCalcMonth].find(i => i.id === id);
+            if(!item) return;
+
+            editingBudgetId = id;
+            setCategoryType(item.type);
+            document.getElementById('new-cat-name').value = item.name;
+            document.getElementById('new-cat-val').value = item.val;
+            setCategoryColor(item.color);
+            
+            document.getElementById('modal-category-title').innerText = "Edytuj Wydatek";
+            document.getElementById('btn-save-category').innerText = "Zapisz zmiany";
             document.getElementById('add-category-modal').classList.add('show');
         }
 
@@ -1790,19 +1934,35 @@
 
             if(!state.budgetData[currentCalcMonth]) state.budgetData[currentCalcMonth] = [];
             
-            state.budgetData[currentCalcMonth].push({
-                id: Date.now().toString(),
-                name: name,
-                type: newCategoryType,
-                // Ensure input value is rounded to 2 decimals before saving
-                val: Math.round(val * 100) / 100,
-                color: newCategoryColor
-            });
+            if (editingBudgetId) {
+                // Update existing
+                const index = state.budgetData[currentCalcMonth].findIndex(i => i.id === editingBudgetId);
+                if(index !== -1) {
+                    state.budgetData[currentCalcMonth][index] = {
+                        ...state.budgetData[currentCalcMonth][index],
+                        name: name,
+                        type: newCategoryType,
+                        val: Math.round(val * 100) / 100,
+                        color: newCategoryColor
+                    };
+                    showToast("Zapisano zmiany");
+                }
+            } else {
+                // Create new
+                state.budgetData[currentCalcMonth].push({
+                    id: Date.now().toString(),
+                    name: name,
+                    type: newCategoryType,
+                    // Ensure input value is rounded to 2 decimals before saving
+                    val: Math.round(val * 100) / 100,
+                    color: newCategoryColor
+                });
+                showToast("Dodano wydatek");
+            }
             
             saveState();
             closeAddCategoryModal();
             renderBudget();
-            showToast("Dodano wydatek");
         }
 
         function deleteBudgetItem(id) {
@@ -2032,19 +2192,14 @@
                 container.appendChild(div);
             });
             
-            // Blok "Koniec historii"
+            // Spacer
             const footerSpacer = document.createElement('div');
-            footerSpacer.className = "flex flex-col items-center justify-center h-24 opacity-50 mt-24"; // Increased mt-16 to mt-24
+            footerSpacer.className = "flex flex-col items-center justify-center h-48 opacity-50 mt-24";
             footerSpacer.innerHTML = `
                 <div class="w-full border-t border-dashed border-gray-300 dark:border-gray-700 mb-8"></div>
                 <p class="text-[10px] text-gray-400 uppercase tracking-widest">Koniec historii</p>
             `;
             container.appendChild(footerSpacer);
-
-            // DODANO: Niewidzialny blok 300px na sam dół
-            const extraBottomSpace = document.createElement('div');
-            extraBottomSpace.className = "h-[300px] w-full pointer-events-none"; 
-            container.appendChild(extraBottomSpace);
         }
 
         // NEW FUNCTION TO TOGGLE DETAILS
@@ -2064,6 +2219,7 @@
             }
         }
 
+        // DEFINING renderHoursList AT TOP LEVEL
         function renderHoursList() {
             const container = document.getElementById('hours-list-container');
             const summary = document.getElementById('hours-list-summary');
@@ -2105,7 +2261,7 @@
                 
                 if(!isEditing) {
                     div.innerHTML = `
-                        <div class="p-4 flex justify-between items-center bg-white dark:bg-darkcard hover:bg-gray-50 dark:hover:bg-gray-800 transition cursor-pointer" onclick="toggleEditDay('${k}')">
+                        <div class="p-4 flex justify-between items-center bg-white dark:bg-darkcard hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                             <div class="flex items-center gap-4">
                                 <div class="bg-gray-100 dark:bg-gray-700 rounded-xl w-12 h-12 flex flex-col items-center justify-center border border-gray-200 dark:border-gray-600">
                                     <span class="text-[9px] font-bold text-gray-400 dark:text-gray-300 uppercase leading-none mb-0.5">Dzień</span>
@@ -2116,9 +2272,15 @@
                                     <p class="text-sm text-gray-400 font-medium">${data.type === 'range' ? data.start + ' - ' + data.end : 'Godziny proste'}</p>
                                 </div>
                             </div>
-                             <div class="text-right">
-                                <p class="text-2xl font-bold text-orange-500 tabular-nums">${data.val}</p>
-                                <span class="text-[10px] text-gray-400 font-bold uppercase">Godzin</span>
+                             <div class="flex items-center gap-4">
+                                <div class="text-right">
+                                    <p class="text-2xl font-bold text-orange-500 tabular-nums">${data.val}</p>
+                                    <span class="text-[10px] text-gray-400 font-bold uppercase">Godzin</span>
+                                </div>
+                                <!-- Edit Button -->
+                                <button onclick="toggleEditDay('${k}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 flex items-center justify-center hover:bg-blue-100 hover:text-blue-500 dark:hover:bg-gray-600 transition">
+                                    <i class="fas fa-pen text-xs"></i>
+                                </button>
                             </div>
                         </div>
                     `;
@@ -2165,306 +2327,14 @@
                 container.appendChild(div);
             });
             
-            // HERE IS THE CHANGE: Add the spacer/footer text block
+            // Spacer
             const footerSpacer = document.createElement('div');
-            footerSpacer.className = "flex flex-col items-center justify-center h-48 opacity-50 mt-24"; // Increased mt-16 to mt-24
+            footerSpacer.className = "flex flex-col items-center justify-center h-48 opacity-50 mt-24";
             footerSpacer.innerHTML = `
                 <div class="w-full border-t border-dashed border-gray-300 dark:border-gray-700 mb-8"></div>
                 <p class="text-[10px] text-gray-400 uppercase tracking-widest">Koniec historii</p>
             `;
             container.appendChild(footerSpacer);
-        }
-
-        // --- Helper Functions ---
-
-        function updateActualSalary(mKey, val) {
-            // Round immediately after input to ensure only 2 decimal places are saved
-            state.actualSalary[mKey] = Math.round(parseFloat(val) * 100) / 100 || 0;
-            saveState();
-        }
-        
-        function saveManualEntry(mKey) {
-            const input = document.getElementById(`actual-${mKey}`);
-            let val = 0;
-            if(input) {
-                // Read from state, which is already rounded by updateActualSalary
-                val = state.actualSalary[mKey];
-                saveState();
-            }
-            if (val > 0) showToast("Zapisano!");
-            renderHistory(); 
-        }
-        
-        function clearActualAndRevertStatus(mKey) {
-             state.actualSalary[mKey] = 0;
-             saveState();
-             renderHistory();
-        }
-
-        function togglePaymentStatus(mKey) {
-            if(state.paymentStatus[mKey] === 'paid') {
-                state.paymentStatus[mKey] = 'pending';
-                state.actualSalary[mKey] = 0; 
-            } else {
-                state.paymentStatus[mKey] = 'paid';
-            }
-            saveState();
-            renderHistory();
-        }
-
-        function loadMonthToCalendar(year, month) {
-            calendarDate.setFullYear(parseInt(year));
-            calendarDate.setMonth(parseInt(month) - 1);
-            const prefix = `${calendarDate.getFullYear()}-${String(calendarDate.getMonth() + 1).padStart(2, '0')}-`;
-            Object.keys(state.workLog).filter(k => k.startsWith(prefix)).forEach(k => {
-                editingState[k] = true;
-            });
-            renderCalendar();
-            switchTab('calendar');
-        }
-
-        function loadMonthToBudget(mKey) {
-            currentCalcMonth = mKey;
-            const [y, m] = mKey.split('-');
-            calendarDate.setFullYear(parseInt(y));
-            calendarDate.setMonth(parseInt(m) - 1);
-            
-            switchTab('budget');
-        }
-
-        function changeMonth(delta) {
-            calendarDate.setMonth(calendarDate.getMonth() + delta);
-            renderCalendar();
-        }
-
-        function getKey(day) {
-            return `${calendarDate.getFullYear()}-${String(calendarDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        }
-
-        function renderCalendar() {
-            document.getElementById('calendar-month-year').innerText = `${monthsNominative[calendarDate.getMonth()]} ${calendarDate.getFullYear()}`;
-            
-            const mName = monthsNominative[calendarDate.getMonth()];
-            const yVal = calendarDate.getFullYear();
-            const headerLabel = document.getElementById('header-label');
-            if(headerLabel) headerLabel.innerText = `Suma godzin (${mName} ${yVal})`;
-
-            const grid = document.getElementById('calendar-grid');
-            grid.innerHTML = '';
-
-            const daysInMonth = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0).getDate();
-            let startDay = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), 1).getDay();
-            startDay = startDay === 0 ? 6 : startDay - 1; 
-
-            for (let i = 0; i < startDay; i++) {
-                const div = document.createElement('div');
-                div.className = "calendar-day empty";
-                grid.appendChild(div);
-            }
-
-            const today = new Date();
-            const isCurrentMonth = today.getFullYear() === calendarDate.getFullYear() && today.getMonth() === calendarDate.getMonth();
-
-            for (let i = 1; i <= daysInMonth; i++) {
-                const div = document.createElement('div');
-                const key = getKey(i);
-                const data = state.workLog[key];
-                const isSelected = !!data;
-                const isNight = data && data.isNight;
-                
-                const dateObj = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), i);
-                const dayOfWeek = dateObj.getDay();
-                
-                let extraClass = '';
-                if (dayOfWeek === 0) extraClass = 'weekend-sun';
-                else if (dayOfWeek === 6) extraClass = 'weekend-sat';
-                if (isNight) extraClass += ' night-shift';
-                
-                if (isCurrentMonth && i === today.getDate()) extraClass += ' today';
-
-                div.className = `calendar-day ${extraClass} ${isSelected ? 'selected' : ''}`;
-                
-                // Content
-                div.innerHTML = `<span class="text-sm">${i}</span>`;
-                
-                if(isSelected && data.val > 0) {
-                    div.innerHTML += `<span class="day-hours-badge">${data.val}h</span>`;
-                }
-
-                div.onclick = () => toggleDay(i);
-                grid.appendChild(div);
-            }
-
-            calculateTotalWorkHours();
-            renderHoursList();
-        }
-
-        function toggleDay(day) {
-            const key = getKey(day);
-            if (state.workLog[key]) {
-                delete state.workLog[key];
-            } else {
-                if (state.fixedHours.enabled) {
-                    // Quick Add: Save immediately, NO EDIT MODE
-                    if (state.fixedHours.type === 'simple') {
-                        state.workLog[key] = { type: 'simple', val: state.fixedHours.val > 0 ? state.fixedHours.val : 8, start: '', end: '', isNight: false };
-                    } else {
-                        const h = calcDiff(state.fixedHours.start, state.fixedHours.end);
-                         const isNight = isRangeNight(state.fixedHours.start, state.fixedHours.end);
-                        state.workLog[key] = { type: 'range', val: h, start: state.fixedHours.start, end: state.fixedHours.end, isNight: isNight };
-                    }
-                    editingState[key] = false; // Ensure edit mode is OFF for quick add
-                } else {
-                    // Manual Add: Open Edit Mode
-                    state.workLog[key] = { type: 'simple', val: 0, start: '', end: '', isNight: false };
-                    editingState[key] = true;
-                    // Auto-expand list to show manual entry form
-                    state.listCollapsed = false;
-                }
-            }
-            saveState();
-            renderCalendar();
-        }
-        
-        function isRangeNight(s, e) {
-             if(!s || !e) return false;
-             const startH = parseInt(s.split(':')[0]);
-             const endH = parseInt(e.split(':')[0]);
-             return endH < startH;
-        }
-
-        function toggleListCollapse() {
-            state.listCollapsed = !state.listCollapsed;
-            renderHoursList();
-            saveState();
-        }
-
-        function toggleEditDay(key) {
-            editingState[key] = !editingState[key];
-            renderHoursList();
-        }
-        
-        function saveDayEdit(key) {
-            editingState[key] = false;
-            saveState();
-            renderHoursList();
-            renderCalendar(); // Update badges immediately
-        }
-        
-        function toggleNightShift(key) {
-            const data = state.workLog[key];
-            if(data) {
-                data.isNight = !data.isNight;
-                if(data.type === 'range') {
-                    data.val = calcDiff(data.start, data.end, data.isNight);
-                }
-                saveState();
-                renderHoursList();
-                renderCalendar(); 
-                calculateTotalWorkHours();
-            }
-        }
-
-        function renderHoursList() {
-            const container = document.getElementById('hours-list-container');
-            const summary = document.getElementById('hours-list-summary');
-            const collapseText = document.getElementById('collapse-text');
-            const collapseIcon = document.getElementById('collapse-icon');
-
-            const prefix = `${calendarDate.getFullYear()}-${String(calendarDate.getMonth() + 1).padStart(2, '0')}-`;
-            const days = Object.keys(state.workLog)
-                .filter(k => k.startsWith(prefix))
-                .sort();
-
-            if (state.listCollapsed) {
-                container.classList.add('hidden');
-                summary.classList.remove('hidden');
-                document.getElementById('hidden-count').innerText = days.length;
-                collapseText.innerText = "Rozwiń";
-                collapseIcon.className = "fas fa-chevron-down";
-            } else {
-                container.classList.remove('hidden');
-                summary.classList.add('hidden');
-                collapseText.innerText = "Zwiń";
-                collapseIcon.className = "fas fa-chevron-up";
-            }
-
-            container.innerHTML = days.length === 0 
-                ? '<div class="text-center py-10 text-gray-400 text-sm bg-white dark:bg-darkcard rounded-xl border border-dashed border-gray-200 dark:border-gray-700"><i class="fas fa-calendar-plus text-2xl mb-2 block opacity-50"></i>Wybierz dni w kalendarzu</div>' 
-                : '';
-
-            days.forEach((k, index) => {
-                const dayNum = parseInt(k.split('-')[2]);
-                const dayMonth = parseInt(k.split('-')[1]) - 1;
-                const data = state.workLog[k];
-                const isEditing = editingState[k] !== false;
-
-                const div = document.createElement('div');
-                div.className = "ios-card dark:bg-darkcard transition-all duration-200 border border-gray-100 dark:border-gray-800 overflow-hidden";
-                
-                const moonIcon = data.isNight ? '<i class="fas fa-moon text-indigo-500 ml-1 text-xs"></i>' : '';
-                
-                if(!isEditing) {
-                    div.innerHTML = `
-                        <div class="p-4 flex justify-between items-center bg-white dark:bg-darkcard hover:bg-gray-50 dark:hover:bg-gray-800 transition cursor-pointer" onclick="toggleEditDay('${k}')">
-                            <div class="flex items-center gap-4">
-                                <div class="bg-gray-100 dark:bg-gray-700 rounded-xl w-12 h-12 flex flex-col items-center justify-center border border-gray-200 dark:border-gray-600">
-                                    <span class="text-[9px] font-bold text-gray-400 dark:text-gray-300 uppercase leading-none mb-0.5">Dzień</span>
-                                    <span class="text-lg font-bold text-gray-800 dark:text-white leading-none">${dayNum}</span>
-                                </div>
-                                <div>
-                                    <p class="font-bold text-gray-700 dark:text-white text-sm capitalize">${monthsGenitive[dayMonth]} ${moonIcon}</p>
-                                    <p class="text-sm text-gray-400 font-medium">${data.type === 'range' ? data.start + ' - ' + data.end : 'Godziny proste'}</p>
-                                </div>
-                            </div>
-                             <div class="text-right">
-                                <p class="text-2xl font-bold text-orange-500 tabular-nums">${data.val}</p>
-                                <span class="text-[10px] text-gray-400 font-bold uppercase">Godzin</span>
-                            </div>
-                        </div>
-                    `;
-                } else {
-                    const isSimple = data.type === 'simple';
-                    div.innerHTML = `
-                        <div class="p-4 bg-gray-50/80 dark:bg-gray-800">
-                            <div class="flex justify-between items-center mb-4">
-                                <span class="font-bold text-gray-800 dark:text-white text-sm">${dayNum} ${monthsGenitive[dayMonth]}</span>
-                                <div class="flex bg-white dark:bg-gray-700 rounded-lg p-1 text-[10px] font-bold shadow-sm border border-gray-200 dark:border-gray-600">
-                                    <button onclick="changeDayType('${k}','simple')" class="px-3 py-1.5 rounded-md transition ${isSimple ? 'bg-gray-800 text-white shadow dark:bg-black' : 'text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600'}">Liczba</button>
-                                    <button onclick="changeDayType('${k}','range')" class="px-3 py-1.5 rounded-md transition ${!isSimple ? 'bg-gray-800 text-white shadow dark:bg-black' : 'text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600'}">Zegar</button>
-                                </div>
-                            </div>
-                            
-                            ${isSimple ? `
-                                <div class="flex items-center gap-3 mb-4">
-                                    <div class="relative flex-grow">
-                                        <input type="number" value="${data.val}" onchange="updateDayData('${k}','val',this.value)" class="w-full bg-white dark:bg-gray-700 rounded-xl p-3 text-center font-bold text-gray-900 dark:text-white border border-gray-200 dark:border-gray-600 focus:border-blue-500 transition outline-none shadow-sm text-lg">
-                                        <span class="absolute right-4 top-4 text-xs font-bold text-gray-400">GODZ</span>
-                                    </div>
-                                </div>
-                            ` : `
-                                <div class="flex items-center gap-2 mb-4">
-                                    <input type="time" value="${data.start || '08:00'}" onchange="updateDayData('${k}','start',this.value)" class="bg-white dark:bg-gray-700 rounded-xl p-3 w-full text-center font-bold text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 outline-none shadow-sm text-sm">
-                                    <span class="text-gray-400 font-bold">-</span>
-                                    <input type="time" value="${data.end || '16:00'}" onchange="updateDayData('${k}','end',this.value)" class="bg-white dark:bg-gray-700 rounded-xl p-3 w-full text-center font-bold text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 outline-none shadow-sm text-sm">
-                                </div>
-                                
-                                <div class="flex justify-between items-center mb-4">
-                                     <button onclick="toggleNightShift('${k}')" class="text-xs font-bold px-3 py-2 rounded-lg border flex items-center gap-1.5 transition ${data.isNight ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200 border-indigo-200 dark:border-indigo-800' : 'bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-300 border-gray-200 dark:border-gray-600'}">
-                                        <i class="fas fa-moon"></i> Nocka
-                                     </button>
-                                     <span class="text-xs font-bold text-orange-600 bg-orange-100 px-3 py-2 rounded-lg">Razem: ${data.val}h</span>
-                                </div>
-                            `}
-                            
-                            <button onclick="saveDayEdit('${k}')" class="w-full py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl text-sm shadow-md transition flex items-center justify-center gap-2">
-                                <i class="fas fa-check"></i> Zatwierdź zmiany
-                            </button>
-                        </div>
-                    `;
-                }
-                container.appendChild(div);
-            });
         }
 
         function changeDayType(key, type) {
@@ -2704,9 +2574,6 @@
                 closeSettings();
                 switchTab('calendar');
                 
-                // Optional: Try reload, if it works, good. If not, we handled it.
-                // location.reload(); // Commented out to rely on soft reset which is smoother
-                
                 showToast("Aplikacja zresetowana");
              });
         }
@@ -2730,6 +2597,194 @@
             
             let m = endM - startM;
             return Math.round((m / 60) * 100) / 100;
+        }
+        
+        function isRangeNight(s, e) {
+             if(!s || !e) return false;
+             const startH = parseInt(s.split(':')[0]);
+             const endH = parseInt(e.split(':')[0]);
+             return endH < startH;
+        }
+
+        function toggleDay(day) {
+            const key = getKey(day);
+            if (state.workLog[key]) {
+                delete state.workLog[key];
+            } else {
+                if (state.fixedHours.enabled) {
+                    // Quick Add: Save immediately, NO EDIT MODE
+                    if (state.fixedHours.type === 'simple') {
+                        state.workLog[key] = { type: 'simple', val: state.fixedHours.val > 0 ? state.fixedHours.val : 8, start: '', end: '', isNight: false };
+                    } else {
+                        const h = calcDiff(state.fixedHours.start, state.fixedHours.end);
+                         const isNight = isRangeNight(state.fixedHours.start, state.fixedHours.end);
+                        state.workLog[key] = { type: 'range', val: h, start: state.fixedHours.start, end: state.fixedHours.end, isNight: isNight };
+                    }
+                    editingState[key] = false; // Ensure edit mode is OFF for quick add
+                } else {
+                    // Manual Add: Open Edit Mode
+                    state.workLog[key] = { type: 'simple', val: 0, start: '', end: '', isNight: false };
+                    editingState[key] = true;
+                    // Auto-expand list to show manual entry form
+                    state.listCollapsed = false;
+                }
+            }
+            saveState();
+            renderCalendar();
+        }
+
+        function toggleListCollapse() {
+            state.listCollapsed = !state.listCollapsed;
+            renderHoursList();
+            saveState();
+        }
+
+        function toggleEditDay(key) {
+            editingState[key] = !editingState[key];
+            renderHoursList();
+        }
+        
+        function saveDayEdit(key) {
+            editingState[key] = false;
+            saveState();
+            renderHoursList();
+            renderCalendar(); // Update badges immediately
+        }
+        
+        function toggleNightShift(key) {
+            const data = state.workLog[key];
+            if(data) {
+                data.isNight = !data.isNight;
+                if(data.type === 'range') {
+                    data.val = calcDiff(data.start, data.end, data.isNight);
+                }
+                saveState();
+                renderHoursList();
+                renderCalendar(); 
+                calculateTotalWorkHours();
+            }
+        }
+
+        function getKey(day) {
+            return `${calendarDate.getFullYear()}-${String(calendarDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        }
+
+        function renderCalendar() {
+            document.getElementById('calendar-month-year').innerText = `${monthsNominative[calendarDate.getMonth()]} ${calendarDate.getFullYear()}`;
+            
+            const mName = monthsNominative[calendarDate.getMonth()];
+            const yVal = calendarDate.getFullYear();
+            const headerLabel = document.getElementById('header-label');
+            if(headerLabel) headerLabel.innerText = `Suma godzin (${mName} ${yVal})`;
+
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+
+            const daysInMonth = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0).getDate();
+            let startDay = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), 1).getDay();
+            startDay = startDay === 0 ? 6 : startDay - 1; 
+
+            for (let i = 0; i < startDay; i++) {
+                const div = document.createElement('div');
+                div.className = "calendar-day empty";
+                grid.appendChild(div);
+            }
+
+            const today = new Date();
+            const isCurrentMonth = today.getFullYear() === calendarDate.getFullYear() && today.getMonth() === calendarDate.getMonth();
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const div = document.createElement('div');
+                const key = getKey(i);
+                const data = state.workLog[key];
+                const isSelected = !!data;
+                const isNight = data && data.isNight;
+                
+                const dateObj = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), i);
+                const dayOfWeek = dateObj.getDay();
+                
+                let extraClass = '';
+                if (dayOfWeek === 0) extraClass = 'weekend-sun';
+                else if (dayOfWeek === 6) extraClass = 'weekend-sat';
+                if (isNight) extraClass += ' night-shift';
+                
+                if (isCurrentMonth && i === today.getDate()) extraClass += ' today';
+
+                div.className = `calendar-day ${extraClass} ${isSelected ? 'selected' : ''}`;
+                
+                // Content
+                div.innerHTML = `<span class="text-sm">${i}</span>`;
+                
+                if(isSelected && data.val > 0) {
+                    div.innerHTML += `<span class="day-hours-badge">${data.val}h</span>`;
+                }
+
+                div.onclick = () => toggleDay(i);
+                grid.appendChild(div);
+            }
+
+            calculateTotalWorkHours();
+            renderHoursList();
+        }
+
+        function changeMonth(delta) {
+            calendarDate.setMonth(calendarDate.getMonth() + delta);
+            renderCalendar();
+        }
+
+        function loadMonthToCalendar(year, month) {
+            calendarDate.setFullYear(parseInt(year));
+            calendarDate.setMonth(parseInt(month) - 1);
+            const prefix = `${calendarDate.getFullYear()}-${String(calendarDate.getMonth() + 1).padStart(2, '0')}-`;
+            Object.keys(state.workLog).filter(k => k.startsWith(prefix)).forEach(k => {
+                editingState[k] = true;
+            });
+            renderCalendar();
+            switchTab('calendar');
+        }
+
+        function loadMonthToBudget(mKey) {
+            currentCalcMonth = mKey;
+            const [y, m] = mKey.split('-');
+            calendarDate.setFullYear(parseInt(y));
+            calendarDate.setMonth(parseInt(m) - 1);
+            
+            switchTab('budget');
+        }
+
+        function updateActualSalary(mKey, val) {
+            // Round immediately after input to ensure only 2 decimal places are saved
+            state.actualSalary[mKey] = Math.round(parseFloat(val) * 100) / 100 || 0;
+            saveState();
+        }
+        
+        function saveManualEntry(mKey) {
+            const input = document.getElementById(`actual-${mKey}`);
+            let val = 0;
+            if(input) {
+                // Read from state, which is already rounded by updateActualSalary
+                val = state.actualSalary[mKey];
+                saveState();
+            }
+            if (val > 0) showToast("Zapisano!");
+            renderHistory(); 
+        }
+        
+        function clearActualAndRevertStatus(mKey) {
+             state.actualSalary[mKey] = 0;
+             saveState();
+             renderHistory();
+        }
+
+        function togglePaymentStatus(mKey) {
+            if(state.paymentStatus[mKey] === 'paid') {
+                state.paymentStatus[mKey] = 'pending';
+                state.actualSalary[mKey] = 0; 
+            } else {
+                state.paymentStatus[mKey] = 'paid';
+            }
+            saveState();
+            renderHistory();
         }
 
         init();
