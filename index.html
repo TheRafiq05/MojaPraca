@@ -2011,9 +2011,315 @@
                 container.appendChild(div);
             });
             
+            // Blok "Koniec historii"
+            const footerSpacer = document.createElement('div');
+            footerSpacer.className = "flex flex-col items-center justify-center h-24 opacity-50 mt-12"; 
+            footerSpacer.innerHTML = `
+                <div class="w-full border-t border-dashed border-gray-300 dark:border-gray-700 mb-4"></div>
+                <p class="text-[10px] text-gray-400 uppercase tracking-widest">Koniec historii</p>
+            `;
+            container.appendChild(footerSpacer);
+
+            // DODANO: Niewidzialny blok 300px na sam dół, aby wypchnąć treść nad stopkę
+            const extraBottomSpace = document.createElement('div');
+            extraBottomSpace.className = "h-[300px] w-full pointer-events-none"; 
+            container.appendChild(extraBottomSpace);
+        }
+
+        // --- Helper Functions ---
+
+        function updateActualSalary(mKey, val) {
+            // Round immediately after input to ensure only 2 decimal places are saved
+            state.actualSalary[mKey] = Math.round(parseFloat(val) * 100) / 100 || 0;
+            saveState();
+        }
+        
+        function saveManualEntry(mKey) {
+            const input = document.getElementById(`actual-${mKey}`);
+            let val = 0;
+            if(input) {
+                // Read from state, which is already rounded by updateActualSalary
+                val = state.actualSalary[mKey];
+                saveState();
+            }
+            if (val > 0) showToast("Zapisano!");
+            renderHistory(); 
+        }
+        
+        function clearActualAndRevertStatus(mKey) {
+             state.actualSalary[mKey] = 0;
+             saveState();
+             renderHistory();
+        }
+
+        function togglePaymentStatus(mKey) {
+            if(state.paymentStatus[mKey] === 'paid') {
+                state.paymentStatus[mKey] = 'pending';
+                state.actualSalary[mKey] = 0; 
+            } else {
+                state.paymentStatus[mKey] = 'paid';
+            }
+            saveState();
+            renderHistory();
+        }
+
+        function loadMonthToCalendar(year, month) {
+            calendarDate.setFullYear(parseInt(year));
+            calendarDate.setMonth(parseInt(month) - 1);
+            const prefix = `${calendarDate.getFullYear()}-${String(calendarDate.getMonth() + 1).padStart(2, '0')}-`;
+            Object.keys(state.workLog).filter(k => k.startsWith(prefix)).forEach(k => {
+                editingState[k] = true;
+            });
+            renderCalendar();
+            switchTab('calendar');
+        }
+
+        function loadMonthToBudget(mKey) {
+            currentCalcMonth = mKey;
+            const [y, m] = mKey.split('-');
+            calendarDate.setFullYear(parseInt(y));
+            calendarDate.setMonth(parseInt(m) - 1);
+            
+            switchTab('budget');
+        }
+
+        function changeMonth(delta) {
+            calendarDate.setMonth(calendarDate.getMonth() + delta);
+            renderCalendar();
+        }
+
+        function getKey(day) {
+            return `${calendarDate.getFullYear()}-${String(calendarDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+        }
+
+        function renderCalendar() {
+            document.getElementById('calendar-month-year').innerText = `${monthsNominative[calendarDate.getMonth()]} ${calendarDate.getFullYear()}`;
+            
+            const mName = monthsNominative[calendarDate.getMonth()];
+            const yVal = calendarDate.getFullYear();
+            const headerLabel = document.getElementById('header-label');
+            if(headerLabel) headerLabel.innerText = `Suma godzin (${mName} ${yVal})`;
+
+            const grid = document.getElementById('calendar-grid');
+            grid.innerHTML = '';
+
+            const daysInMonth = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0).getDate();
+            let startDay = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), 1).getDay();
+            startDay = startDay === 0 ? 6 : startDay - 1; 
+
+            for (let i = 0; i < startDay; i++) {
+                const div = document.createElement('div');
+                div.className = "calendar-day empty";
+                grid.appendChild(div);
+            }
+
+            const today = new Date();
+            const isCurrentMonth = today.getFullYear() === calendarDate.getFullYear() && today.getMonth() === calendarDate.getMonth();
+
+            for (let i = 1; i <= daysInMonth; i++) {
+                const div = document.createElement('div');
+                const key = getKey(i);
+                const data = state.workLog[key];
+                const isSelected = !!data;
+                const isNight = data && data.isNight;
+                
+                const dateObj = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), i);
+                const dayOfWeek = dateObj.getDay();
+                
+                let extraClass = '';
+                if (dayOfWeek === 0) extraClass = 'weekend-sun';
+                else if (dayOfWeek === 6) extraClass = 'weekend-sat';
+                if (isNight) extraClass += ' night-shift';
+                
+                if (isCurrentMonth && i === today.getDate()) extraClass += ' today';
+
+                div.className = `calendar-day ${extraClass} ${isSelected ? 'selected' : ''}`;
+                
+                // Content
+                div.innerHTML = `<span class="text-sm">${i}</span>`;
+                
+                if(isSelected && data.val > 0) {
+                    div.innerHTML += `<span class="day-hours-badge">${data.val}h</span>`;
+                }
+
+                div.onclick = () => toggleDay(i);
+                grid.appendChild(div);
+            }
+
+            calculateTotalWorkHours();
+            renderHoursList();
+        }
+
+        function toggleDay(day) {
+            const key = getKey(day);
+            if (state.workLog[key]) {
+                delete state.workLog[key];
+            } else {
+                if (state.fixedHours.enabled) {
+                    // Quick Add: Save immediately, NO EDIT MODE
+                    if (state.fixedHours.type === 'simple') {
+                        state.workLog[key] = { type: 'simple', val: state.fixedHours.val > 0 ? state.fixedHours.val : 8, start: '', end: '', isNight: false };
+                    } else {
+                        const h = calcDiff(state.fixedHours.start, state.fixedHours.end);
+                         const isNight = isRangeNight(state.fixedHours.start, state.fixedHours.end);
+                        state.workLog[key] = { type: 'range', val: h, start: state.fixedHours.start, end: state.fixedHours.end, isNight: isNight };
+                    }
+                    editingState[key] = false; // Ensure edit mode is OFF for quick add
+                } else {
+                    // Manual Add: Open Edit Mode
+                    state.workLog[key] = { type: 'simple', val: 0, start: '', end: '', isNight: false };
+                    editingState[key] = true;
+                    // Auto-expand list to show manual entry form
+                    state.listCollapsed = false;
+                }
+            }
+            saveState();
+            renderCalendar();
+        }
+        
+        function isRangeNight(s, e) {
+             if(!s || !e) return false;
+             const startH = parseInt(s.split(':')[0]);
+             const endH = parseInt(e.split(':')[0]);
+             return endH < startH;
+        }
+
+        function toggleListCollapse() {
+            state.listCollapsed = !state.listCollapsed;
+            renderHoursList();
+            saveState();
+        }
+
+        function toggleEditDay(key) {
+            editingState[key] = !editingState[key];
+            renderHoursList();
+        }
+        
+        function saveDayEdit(key) {
+            editingState[key] = false;
+            saveState();
+            renderHoursList();
+            renderCalendar(); // Update badges immediately
+        }
+        
+        function toggleNightShift(key) {
+            const data = state.workLog[key];
+            if(data) {
+                data.isNight = !data.isNight;
+                if(data.type === 'range') {
+                    data.val = calcDiff(data.start, data.end, data.isNight);
+                }
+                saveState();
+                renderHoursList();
+                renderCalendar(); 
+                calculateTotalWorkHours();
+            }
+        }
+
+        function renderHoursList() {
+            const container = document.getElementById('hours-list-container');
+            const summary = document.getElementById('hours-list-summary');
+            const collapseText = document.getElementById('collapse-text');
+            const collapseIcon = document.getElementById('collapse-icon');
+
+            const prefix = `${calendarDate.getFullYear()}-${String(calendarDate.getMonth() + 1).padStart(2, '0')}-`;
+            const days = Object.keys(state.workLog)
+                .filter(k => k.startsWith(prefix))
+                .sort();
+
+            if (state.listCollapsed) {
+                container.classList.add('hidden');
+                summary.classList.remove('hidden');
+                document.getElementById('hidden-count').innerText = days.length;
+                collapseText.innerText = "Rozwiń";
+                collapseIcon.className = "fas fa-chevron-down";
+            } else {
+                container.classList.remove('hidden');
+                summary.classList.add('hidden');
+                collapseText.innerText = "Zwiń";
+                collapseIcon.className = "fas fa-chevron-up";
+            }
+
+            container.innerHTML = days.length === 0 
+                ? '<div class="text-center py-10 text-gray-400 text-sm bg-white dark:bg-darkcard rounded-xl border border-dashed border-gray-200 dark:border-gray-700"><i class="fas fa-calendar-plus text-2xl mb-2 block opacity-50"></i>Wybierz dni w kalendarzu</div>' 
+                : '';
+
+            days.forEach((k, index) => {
+                const dayNum = parseInt(k.split('-')[2]);
+                const dayMonth = parseInt(k.split('-')[1]) - 1;
+                const data = state.workLog[k];
+                const isEditing = editingState[k] !== false;
+
+                const div = document.createElement('div');
+                div.className = "ios-card dark:bg-darkcard transition-all duration-200 border border-gray-100 dark:border-gray-800 overflow-hidden";
+                
+                const moonIcon = data.isNight ? '<i class="fas fa-moon text-indigo-500 ml-1 text-xs"></i>' : '';
+                
+                if(!isEditing) {
+                    div.innerHTML = `
+                        <div class="p-4 flex justify-between items-center bg-white dark:bg-darkcard hover:bg-gray-50 dark:hover:bg-gray-800 transition cursor-pointer" onclick="toggleEditDay('${k}')">
+                            <div class="flex items-center gap-4">
+                                <div class="bg-gray-100 dark:bg-gray-700 rounded-xl w-12 h-12 flex flex-col items-center justify-center border border-gray-200 dark:border-gray-600">
+                                    <span class="text-[9px] font-bold text-gray-400 dark:text-gray-300 uppercase leading-none mb-0.5">Dzień</span>
+                                    <span class="text-lg font-bold text-gray-800 dark:text-white leading-none">${dayNum}</span>
+                                </div>
+                                <div>
+                                    <p class="font-bold text-gray-700 dark:text-white text-sm capitalize">${monthsGenitive[dayMonth]} ${moonIcon}</p>
+                                    <p class="text-sm text-gray-400 font-medium">${data.type === 'range' ? data.start + ' - ' + data.end : 'Godziny proste'}</p>
+                                </div>
+                            </div>
+                             <div class="text-right">
+                                <p class="text-2xl font-bold text-orange-500 tabular-nums">${data.val}</p>
+                                <span class="text-[10px] text-gray-400 font-bold uppercase">Godzin</span>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    const isSimple = data.type === 'simple';
+                    div.innerHTML = `
+                        <div class="p-4 bg-gray-50/80 dark:bg-gray-800">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="font-bold text-gray-800 dark:text-white text-sm">${dayNum} ${monthsGenitive[dayMonth]}</span>
+                                <div class="flex bg-white dark:bg-gray-700 rounded-lg p-1 text-[10px] font-bold shadow-sm border border-gray-200 dark:border-gray-600">
+                                    <button onclick="changeDayType('${k}','simple')" class="px-3 py-1.5 rounded-md transition ${isSimple ? 'bg-gray-800 text-white shadow dark:bg-black' : 'text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600'}">Liczba</button>
+                                    <button onclick="changeDayType('${k}','range')" class="px-3 py-1.5 rounded-md transition ${!isSimple ? 'bg-gray-800 text-white shadow dark:bg-black' : 'text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-600'}">Zegar</button>
+                                </div>
+                            </div>
+                            
+                            ${isSimple ? `
+                                <div class="flex items-center gap-3 mb-4">
+                                    <div class="relative flex-grow">
+                                        <input type="number" value="${data.val}" onchange="updateDayData('${k}','val',this.value)" class="w-full bg-white dark:bg-gray-700 rounded-xl p-3 text-center font-bold text-gray-900 dark:text-white border border-gray-200 dark:border-gray-600 focus:border-blue-500 transition outline-none shadow-sm text-lg">
+                                        <span class="absolute right-4 top-4 text-xs font-bold text-gray-400">GODZ</span>
+                                    </div>
+                                </div>
+                            ` : `
+                                <div class="flex items-center gap-2 mb-4">
+                                    <input type="time" value="${data.start || '08:00'}" onchange="updateDayData('${k}','start',this.value)" class="bg-white dark:bg-gray-700 rounded-xl p-3 w-full text-center font-bold text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 outline-none shadow-sm text-sm">
+                                    <span class="text-gray-400 font-bold">-</span>
+                                    <input type="time" value="${data.end || '16:00'}" onchange="updateDayData('${k}','end',this.value)" class="bg-white dark:bg-gray-700 rounded-xl p-3 w-full text-center font-bold text-gray-800 dark:text-white border border-gray-200 dark:border-gray-600 outline-none shadow-sm text-sm">
+                                </div>
+                                
+                                <div class="flex justify-between items-center mb-4">
+                                     <button onclick="toggleNightShift('${k}')" class="text-xs font-bold px-3 py-2 rounded-lg border flex items-center gap-1.5 transition ${data.isNight ? 'bg-indigo-100 dark:bg-indigo-900 text-indigo-700 dark:text-indigo-200 border-indigo-200 dark:border-indigo-800' : 'bg-white dark:bg-gray-700 text-gray-500 dark:text-gray-300 border-gray-200 dark:border-gray-600'}">
+                                        <i class="fas fa-moon"></i> Nocka
+                                     </button>
+                                     <span class="text-xs font-bold text-orange-600 bg-orange-100 px-3 py-2 rounded-lg">Razem: ${data.val}h</span>
+                                </div>
+                            `}
+                            
+                            <button onclick="saveDayEdit('${k}')" class="w-full py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl text-sm shadow-md transition flex items-center justify-center gap-2">
+                                <i class="fas fa-check"></i> Zatwierdź zmiany
+                            </button>
+                        </div>
+                    `;
+                }
+                container.appendChild(div);
+            });
+            
             // HERE IS THE CHANGE: Add the spacer/footer text block
             const footerSpacer = document.createElement('div');
-            footerSpacer.className = "flex flex-col items-center justify-center h-48 opacity-50 mt-12"; // Changed class
+            footerSpacer.className = "flex flex-col items-center justify-center h-48 opacity-50 mt-24"; // Increased mt-16 to mt-24
             footerSpacer.innerHTML = `
                 <div class="w-full border-t border-dashed border-gray-300 dark:border-gray-700 mb-8"></div>
                 <p class="text-[10px] text-gray-400 uppercase tracking-widest">Koniec historii</p>
