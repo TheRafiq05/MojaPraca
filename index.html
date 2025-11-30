@@ -4,8 +4,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/png" href="icon-192.png">       
-    <link rel="apple-touch-icon" href="icon-192.png">            
+    <link rel="icon" type="image/png" id="dynamic-favicon" href="icon-192.png">       
+    <link rel="apple-touch-icon" id="dynamic-apple-icon" href="icon-192.png">            
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#ffffff">
@@ -310,22 +310,6 @@
         html.dark body.liquid-theme .calendar-day.selected.weekend-sun {
              background-color: rgba(234, 88, 12, 0.55) !important; /* Darker Orange */
              border: 1px solid rgba(251, 146, 60, 0.3) !important;
-        }
-
-        /* ZAZNACZONA NOCKA (Night Shift) w Liquid - poprawka koloru */
-        .liquid-theme .calendar-day.selected.night-shift {
-             background: linear-gradient(135deg, rgba(249, 115, 22, 0.85) 60%, rgba(79, 70, 229, 0.8) 100%) !important;
-             backdrop-filter: blur(8px);
-             border: 1px solid rgba(255, 255, 255, 0.3) !important;
-             box-shadow: 0 4px 12px rgba(249, 115, 22, 0.3);
-             color: white !important;
-        }
-        
-        /* Dark Mode Fix for Selected Night Shift in Liquid */
-        html.dark body.liquid-theme .calendar-day.selected.night-shift {
-             background: linear-gradient(135deg, rgba(234, 88, 12, 0.55) 60%, rgba(79, 70, 229, 0.55) 100%) !important;
-             border: 1px solid rgba(251, 146, 60, 0.3) !important;
-             box-shadow: 0 4px 12px rgba(0,0,0,0.3);
         }
 
         /* Niezaznaczona nocka w Liquid */
@@ -724,7 +708,7 @@
                     <h2 class="text-5xl font-bold tabular-nums tracking-tighter"><span id="header-hours">0</span><span class="text-2xl text-gray-500 ml-1">h</span></h2>
                 </div>
                 <button onclick="goToCalculator()" class="ios-btn bg-orange-500 hover:bg-orange-600 text-white px-5 py-3 rounded-2xl text-sm font-bold shadow-lg shadow-orange-500/30 flex items-center gap-2">
-                    Oblicz <i class="fas fa-arrow-right"></i>
+                    Oblicz wypłatę <i class="fas fa-arrow-right"></i>
                 </button>
             </div>
         </div>
@@ -1886,6 +1870,22 @@
             container.innerHTML = '';
             
             displayMonths.forEach(mKey => {
+                // ... existing code to calculate counts ...
+                
+                let countDays = 0;
+                let countNights = 0;
+                let countWeekends = 0;
+
+                Object.keys(state.workLog).forEach(dateKey => {
+                    if (dateKey.startsWith(mKey)) {
+                        countDays++;
+                        if (state.workLog[dateKey].isNight) countNights++;
+                        const d = new Date(dateKey);
+                        const day = d.getDay();
+                        if (day === 0 || day === 6) countWeekends++;
+                    }
+                });
+
                 const [year, month] = mKey.split('-');
                 const monthName = monthsNominative[parseInt(month) - 1];
                 const totalHours = (dataByMonth[mKey] || 0).toFixed(2); 
@@ -1920,6 +1920,7 @@
                 }
 
                 // Profit/Loss
+                let diffHtml = '';
                 if (actual > 0 && calculatedNet > 0) {
                     const diff = Math.round((actual - calculatedNet) * 100) / 100;
                     if (Math.abs(diff) < 1) {
@@ -1931,7 +1932,6 @@
                     }
                 }
                 
-                const rateSummary = rateToUse > 0 ? `${totalHours}h × ${rateToUse.toFixed(2)}` : `${totalHours}h (brak stawki)`;
                 const isFinalized = isPaid && actual > 0;
 
                 const div = document.createElement('div');
@@ -1981,11 +1981,8 @@
                         <div class="flex justify-between items-center mt-2">
                             <div>
                                 <p class="text-2xl font-bold text-gray-900 dark:text-white tabular-nums">${estimatedEarningsDisplay}</p>
-                                <p class="text-xs text-gray-400 font-mono">${rateSummary}</p>
+                                <p class="text-xs text-gray-400 font-mono">${totalHours}h ${rateToUse > 0 ? `× ${rateToUse.toFixed(2)} zł` : '(brak stawki)'}</p>
                             </div>
-                             <button onclick="loadMonthToCalendar('${year}', '${month}')" class="w-10 h-10 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-300 hover:bg-gray-200">
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
                         </div>
                     `;
                 }
@@ -2001,218 +1998,69 @@
                              <button onclick="togglePaymentStatus('${mKey}')" class="w-8 h-8 rounded-full ${isPaid ? 'bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-300' : 'bg-gray-100 text-gray-400 dark:bg-gray-700'} flex items-center justify-center transition">
                                 <i class="fas ${isPaid ? 'fa-check' : 'fa-hourglass-half'} text-xs"></i>
                             </button>
+                             
+                             <!-- EXPAND DETAILS BUTTON -->
+                             <button onclick="toggleHistoryDetails('${mKey}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center text-gray-500 dark:text-gray-300 hover:bg-gray-200 transition" id="btn-details-${mKey}">
+                                <i class="fas fa-chevron-down transition-transform duration-300"></i>
+                             </button>
+
                              <button onclick="deleteMonthlyRecord('${mKey}')" class="w-8 h-8 rounded-full bg-red-50 dark:bg-red-900/20 text-red-500 dark:text-red-300 flex items-center justify-center hover:bg-red-100 transition">
                                 <i class="fas fa-trash-alt text-xs"></i>
                             </button>
                         </div>
                     </div>
                     ${contentHTML}
+                    
+                    <!-- HIDDEN DETAILS CONTAINER -->
+                    <div id="details-${mKey}" class="hidden pt-4 mt-4 border-t border-gray-100 dark:border-gray-700 text-sm animate-fadeIn">
+                        <div class="grid grid-cols-3 gap-2">
+                            <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-2 flex flex-col items-center justify-center h-full">
+                                <span class="w-full h-8 flex items-center justify-center text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1 text-center leading-tight">Dni pracy</span>
+                                <span class="font-bold text-gray-800 dark:text-white text-lg">${countDays}</span>
+                            </div>
+                             <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-2 flex flex-col items-center justify-center h-full">
+                                <span class="w-full h-8 flex items-center justify-center text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1 text-center leading-tight">w tym nocki</span>
+                                <span class="font-bold text-indigo-500 text-lg">${countNights}</span>
+                            </div>
+                             <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-2 flex flex-col items-center justify-center h-full">
+                                <span class="w-full h-8 flex items-center justify-center text-[10px] text-gray-400 uppercase font-bold tracking-wider mb-1 text-center leading-tight">w tym dni weekendowe</span>
+                                <span class="font-bold text-red-500 text-lg">${countWeekends}</span>
+                            </div>
+                        </div>
+                    </div>
                 `;
                 container.appendChild(div);
             });
             
             // Blok "Koniec historii"
             const footerSpacer = document.createElement('div');
-            footerSpacer.className = "flex flex-col items-center justify-center h-24 opacity-50 mt-12"; 
+            footerSpacer.className = "flex flex-col items-center justify-center h-24 opacity-50 mt-24"; // Increased mt-16 to mt-24
             footerSpacer.innerHTML = `
-                <div class="w-full border-t border-dashed border-gray-300 dark:border-gray-700 mb-4"></div>
+                <div class="w-full border-t border-dashed border-gray-300 dark:border-gray-700 mb-8"></div>
                 <p class="text-[10px] text-gray-400 uppercase tracking-widest">Koniec historii</p>
             `;
             container.appendChild(footerSpacer);
 
-            // DODANO: Niewidzialny blok 300px na sam dół, aby wypchnąć treść nad stopkę
+            // DODANO: Niewidzialny blok 300px na sam dół
             const extraBottomSpace = document.createElement('div');
             extraBottomSpace.className = "h-[300px] w-full pointer-events-none"; 
             container.appendChild(extraBottomSpace);
         }
 
-        // --- Helper Functions ---
-
-        function updateActualSalary(mKey, val) {
-            // Round immediately after input to ensure only 2 decimal places are saved
-            state.actualSalary[mKey] = Math.round(parseFloat(val) * 100) / 100 || 0;
-            saveState();
-        }
-        
-        function saveManualEntry(mKey) {
-            const input = document.getElementById(`actual-${mKey}`);
-            let val = 0;
-            if(input) {
-                // Read from state, which is already rounded by updateActualSalary
-                val = state.actualSalary[mKey];
-                saveState();
-            }
-            if (val > 0) showToast("Zapisano!");
-            renderHistory(); 
-        }
-        
-        function clearActualAndRevertStatus(mKey) {
-             state.actualSalary[mKey] = 0;
-             saveState();
-             renderHistory();
-        }
-
-        function togglePaymentStatus(mKey) {
-            if(state.paymentStatus[mKey] === 'paid') {
-                state.paymentStatus[mKey] = 'pending';
-                state.actualSalary[mKey] = 0; 
-            } else {
-                state.paymentStatus[mKey] = 'paid';
-            }
-            saveState();
-            renderHistory();
-        }
-
-        function loadMonthToCalendar(year, month) {
-            calendarDate.setFullYear(parseInt(year));
-            calendarDate.setMonth(parseInt(month) - 1);
-            const prefix = `${calendarDate.getFullYear()}-${String(calendarDate.getMonth() + 1).padStart(2, '0')}-`;
-            Object.keys(state.workLog).filter(k => k.startsWith(prefix)).forEach(k => {
-                editingState[k] = true;
-            });
-            renderCalendar();
-            switchTab('calendar');
-        }
-
-        function loadMonthToBudget(mKey) {
-            currentCalcMonth = mKey;
-            const [y, m] = mKey.split('-');
-            calendarDate.setFullYear(parseInt(y));
-            calendarDate.setMonth(parseInt(m) - 1);
+        // NEW FUNCTION TO TOGGLE DETAILS
+        function toggleHistoryDetails(id) {
+            const el = document.getElementById(`details-${id}`);
+            const btn = document.getElementById(`btn-details-${id}`);
+            const icon = btn.querySelector('i');
             
-            switchTab('budget');
-        }
-
-        function changeMonth(delta) {
-            calendarDate.setMonth(calendarDate.getMonth() + delta);
-            renderCalendar();
-        }
-
-        function getKey(day) {
-            return `${calendarDate.getFullYear()}-${String(calendarDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
-        }
-
-        function renderCalendar() {
-            document.getElementById('calendar-month-year').innerText = `${monthsNominative[calendarDate.getMonth()]} ${calendarDate.getFullYear()}`;
-            
-            const mName = monthsNominative[calendarDate.getMonth()];
-            const yVal = calendarDate.getFullYear();
-            const headerLabel = document.getElementById('header-label');
-            if(headerLabel) headerLabel.innerText = `Suma godzin (${mName} ${yVal})`;
-
-            const grid = document.getElementById('calendar-grid');
-            grid.innerHTML = '';
-
-            const daysInMonth = new Date(calendarDate.getFullYear(), calendarDate.getMonth() + 1, 0).getDate();
-            let startDay = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), 1).getDay();
-            startDay = startDay === 0 ? 6 : startDay - 1; 
-
-            for (let i = 0; i < startDay; i++) {
-                const div = document.createElement('div');
-                div.className = "calendar-day empty";
-                grid.appendChild(div);
-            }
-
-            const today = new Date();
-            const isCurrentMonth = today.getFullYear() === calendarDate.getFullYear() && today.getMonth() === calendarDate.getMonth();
-
-            for (let i = 1; i <= daysInMonth; i++) {
-                const div = document.createElement('div');
-                const key = getKey(i);
-                const data = state.workLog[key];
-                const isSelected = !!data;
-                const isNight = data && data.isNight;
-                
-                const dateObj = new Date(calendarDate.getFullYear(), calendarDate.getMonth(), i);
-                const dayOfWeek = dateObj.getDay();
-                
-                let extraClass = '';
-                if (dayOfWeek === 0) extraClass = 'weekend-sun';
-                else if (dayOfWeek === 6) extraClass = 'weekend-sat';
-                if (isNight) extraClass += ' night-shift';
-                
-                if (isCurrentMonth && i === today.getDate()) extraClass += ' today';
-
-                div.className = `calendar-day ${extraClass} ${isSelected ? 'selected' : ''}`;
-                
-                // Content
-                div.innerHTML = `<span class="text-sm">${i}</span>`;
-                
-                if(isSelected && data.val > 0) {
-                    div.innerHTML += `<span class="day-hours-badge">${data.val}h</span>`;
-                }
-
-                div.onclick = () => toggleDay(i);
-                grid.appendChild(div);
-            }
-
-            calculateTotalWorkHours();
-            renderHoursList();
-        }
-
-        function toggleDay(day) {
-            const key = getKey(day);
-            if (state.workLog[key]) {
-                delete state.workLog[key];
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                icon.style.transform = 'rotate(180deg)';
+                btn.classList.add('bg-gray-200', 'dark:bg-gray-600'); 
             } else {
-                if (state.fixedHours.enabled) {
-                    // Quick Add: Save immediately, NO EDIT MODE
-                    if (state.fixedHours.type === 'simple') {
-                        state.workLog[key] = { type: 'simple', val: state.fixedHours.val > 0 ? state.fixedHours.val : 8, start: '', end: '', isNight: false };
-                    } else {
-                        const h = calcDiff(state.fixedHours.start, state.fixedHours.end);
-                         const isNight = isRangeNight(state.fixedHours.start, state.fixedHours.end);
-                        state.workLog[key] = { type: 'range', val: h, start: state.fixedHours.start, end: state.fixedHours.end, isNight: isNight };
-                    }
-                    editingState[key] = false; // Ensure edit mode is OFF for quick add
-                } else {
-                    // Manual Add: Open Edit Mode
-                    state.workLog[key] = { type: 'simple', val: 0, start: '', end: '', isNight: false };
-                    editingState[key] = true;
-                    // Auto-expand list to show manual entry form
-                    state.listCollapsed = false;
-                }
-            }
-            saveState();
-            renderCalendar();
-        }
-        
-        function isRangeNight(s, e) {
-             if(!s || !e) return false;
-             const startH = parseInt(s.split(':')[0]);
-             const endH = parseInt(e.split(':')[0]);
-             return endH < startH;
-        }
-
-        function toggleListCollapse() {
-            state.listCollapsed = !state.listCollapsed;
-            renderHoursList();
-            saveState();
-        }
-
-        function toggleEditDay(key) {
-            editingState[key] = !editingState[key];
-            renderHoursList();
-        }
-        
-        function saveDayEdit(key) {
-            editingState[key] = false;
-            saveState();
-            renderHoursList();
-            renderCalendar(); // Update badges immediately
-        }
-        
-        function toggleNightShift(key) {
-            const data = state.workLog[key];
-            if(data) {
-                data.isNight = !data.isNight;
-                if(data.type === 'range') {
-                    data.val = calcDiff(data.start, data.end, data.isNight);
-                }
-                saveState();
-                renderHoursList();
-                renderCalendar(); 
-                calculateTotalWorkHours();
+                el.classList.add('hidden');
+                icon.style.transform = 'rotate(0deg)';
+                btn.classList.remove('bg-gray-200', 'dark:bg-gray-600');
             }
         }
 
