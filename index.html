@@ -745,6 +745,72 @@
             flex-direction: column;
             justify-content: center;
         }
+        /* ========================================================================== */
+        /* === NAPRAWA KONTRASTU W PLANERZE (LIQUID MODE - DARK & LIGHT) - FIXED === */
+        /* ========================================================================== */
+
+        /* 1. DARK LIQUID: Naprawa widoczności kwot (Do rozdysponowania, Przychody, Łącznie) */
+        /* Wymuszamy idealną biel dla kluczowych liczb i tekstów, które były szare/niewidoczne */
+        html.dark body.liquid-theme #view-budget .ios-card #budget-remaining,
+        html.dark body.liquid-theme #view-budget .ios-card #budget-total-income,
+        html.dark body.liquid-theme #view-budget .ios-card .text-white,     /* Kwoty w liście */
+        html.dark body.liquid-theme #view-budget .ios-card .text-gray-200,   /* Kwota podstawy */
+        html.dark body.liquid-theme #view-budget .ios-card .text-gray-300,   /* Etykieta Łącznie */
+        html.dark body.liquid-theme #view-budget .ios-card h2 {
+            color: #ffffff !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.8); /* Lekki cień dla podbicia kontrastu */
+        }
+        
+        /* 2. LIGHT LIQUID: Naprawa niewidocznych białych tekstów na jasnym tle */
+        /* Elementy które w kodzie JS mają klasę text-white/gray-200 muszą być CIEMNE w trybie Light Liquid */
+        body.liquid-theme:not(.dark) #view-budget .ios-card .text-white,
+        body.liquid-theme:not(.dark) #view-budget .ios-card .text-gray-200,
+        body.liquid-theme:not(.dark) #view-budget .ios-card .text-gray-300,
+        body.liquid-theme:not(.dark) #view-budget .ios-card #budget-remaining,
+        body.liquid-theme:not(.dark) #view-budget .ios-card #budget-total-income {
+            color: #111827 !important; /* Prawie czarny */
+            font-weight: 700 !important; /* Pogrubienie dla czytelności */
+        }
+
+        /* Poprawa koloru zielonego w Light Liquid (z jasnego emerald-400 na ciemniejszy) */
+        body.liquid-theme:not(.dark) #view-budget .ios-card .text-emerald-400,
+        body.liquid-theme:not(.dark) #view-budget .ios-card .text-emerald-500 {
+            color: #059669 !important; /* Ciemniejszy zielony */
+        }
+
+        /* 3. LIGHT LIQUID TOGGLE: Naprawa przycisku "Grupuj/Szczegóły" */
+        /* Gdy przycisk jest aktywny (czarne tło), tekst musi być BIAŁY */
+        body.liquid-theme:not(.dark) .toggle-active-style {
+            color: #ffffff !important;
+        }
+        /* Gdy przycisk jest nieaktywny, tekst musi być CIEMNY */
+        body.liquid-theme:not(.dark) .toggle-inactive-style {
+            color: #374151 !important; /* Gray-700 */
+        }
+        /* ================= NAPRAWA KOLORÓW W PLANERZE (BUDGET) ================= */
+
+        /* 1. DARK LIQUID: Wymuszenie bieli dla tekstów, które są za ciemne */
+        html.dark body.liquid-theme #view-budget .ios-card .text-gray-400,
+        html.dark body.liquid-theme #view-budget .ios-card .text-gray-300,
+        html.dark body.liquid-theme #view-budget .ios-card .text-white {
+            color: #ffffff !important;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+        }
+
+        /* 2. LIGHT LIQUID: Odwrócenie kolorów (Białe napisy stają się ciemne na jasnym szkle) */
+        /* Dotyczy to sytuacji, gdy w JS ustawimy text-white/gray-300 dla trybu Standard */
+        body.liquid-theme:not(.dark) #view-budget .ios-card .text-white {
+            color: #111827 !important; /* Zamień biały na prawie czarny */
+            font-weight: 700;
+        }
+        body.liquid-theme:not(.dark) #view-budget .ios-card .text-gray-300,
+        body.liquid-theme:not(.dark) #view-budget .ios-card .text-gray-400 {
+            color: rgba(0, 0, 0, 0.7) !important; /* Zamień szary jasny na szary ciemny */
+            font-weight: 600;
+        }
+        body.liquid-theme:not(.dark) #view-budget .ios-card .text-emerald-400 {
+            color: #059669 !important; /* Ciemniejszy zielony dla czytelności */
+        }
     </style>
 </head>
 <body class="bg-[#F5F5F7] text-[#1D1D1F] dark:bg-darkbg dark:text-gray-100 transition-colors duration-300">
@@ -933,94 +999,94 @@
 
     <!-- ================= VIEW 4: PLANER (BUDGET) ================= -->
     <div id="view-budget" class="view-section max-w-lg mx-auto p-4 pt-8">
-        <header class="flex justify-between items-center mb-6">
-            <div>
-                <p class="text-xs text-orange-500 font-bold uppercase tracking-wide">Mój</p>
-                <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white">Planer</h1>
-            </div>
-            <div class="flex gap-3">
-                <button onclick="openSettings()" class="ios-btn w-10 h-10 bg-white dark:bg-darkcard border border-gray-100 dark:border-gray-800 text-gray-500 dark:text-gray-300 rounded-full flex items-center justify-center hover:text-gray-800 transition shadow-sm">
-                    <i class="fas fa-cog"></i>
-                </button>
-            </div>
-        </header>
+    <header class="flex justify-between items-center mb-6">
+        <div>
+            <p class="text-xs text-orange-500 font-bold uppercase tracking-wide">Mój</p>
+            <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white">Planer</h1>
+        </div>
+        <div class="flex gap-3">
+            <button onclick="openSettings()" class="ios-btn w-10 h-10 bg-white dark:bg-darkcard border border-gray-100 dark:border-gray-800 text-gray-500 dark:text-gray-300 rounded-full flex items-center justify-center hover:text-gray-800 transition shadow-sm">
+                <i class="fas fa-cog"></i>
+            </button>
+        </div>
+    </header>
 
-        <!-- Context Info -->
-        <div class="mb-4 px-2 flex justify-between items-center">
-            <div>
-                <h3 id="budget-month-label" class="text-lg font-bold text-gray-800 dark:text-white capitalize"></h3>
-                <!-- Punkt 7: Dwie linijki notki -->
-                <p class="text-[10px] text-gray-400 mt-0.5 flex items-start gap-1">
-                    <i class="fas fa-info-circle mt-0.5"></i> 
-                    <span class="leading-tight">Dotyczy miesiąca<br/>wybranego w Grafiku.</span>
-                </p>
-            </div>
-            <div class="text-right">
-                <div class="text-[10px] text-gray-400 uppercase font-bold">Źródło</div>
-                <div id="budget-source-type" class="text-xs font-bold bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-gray-700 dark:text-gray-300 inline-block mt-1">Kalkulator</div>
-            </div>
+    <div class="mb-4 px-2 flex justify-between items-center">
+        <div>
+            <h3 id="budget-month-label" class="text-lg font-bold text-gray-800 dark:text-white capitalize"></h3>
+            <p class="text-[10px] text-gray-400 mt-0.5 flex items-start gap-1">
+                <i class="fas fa-info-circle mt-0.5"></i> 
+                <span class="leading-tight">Dotyczy miesiąca<br/>wybranego w Grafiku.</span>
+            </p>
+        </div>
+        <div class="text-right">
+             <div class="text-[10px] text-gray-400 uppercase font-bold">Baza</div>
+            <div id="budget-source-type" class="text-xs font-bold bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-gray-700 dark:text-gray-300 inline-block mt-1">Kalkulator</div>
+        </div>
+    </div>
+
+    <div class="ios-card bg-gray-800 dark:bg-gray-900 text-white p-5 pb-6 mb-4 shadow-xl relative overflow-hidden">
+        <div class="absolute top-4 right-4 z-20 toggle-container-style bg-gray-200/50 dark:bg-gray-700 rounded-lg p-0.5 flex text-[10px] font-bold">
+            <button onclick="setChartMode('groups')" id="chart-mode-groups" class="px-2 py-1 rounded-md transition text-center">Grupuj</button>
+            <button onclick="setChartMode('details')" id="chart-mode-details" class="px-2 py-1 rounded-md transition text-center">Szczegóły</button>
         </div>
 
-        <!-- Main Budget Card -->
-        <!-- Punkt 9: padding-bottom (pb-10) zwiększony, aby uniknąć nakładania -->
-        <div class="ios-card bg-gray-800 dark:bg-gray-900 text-white p-6 pb-10 mb-6 shadow-xl relative overflow-hidden">
-            <!-- Chart Toggle -->
-            <!-- Punkt 3: Styl toggle w Planerze taki sam jak w Grafiku (Liczba/Zegar) -->
-            <div class="absolute top-4 right-4 z-20 toggle-container-style bg-gray-200/50 dark:bg-gray-700 rounded-lg p-0.5 flex text-[10px] font-bold">
-                <button onclick="setChartMode('groups')" id="chart-mode-groups" class="px-2 py-1 rounded-md transition text-center">Grupuj</button>
-                <button onclick="setChartMode('details')" id="chart-mode-details" class="px-2 py-1 rounded-md transition text-center">Szczegóły</button>
-            </div>
-
-            <div class="flex items-center gap-6 relative z-10 pt-4">
+        <div class="flex flex-col gap-4 relative z-10">
+            <div class="flex items-center gap-5 pt-2">
                 <div class="flex-shrink-0">
-                    <!-- Chart color logic handled in JS -->
-                    <div class="pie-chart" id="budget-pie-chart"></div>
+                    <div class="pie-chart scale-90" id="budget-pie-chart"></div>
                 </div>
-                <!-- Punkt 9: Kontener z tekstem 'Do rozdysponowania' lekko odsunięty w dół (pt-8) -->
-                <div class="flex-grow pt-8">
+                <div class="flex-grow pt-4">
                     <p class="text-gray-400 text-[10px] font-bold uppercase tracking-wider mb-1">Do rozdysponowania</p>
                     <div class="flex items-baseline gap-1">
-                        <h2 class="text-3xl font-bold tabular-nums" id="budget-remaining">0.00</h2>
+                        <h2 class="text-3xl font-bold tabular-nums text-white" id="budget-remaining">0.00</h2>
                         <span class="text-sm font-medium text-gray-400">zł</span>
                     </div>
-                    <div class="h-px bg-gray-700 my-3 w-full"></div>
-                    <p class="text-xs text-gray-400">Łączny przychód: <span id="budget-total-income" class="text-white font-bold ml-1">0.00 zł</span></p>
                 </div>
             </div>
-        </div>
 
-        <!-- Controls -->
-        <div class="flex gap-2 mb-6">
-            <button onclick="openAddCategoryModal()" class="ios-btn flex-1 bg-gray-900 dark:bg-darkcard dark:border dark:border-gray-700 text-white py-3 rounded-xl font-bold text-sm shadow-md transition flex items-center justify-center gap-2 hover:bg-black">
-                <i class="fas fa-plus-circle"></i> Dodaj wydatek
-            </button>
-            <button onclick="resetBudgetForMonth()" class="ios-btn w-12 bg-white dark:bg-darkcard border border-gray-200 dark:border-gray-700 text-gray-400 rounded-xl flex items-center justify-center hover:bg-red-50 hover:text-red-500 hover:border-red-100 transition shadow-sm">
-                <i class="fas fa-trash-alt"></i>
-            </button>
-        </div>
+            <div class="h-px bg-gray-700 w-full"></div>
 
-        <!-- Categories List -->
-        <div id="budget-categories-list" class="space-y-6 pb-20">
-            <!-- Fixed Expenses Section -->
-            <div id="section-fixed">
-                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 px-2 flex justify-between items-center">
-                    <span class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-red-500"></div> Opłaty Stałe</span>
-                    <span id="sum-fixed" class="text-gray-800 dark:text-gray-300 tabular-nums">0.00 zł</span>
-                </h3>
-                <div id="list-fixed" class="space-y-2"></div>
-            </div>
-
-            <!-- Percent Expenses Section -->
-            <div id="section-percent">
-                <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 px-2 flex justify-between items-center">
-                     <span class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-amber-500"></div> Budżety (%)</span>
-                     <!-- Punkt 8: Baza % ma teraz taki sam styl jak Suma Opłat Stałych (tylko tekst, bez tła) -->
-                     <span id="base-for-percent" class="text-gray-800 dark:text-gray-300 tabular-nums">Baza: 0 zł</span>
-                </h3>
-                <div id="list-percent" class="space-y-2"></div>
+            <div id="income-breakdown-container" class="space-y-2">
+                <p class="text-xs text-gray-400">Łączny przychód: <span id="budget-total-income" class="text-white font-bold ml-1">0.00 zł</span></p>
             </div>
         </div>
     </div>
+
+    <div class="grid grid-cols-2 gap-3 mb-6">
+    <button onclick="openAddCategoryModal()" class="ios-btn bg-gray-900 dark:bg-darkcard dark:border dark:border-gray-700 text-white py-3 rounded-xl font-bold text-sm shadow-md transition flex items-center justify-center gap-2 hover:bg-black">
+        <i class="fas fa-minus-circle text-red-500 text-lg"></i> Dodaj wydatek
+    </button>
+    
+    <button onclick="openAddIncomeModal()" class="ios-btn bg-gray-900 dark:bg-darkcard dark:border dark:border-gray-700 text-white py-3 rounded-xl font-bold text-sm shadow-md transition flex items-center justify-center gap-2 hover:bg-black">
+        <i class="fas fa-plus-circle text-green-500 text-lg"></i> Dodaj przychód
+    </button>
+</div>
+    
+    <div class="flex justify-center mb-6">
+         <button onclick="resetBudgetForMonth()" class="text-xs text-red-400 hover:text-red-500 font-bold flex items-center gap-1 py-2 px-4 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition">
+            <i class="fas fa-trash-alt"></i> Wyczyść ten miesiąc
+        </button>
+    </div>
+
+    <div id="budget-categories-list" class="space-y-6 pb-20">
+        <div id="section-fixed">
+            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 px-2 flex justify-between items-center">
+                <span class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-red-500"></div> Opłaty Stałe</span>
+                <span id="sum-fixed" class="text-gray-800 dark:text-gray-300 tabular-nums">0.00 zł</span>
+            </h3>
+            <div id="list-fixed" class="space-y-2"></div>
+        </div>
+
+        <div id="section-percent">
+            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3 px-2 flex justify-between items-center">
+                 <span class="flex items-center gap-2"><div class="w-2 h-2 rounded-full bg-amber-500"></div> Budżety (%)</span>
+                 <span id="base-for-percent" class="text-gray-800 dark:text-gray-300 tabular-nums">Baza: 0 zł</span>
+            </h3>
+            <div id="list-percent" class="space-y-2"></div>
+        </div>
+    </div>
+</div>
 
     <!-- ================= VIEW 3: KALKULATOR ================= -->
     <div id="view-calculator" class="view-section max-w-lg mx-auto p-4 pt-8">
@@ -1286,10 +1352,10 @@
 
             <div class="space-y-4">
                 <!-- Type Selection -->
-                <div class="bg-gray-100 dark:bg-gray-800 p-1 rounded-xl flex text-xs font-bold">
-                    <button onclick="setCategoryType('fixed')" id="btn-cat-fixed" class="flex-1 py-2.5 rounded-lg shadow bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition">Kwota (Stała)</button>
-                    <button onclick="setCategoryType('percent')" id="btn-cat-percent" class="flex-1 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-200 transition">Procent %</button>
-                </div>
+                <div id="category-type-selector" class="bg-gray-100 dark:bg-gray-800 p-1 rounded-xl flex text-xs font-bold">
+    <button onclick="setCategoryType('fixed')" id="btn-cat-fixed" class="flex-1 py-2.5 rounded-lg shadow bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition">Kwota (Stała)</button>
+    <button onclick="setCategoryType('percent')" id="btn-cat-percent" class="flex-1 py-2.5 rounded-lg text-gray-500 dark:text-gray-400 hover:bg-gray-200 transition">Procent %</button>
+</div>
 
                 <div>
                     <label class="block text-[10px] font-bold text-gray-400 uppercase mb-1">Nazwa</label>
@@ -1301,10 +1367,10 @@
                     <input type="number" id="new-cat-val" placeholder="0" class="w-full bg-gray-50 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-xl p-3 text-xl font-bold text-gray-900 dark:text-white outline-none focus:border-gray-900 focus:bg-white dark:focus:bg-gray-800 transition tabular-nums">
                 </div>
                 
-                <div>
-                     <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2">Kolor</label>
-                     <div class="flex gap-2 justify-between" id="color-picker"></div>
-                </div>
+                <div id="modal-color-section">
+    <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2">Kolor</label>
+    <div class="flex gap-2 justify-between" id="color-picker"></div>
+</div>
 
                 <button onclick="addCategory()" id="btn-save-category" class="ios-btn w-full py-3.5 bg-gray-900 dark:bg-white hover:bg-black text-white dark:text-black font-bold rounded-xl shadow-lg shadow-gray-300/50 mt-2">
                     Dodaj do listy
@@ -1669,13 +1735,13 @@
             const [y, m] = currentCalcMonth.split('-');
             document.getElementById('budget-month-label').innerText = `${monthsNominative[parseInt(m)-1]} ${y}`;
             
-            // 1. Determine Total Income
-            let totalIncome = 0;
+            // 1. Ustal Podstawę (Wypłatę)
+            let baseIncome = 0;
             let source = "Kalkulator";
             
             if(state.actualSalary[currentCalcMonth] && state.actualSalary[currentCalcMonth] > 0) {
-                totalIncome = state.actualSalary[currentCalcMonth];
-                source = "Wypłata Rzeczywista";
+                baseIncome = state.actualSalary[currentCalcMonth];
+                source = "Wypłata (Historia)";
             } else {
                 const savedRate = state.monthlyRates[currentCalcMonth] ? parseFloat(state.monthlyRates[currentCalcMonth]) : (parseFloat(state.hourlyRate) || 0);
                 const prefix = `${y}-${m}-`;
@@ -1695,115 +1761,165 @@
                     let tax = Math.round(taxBase * 0.12);
                     if(state.isPit2) tax -= 300;
                     if(tax < 0) tax = 0;
-                    net = gross - spoleczne - zdrowotna - tax;
+                    net = gross - spoleczne - zdrav - tax;
                 }
-                totalIncome = net;
+                baseIncome = net;
             }
-            
-            // Round the income total for display/budgeting consistency
-            totalIncome = Math.round(totalIncome * 100) / 100;
-
-            document.getElementById('budget-total-income').innerText = formatCurrency(totalIncome);
+            baseIncome = Math.round(baseIncome * 100) / 100;
             document.getElementById('budget-source-type').innerText = source;
 
-            // 2. Get Expenses
-            const expenses = state.budgetData[currentCalcMonth] || [];
+            // 2. Pobierz wszystkie pozycje
+            const budgetItems = state.budgetData[currentCalcMonth] || [];
             
-            // 3. Process Fixed
+            // 3. Rozdziel na Wydatki i Przychody Dodatkowe
+            // type: 'income' -> to dodatkowe przychody
+            const additionalIncomes = budgetItems.filter(e => e.type === 'income');
+            // type: 'fixed' lub 'percent' -> to wydatki
+            const expenses = budgetItems.filter(e => e.type !== 'income');
+
+            // 4. Oblicz sumę dodatków
+            let totalAdditional = 0;
+            additionalIncomes.forEach(inc => totalAdditional += inc.val);
+            totalAdditional = Math.round(totalAdditional * 100) / 100;
+
+            // 5. CAŁKOWITY PRZYCHÓD (Podstawa + Dodatki)
+            const grandTotalIncome = baseIncome + totalAdditional;
+
+            // --- RENDEROWANIE LISTY PRZYCHODÓW W KARCIE ---
+            const breakdownContainer = document.getElementById('income-breakdown-container');
+            
+            if (additionalIncomes.length === 0) {
+                // Widok prosty (tylko podstawa)
+                breakdownContainer.innerHTML = `
+                    <div class="flex justify-between items-center text-xs">
+                         <span class="text-gray-400">Podstawa (Wypłata)</span>
+                         <span class="text-white font-bold">${formatCurrency(baseIncome)}</span>
+                    </div>
+                    <div class="h-px bg-gray-700 w-full my-1"></div>
+                    <div class="flex justify-between items-center text-sm">
+                         <span class="text-gray-300 font-bold">Łączny przychód</span>
+                         <span class="text-emerald-400 font-bold text-lg">${formatCurrency(grandTotalIncome)}</span>
+                    </div>
+                `;
+                } else {
+                // Widok rozszerzony (lista dodatków)
+                // USTAWIENIE BAZOWE: Jasne napisy (dla ciemnej karty w trybie Standard)
+                let listHtml = `
+                    <div class="flex justify-between items-center text-xs mb-2">
+                         <span class="text-gray-400 font-medium">Podstawa (Wypłata)</span>
+                         <span class="text-white font-bold">${formatCurrency(baseIncome)}</span>
+                    </div>
+                `;
+                
+                additionalIncomes.forEach(inc => {
+                    listHtml += `
+                        <div class="flex justify-between items-center text-xs mb-2 group">
+                             <div class="flex items-center gap-2">
+                                <span class="text-emerald-400 font-bold">+</span>
+                                <span class="text-gray-300 font-medium truncate max-w-[120px]">${inc.name}</span>
+                             </div>
+                             <div class="flex items-center gap-3">
+                                 <span class="text-white font-bold">${formatCurrency(inc.val)}</span>
+                                 
+                                 <button onclick="editBudgetItem('${inc.id}')" class="text-gray-400 hover:text-blue-400 transition p-1"><i class="fas fa-pen text-xs"></i></button>
+                                 <button onclick="deleteBudgetItem('${inc.id}')" class="text-gray-400 hover:text-red-400 transition p-1"><i class="fas fa-trash-alt text-xs"></i></button>
+                             </div>
+                        </div>
+                    `;
+                });
+                
+                listHtml += `
+                    <div class="h-px bg-gray-600 w-full my-2"></div>
+                    <div class="flex justify-between items-center">
+                         <span class="text-gray-400 text-xs font-bold uppercase tracking-wider">Łącznie</span>
+                         <span class="text-emerald-400 font-bold text-xl">${formatCurrency(grandTotalIncome)}</span>
+                    </div>
+                `;
+                
+                breakdownContainer.innerHTML = listHtml;
+            }
+            // 6. Przetwarzanie Wydatków Stałych
             let sumFixed = 0;
             const fixedExpenses = expenses.filter(e => e.type === 'fixed');
             fixedExpenses.forEach(e => sumFixed += e.val);
 
-            // 4. Calculate Remainder for percentages
-            let remainderAfterFixed = totalIncome - sumFixed;
+            // 7. Oblicz resztę dla procentów (Od CAŁKOWITEGO przychodu)
+            let remainderAfterFixed = grandTotalIncome - sumFixed;
             if (remainderAfterFixed < 0) remainderAfterFixed = 0;
 
-            // 5. Process Percent
+            // 8. Przetwarzanie Wydatków Procentowych
             const percentExpenses = expenses.filter(e => e.type === 'percent');
             let sumPercentVal = 0;
             
             const processedPercentItems = percentExpenses.map(e => {
-                // Calculate value, round to 2 decimals
                 const rawVal = remainderAfterFixed * (e.val / 100);
                 const calculatedVal = Math.round(rawVal * 100) / 100;
                 sumPercentVal += calculatedVal;
                 return { ...e, calculatedVal };
             });
 
-            // 6. Final Remaining
-            let finalRemaining = totalIncome - sumFixed - sumPercentVal;
-            // Round final remaining
+            // Korekta groszowa
+            let totalAllocated = sumFixed + sumPercentVal;
+            totalAllocated = Math.round(totalAllocated * 100) / 100;
+            if (totalAllocated > grandTotalIncome && processedPercentItems.length > 0) {
+                const diff = totalAllocated - grandTotalIncome;
+                if (diff < 0.05) {
+                    const lastItem = processedPercentItems[processedPercentItems.length - 1];
+                    lastItem.calculatedVal -= diff;
+                    lastItem.calculatedVal = Math.round(lastItem.calculatedVal * 100) / 100;
+                    sumPercentVal -= diff;
+                }
+            }
+
+            // 9. Ostateczna kwota do rozdysponowania
+            let finalRemaining = grandTotalIncome - sumFixed - sumPercentVal;
             finalRemaining = Math.round(finalRemaining * 100) / 100;
             
             document.getElementById('budget-remaining').innerText = finalRemaining.toLocaleString('pl-PL', {minimumFractionDigits: 2});
             document.getElementById('sum-fixed').innerText = formatCurrency(sumFixed);
-            // Punkt 8: "Baza %" formatting fix
             document.getElementById('base-for-percent').innerText = `Baza %: ${remainderAfterFixed.toLocaleString('pl-PL', {minimumFractionDigits:0})} zł`;
 
-            // UI Mode Toggles - Punkt 3: Match Calendar Toggle Styles
-            const btnGroups = document.getElementById('chart-mode-groups');
-            const btnDetails = document.getElementById('chart-mode-details');
-            
-            // Logic for toggle classes based on theme & state
-            // We need to check theme mode here, which is tricky in pure JS without re-checking DOM or state
-            // Rely on 'dark' class on html element and 'liquid-theme' on body
-            
-            const isDark = document.documentElement.classList.contains('dark');
-            const isLiquid = document.body.classList.contains('liquid-theme');
-
-            let activeClass = "";
-            let inactiveClass = "";
-
-            if (isLiquid) {
-                // LIQUID MODE
-                if (isDark) {
-                    // DARK LIQUID (Best look: light translucent active)
-                    activeClass = "toggle-active-style"; // defined in CSS
-                    inactiveClass = "toggle-inactive-style"; // defined in CSS
+            // --- RENDEROWANIE WYKRESU (PIE CHART) ---
+            const chart = document.getElementById('budget-pie-chart');
+            if(grandTotalIncome > 0) {
+                let gradientStr = '';
+                if (state.chartMode === 'groups') {
+                    const fixedPercent = (sumFixed / grandTotalIncome) * 100;
+                    const dynamicPercent = (sumPercentVal / grandTotalIncome) * 100;
+                    const degFixed = (fixedPercent / 100) * 360;
+                    const degPercent = degFixed + ((dynamicPercent / 100) * 360);
+                    gradientStr = `#EF4444 0deg ${degFixed}deg, #F59E0B ${degFixed}deg ${degPercent}deg, #6B7280 ${degPercent}deg 360deg`;
                 } else {
-                    // LIGHT LIQUID (Dark translucent active for contrast)
-                    activeClass = "toggle-active-style"; // defined in CSS
-                    inactiveClass = "toggle-inactive-style"; // defined in CSS
+                    const allItems = [...fixedExpenses, ...processedPercentItems];
+                    let currentDeg = 0;
+                    const parts = [];
+                    allItems.forEach(item => {
+                        const val = item.calculatedVal !== undefined ? item.calculatedVal : item.val;
+                        const percent = (val / grandTotalIncome);
+                        const deg = percent * 360;
+                        const endDeg = currentDeg + deg;
+                        const colorObj = colors.find(c => c.val === item.color);
+                        const colorHex = colorObj ? colorObj.hex : '#9CA3AF';
+                        parts.push(`${colorHex} ${currentDeg}deg ${endDeg}deg`);
+                        currentDeg = endDeg;
+                    });
+                    parts.push(`#6B7280 ${currentDeg}deg 360deg`);
+                    gradientStr = parts.join(', ');
                 }
+                chart.style.setProperty('--chart-gradient', gradientStr);
             } else {
-                // STANDARD MODE
-                if (isDark) {
-                    // DARK STANDARD
-                    activeClass = "bg-gray-600 text-white shadow";
-                    inactiveClass = "text-gray-400 hover:bg-gray-700";
-                } else {
-                    // LIGHT STANDARD
-                    activeClass = "bg-white text-gray-800 shadow";
-                    inactiveClass = "text-gray-500 hover:bg-gray-200";
-                }
+                chart.style.setProperty('--chart-gradient', `#6B7280 0deg 360deg`);
             }
 
-            // Base classes
-            const baseBtn = "px-2 py-1 rounded-md transition text-center text-[10px] font-bold";
-
-            if(state.chartMode === 'groups') {
-                btnGroups.className = `${baseBtn} ${activeClass}`;
-                btnDetails.className = `${baseBtn} ${inactiveClass}`;
-            } else {
-                btnGroups.className = `${baseBtn} ${inactiveClass}`;
-                btnDetails.className = `${baseBtn} ${activeClass}`;
-            }
-
-            // Render Lists
+            // --- RENDEROWANIE LIST WYDATKÓW ---
             const listFixed = document.getElementById('list-fixed');
             listFixed.innerHTML = '';
-            
-            const bgColors = {
-                'red': 'bg-red-500', 'orange': 'bg-orange-500', 'amber': 'bg-amber-500', 'emerald': 'bg-emerald-500',
-                'green': 'bg-green-500', 'blue': 'bg-blue-500', 'purple': 'bg-purple-500', 'pink': 'bg-pink-500',
-                'indigo': 'bg-indigo-500'
-            };
+            const bgColors = { 'red': 'bg-red-500', 'orange': 'bg-orange-500', 'amber': 'bg-amber-500', 'emerald': 'bg-emerald-500', 'green': 'bg-green-500', 'blue': 'bg-blue-500', 'purple': 'bg-purple-500', 'pink': 'bg-pink-500', 'indigo': 'bg-indigo-500' };
 
             if(fixedExpenses.length === 0) listFixed.innerHTML = '<div class="text-xs text-center text-gray-400 py-2">Brak wydatków stałych</div>';
 
             fixedExpenses.forEach(item => {
                 const el = document.createElement('div');
-                // Punkt 1: Added dark:bg-darkcard to fix white background in classic dark mode
                 el.className = "flex justify-between items-center ios-card liquid-glass-card p-3 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm dark:bg-darkcard"; 
                 el.innerHTML = `
                     <div class="flex items-center gap-3">
@@ -1812,7 +1928,6 @@
                     </div>
                     <div class="flex items-center gap-3">
                         <span class="font-bold text-gray-900 dark:text-white">${formatCurrency(item.val)}</span>
-                        <!-- Punkt 4: Edit Button -->
                         <button onclick="editBudgetItem('${item.id}')" class="text-gray-400 hover:text-blue-500 w-6 h-6 flex items-center justify-center"><i class="fas fa-pen text-xs"></i></button>
                         <button onclick="deleteBudgetItem('${item.id}')" class="text-gray-400 hover:text-red-500 w-6 h-6 flex items-center justify-center"><i class="fas fa-trash-alt text-xs"></i></button>
                     </div>
@@ -1822,12 +1937,10 @@
 
             const listPercent = document.getElementById('list-percent');
             listPercent.innerHTML = '';
-            
             if(processedPercentItems.length === 0) listPercent.innerHTML = '<div class="text-xs text-center text-gray-400 py-2">Brak budżetów procentowych</div>';
 
             processedPercentItems.forEach(item => {
                  const el = document.createElement('div');
-                // Punkt 1: Added dark:bg-darkcard here too
                 el.className = "flex flex-col ios-card liquid-glass-card p-3 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm dark:bg-darkcard";
                 el.innerHTML = `
                     <div class="flex justify-between items-center mb-1">
@@ -1837,7 +1950,6 @@
                         </div>
                         <div class="flex items-center gap-3">
                             <span class="font-bold text-gray-900 dark:text-white">${formatCurrency(item.calculatedVal)}</span>
-                            <!-- Punkt 4: Edit Button -->
                             <button onclick="editBudgetItem('${item.id}')" class="text-gray-400 hover:text-blue-500 w-6 h-6 flex items-center justify-center"><i class="fas fa-pen text-xs"></i></button>
                             <button onclick="deleteBudgetItem('${item.id}')" class="text-gray-400 hover:text-red-500 w-6 h-6 flex items-center justify-center"><i class="fas fa-trash-alt text-xs"></i></button>
                         </div>
@@ -1848,79 +1960,85 @@
                 `;
                 listPercent.appendChild(el);
             });
-
-            // 7. Pie Chart Logic - GRAY Remaining
-            const chart = document.getElementById('budget-pie-chart');
             
-            if(totalIncome > 0) {
-                let gradientStr = '';
-                
-                if (state.chartMode === 'groups') {
-                    // Mode: Groups (Fixed Red, Percent Amber, Remaining Gray)
-                    const fixedPercent = (sumFixed / totalIncome) * 100;
-                    const dynamicPercent = (sumPercentVal / totalIncome) * 100;
-                    
-                    const degFixed = (fixedPercent / 100) * 360;
-                    const degPercent = degFixed + ((dynamicPercent / 100) * 360);
-                    
-                    // Fixed (Red), Percent (Amber), Remaining (Gray)
-                    gradientStr = `#EF4444 0deg ${degFixed}deg, #F59E0B ${degFixed}deg ${degPercent}deg, #6B7280 ${degPercent}deg 360deg`;
-                } else {
-                    // Mode: Details (All slices + Gray Remaining)
-                    const allItems = [...fixedExpenses, ...processedPercentItems];
-                    let currentDeg = 0;
-                    const parts = [];
-                    
-                    allItems.forEach(item => {
-                        const val = item.calculatedVal !== undefined ? item.calculatedVal : item.val;
-                        const percent = (val / totalIncome);
-                        const deg = percent * 360;
-                        const endDeg = currentDeg + deg;
-                        
-                        const colorObj = colors.find(c => c.val === item.color);
-                        const colorHex = colorObj ? colorObj.hex : '#9CA3AF';
-                        
-                        parts.push(`${colorHex} ${currentDeg}deg ${endDeg}deg`);
-                        currentDeg = endDeg;
-                    });
-                    
-                    // Remaining as Gray
-                    parts.push(`#6B7280 ${currentDeg}deg 360deg`);
-                    gradientStr = parts.join(', ');
-                }
-                
-                chart.style.setProperty('--chart-gradient', gradientStr);
+            // Toggle Button Styles
+            const btnGroups = document.getElementById('chart-mode-groups');
+            const btnDetails = document.getElementById('chart-mode-details');
+            const isLiquid = document.body.classList.contains('liquid-theme');
+            const baseBtn = "px-2 py-1 rounded-md transition text-center text-[10px] font-bold";
+            let activeClass = isLiquid ? "toggle-active-style" : "bg-gray-900 text-white shadow dark:bg-gray-600";
+            let inactiveClass = isLiquid ? "toggle-inactive-style" : "text-gray-500 hover:bg-gray-200 dark:text-gray-400";
+            
+            if(state.chartMode === 'groups') {
+                btnGroups.className = `${baseBtn} ${activeClass}`;
+                btnDetails.className = `${baseBtn} ${inactiveClass}`;
             } else {
-                 chart.style.setProperty('--chart-gradient', `#6B7280 0deg 360deg`); // Gray for empty/100% remaining
+                btnGroups.className = `${baseBtn} ${inactiveClass}`;
+                btnDetails.className = `${baseBtn} ${activeClass}`;
             }
         }
-
         // --- Budget Modal & Actions ---
+        function openAddIncomeModal() {
+    setCategoryType('income');
+    document.getElementById('new-cat-name').value = '';
+    document.getElementById('new-cat-val').value = '';
+    setCategoryColor('emerald'); // Domyślny kolor dla przychodu (wewnętrznie)
+    editingBudgetId = null; 
+    
+    document.getElementById('modal-category-title').innerText = "Dodatkowy Przychód";
+    document.getElementById('lbl-cat-val').innerText = "Kwota (zł)";
+    document.getElementById('btn-save-category').innerText = "Dodaj przychód";
+    
+    // Ukryj wybór typu i wybór koloru
+    document.getElementById('category-type-selector').classList.add('hidden');
+    document.getElementById('modal-color-section').classList.add('hidden'); // <--- NOWE
+    
+    document.getElementById('add-category-modal').classList.add('show');
+}
+
+        // ZMODYFIKOWANA - Dodawanie wydatku (musi pokazać selektor)
         function openAddCategoryModal() {
-            setCategoryType('fixed');
-            document.getElementById('new-cat-name').value = '';
-            document.getElementById('new-cat-val').value = '';
-            setCategoryColor('blue');
-            editingBudgetId = null; // Reset editing state
-            document.getElementById('modal-category-title').innerText = "Nowy Wydatek";
-            document.getElementById('btn-save-category').innerText = "Dodaj do listy";
-            document.getElementById('add-category-modal').classList.add('show');
-        }
+    setCategoryType('fixed');
+    document.getElementById('new-cat-name').value = '';
+    document.getElementById('new-cat-val').value = '';
+    setCategoryColor('blue');
+    editingBudgetId = null;
+    document.getElementById('modal-category-title').innerText = "Nowy Wydatek";
+    document.getElementById('btn-save-category').innerText = "Dodaj do listy";
+    
+    // Pokaż wybór typu i wybór koloru
+    document.getElementById('category-type-selector').classList.remove('hidden');
+    document.getElementById('modal-color-section').classList.remove('hidden'); // <--- NOWE
 
+    document.getElementById('add-category-modal').classList.add('show');
+}
+
+        // ZMODYFIKOWANA - Edycja (musi sprawdzić czy to income czy wydatek)
         function editBudgetItem(id) {
-            const item = state.budgetData[currentCalcMonth].find(i => i.id === id);
-            if(!item) return;
+    const item = state.budgetData[currentCalcMonth].find(i => i.id === id);
+    if(!item) return;
 
-            editingBudgetId = id;
-            setCategoryType(item.type);
-            document.getElementById('new-cat-name').value = item.name;
-            document.getElementById('new-cat-val').value = item.val;
-            setCategoryColor(item.color);
-            
-            document.getElementById('modal-category-title').innerText = "Edytuj Wydatek";
-            document.getElementById('btn-save-category').innerText = "Zapisz zmiany";
-            document.getElementById('add-category-modal').classList.add('show');
-        }
+    editingBudgetId = id;
+    setCategoryType(item.type);
+    document.getElementById('new-cat-name').value = item.name;
+    document.getElementById('new-cat-val').value = item.val;
+    setCategoryColor(item.color);
+    
+    document.getElementById('modal-category-title').innerText = item.type === 'income' ? "Edytuj Przychód" : "Edytuj Wydatek";
+    document.getElementById('btn-save-category').innerText = "Zapisz zmiany";
+
+    // Ukryj selektor i kolor dla income, pokaż dla reszty
+    if (item.type === 'income') {
+         document.getElementById('category-type-selector').classList.add('hidden');
+         document.getElementById('modal-color-section').classList.add('hidden'); // <--- NOWE
+         document.getElementById('lbl-cat-val').innerText = "Kwota (zł)";
+    } else {
+         document.getElementById('category-type-selector').classList.remove('hidden');
+         document.getElementById('modal-color-section').classList.remove('hidden'); // <--- NOWE
+    }
+
+    document.getElementById('add-category-modal').classList.add('show');
+}
 
         function closeAddCategoryModal() {
             document.getElementById('add-category-modal').classList.remove('show');
@@ -2413,7 +2531,13 @@ function renderHistoryChart() {
                 const dayNum = parseInt(k.split('-')[2]);
                 const dayMonth = parseInt(k.split('-')[1]) - 1;
                 const data = state.workLog[k];
-                const isEditing = editingState[k] !== false;
+                
+                // --- POPRAWKA TUTAJ (ZMIANA 1) ---
+                // Było: const isEditing = editingState[k] !== false;
+                // Jest: const isEditing = editingState[k] === true;
+                // To sprawia, że domyślnie lista jest w trybie podglądu, a nie edycji.
+                const isEditing = editingState[k] === true; 
+                // ---------------------------------
 
                 const div = document.createElement('div');
                 div.className = "ios-card dark:bg-darkcard transition-all duration-200 border border-gray-100 dark:border-gray-800 overflow-hidden";
@@ -2421,6 +2545,7 @@ function renderHistoryChart() {
                 const moonIcon = data.isNight ? '<i class="fas fa-moon text-indigo-500 ml-1 text-xs"></i>' : '';
                 
                 if(!isEditing) {
+                    // ... (reszta kodu wewnątrz if(!isEditing) bez zmian) ...
                     div.innerHTML = `
                         <div class="p-4 flex justify-between items-center bg-white dark:bg-darkcard hover:bg-gray-50 dark:hover:bg-gray-800 transition">
                             <div class="flex items-center gap-4">
@@ -2433,12 +2558,11 @@ function renderHistoryChart() {
                                     <p class="text-sm text-gray-400 font-medium">${data.type === 'range' ? data.start + ' - ' + data.end : 'Godziny proste'}</p>
                                 </div>
                             </div>
-                             <div class="flex items-center gap-4">
+                            <div class="flex items-center gap-4">
                                 <div class="text-right">
                                     <p class="text-2xl font-bold text-orange-500 tabular-nums">${data.val}</p>
                                     <span class="text-[10px] text-gray-400 font-bold uppercase">Godzin</span>
                                 </div>
-                                <!-- Edit Button -->
                                 <button onclick="toggleEditDay('${k}')" class="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-300 flex items-center justify-center hover:bg-blue-100 hover:text-blue-500 dark:hover:bg-gray-600 transition">
                                     <i class="fas fa-pen text-xs"></i>
                                 </button>
@@ -2446,6 +2570,7 @@ function renderHistoryChart() {
                         </div>
                     `;
                 } else {
+                     // ... (kod widoku edycji bez zmian) ...
                     const isSimple = data.type === 'simple';
                     div.innerHTML = `
                         <div class="p-4 bg-gray-50/80 dark:bg-gray-800">
@@ -2524,7 +2649,16 @@ function renderHistoryChart() {
                 }
             }
             saveState();
-            if (field !== 'val') renderHoursList(); 
+            
+            // --- POPRAWKA TUTAJ (ZMIANA 2) ---
+            // Wykomentowałem renderHoursList(). Dzięki temu po zmianie godziny
+            // widok nie przeładuje się automatycznie, pozwalając na edycję minut.
+            // Zmiany w widoku pojawią się dopiero po kliknięciu "Zatwierdź zmiany".
+            
+            // if (field !== 'val') renderHoursList(); 
+            
+            // ---------------------------------
+            
             calculateTotalWorkHours();
             renderHistoryChart();
         }
