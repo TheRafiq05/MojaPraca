@@ -1470,40 +1470,61 @@
 
         // --- Core Functions ---
 
-        function init() {
+                function init() {
+            // 1. Najpierw wymuś ukrycie Splash Screena po czasie, 
+            // niezależnie od tego czy wystąpi błąd w danych!
+            setTimeout(() => {
+                const splash = document.getElementById('splash-screen');
+                if(splash) {
+                    splash.classList.add('hide-splash');
+                    setTimeout(() => {
+                        if(splash.parentNode) splash.parentNode.removeChild(splash);
+                    }, 600);
+                }
+            }, 2000);
+
+            // 2. Wczytywanie danych
             const stored = localStorage.getItem(STORAGE_KEY);
             if (stored) {
                 try {
                     const parsed = JSON.parse(stored);
+                    // Bezpieczne scalanie danych
                     state = { ...state, ...parsed };
+                    
+                    // Naprawa brakujących struktur (zabezpieczenie przed starymi danymi)
                     if(!state.paymentStatus) state.paymentStatus = {}; 
                     if(!state.actualSalary) state.actualSalary = {}; 
                     if(!state.monthlyRates) state.monthlyRates = {};
                     if(!state.budgetData) state.budgetData = {};
                     if(state.isPit2 === undefined) state.isPit2 = true;
                     if(!state.theme) state.theme = 'light';
-                    if(!state.themeStyle) state.themeStyle = 'classic'; // Inicjalizacja nowego stanu
+                    if(!state.themeStyle) state.themeStyle = 'classic';
                     if(!state.chartMode) state.chartMode = 'groups';
-                } catch (e) { console.error("Data load error", e); }
+                    
+                } catch (e) { 
+                    console.error("Błąd odczytu danych", e); 
+                    // Opcjonalnie: pokaż alert, że dane są uszkodzone, ale aplikacja ruszy
+                    alert("Wykryto problem z zapisanymi danymi, ale próbuję uruchomić aplikację.");
+                }
             }
 
             const now = new Date();
             currentCalcMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
 
-            refreshUI(); // Central UI refresh
+            // 3. Próba narysowania interfejsu w bloku try-catch
+            try {
+                refreshUI(); 
+            } catch (e) {
+                console.error("Błąd rysowania UI:", e);
+                alert("Błąd wyświetlania danych. Wejdź w Ustawienia i zrób Eksport (Pobierz kopię), aby uratować dane!");
+            }
             
-            document.getElementById('confirm-yes-btn').onclick = executeConfirm;
-
-            // Splash Screen Logic
-            setTimeout(() => {
-                const splash = document.getElementById('splash-screen');
-                splash.classList.add('hide-splash');
-                // Remove from DOM after animation completes to free resources
-                setTimeout(() => {
-                    if(splash.parentNode) splash.parentNode.removeChild(splash);
-                }, 600);
-            }, 2000);
+            // Obsługa przycisku potwierdzenia
+            const confirmBtn = document.getElementById('confirm-yes-btn');
+            if(confirmBtn) confirmBtn.onclick = executeConfirm;
         }
+
+
         
         // Unified UI Refresh Function
         function refreshUI() {
@@ -2879,24 +2900,33 @@ function renderHistoryChart() {
         }
 
         // --- Helpers ---
-        function calcDiff(s, e, isNight) {
-            if (!s || !e) return 0;
-            const start = s.split(':').map(Number);
-            const end = e.split(':').map(Number);
-            let startM = start[0] * 60 + start[1];
-            let endM = end[0] * 60 + end[1];
+                function calcDiff(s, e, isNight) {
+            // ZABEZPIECZENIE: Sprawdź czy s i e są na pewno napisami (string)
+            if (!s || !e || typeof s !== 'string' || typeof e !== 'string') return 0;
             
-            if (isNight) {
-                if (endM <= startM) {
-                    endM += 24 * 60;
+            try {
+                const start = s.split(':').map(Number);
+                const end = e.split(':').map(Number);
+                
+                // Dodatkowe zabezpieczenie przed NaN
+                if (start.length < 2 || end.length < 2 || isNaN(start[0]) || isNaN(end[0])) return 0;
+
+                let startM = start[0] * 60 + start[1];
+                let endM = end[0] * 60 + end[1];
+                
+                if (isNight) {
+                    if (endM <= startM) {
+                        endM += 24 * 60;
+                    }
+                } else {
+                    if (endM < startM) endM += 24 * 60;
                 }
-            } else {
-                // If user didn't mark night but end time is smaller, assume next day logic only if difference is huge, otherwise standard logic
-                if (endM < startM) endM += 24 * 60;
+                
+                let m = endM - startM;
+                return Math.round((m / 60) * 100) / 100;
+            } catch(e) {
+                return 0; // W razie błędu zwróć 0 zamiast wywalać apkę
             }
-            
-            let m = endM - startM;
-            return Math.round((m / 60) * 100) / 100;
         }
         
         function isRangeNight(s, e) {
@@ -3090,7 +3120,7 @@ function renderHistoryChart() {
             renderHistory();
             renderHistoryChart();
         }
-
+        
         init();
 
     </script>
