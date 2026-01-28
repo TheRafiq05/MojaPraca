@@ -1710,36 +1710,36 @@
         }
 
         function switchTab(tabId) {
-            // 1. Przełączanie widoków (stara logika)
+            // 1. Przełączanie widoków
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.getElementById('view-' + tabId).classList.add('active');
             window.scrollTo(0, 0);
 
-            // 2. Logika PŁYWAJĄCEGO KÓŁECZKA (Nowość)
+            // 2. Logika PŁYWAJĄCEGO KÓŁECZKA
             const activeBtn = document.getElementById('nav-' + tabId);
             const indicator = document.getElementById('nav-indicator');
             const allBtns = document.querySelectorAll('.nav-item');
 
             if(activeBtn && indicator) {
-                // Oblicz pozycję: Przesuń kółko tam, gdzie jest przycisk
-                // activeBtn.offsetLeft daje nam odległość przycisku od lewej krawędzi pigułki
+                // Przesuń wskaźnik
                 indicator.style.left = activeBtn.offsetLeft + 'px';
-                // Ustaw szerokość kółka taką samą jak przycisku (dla pewności)
                 indicator.style.width = activeBtn.offsetWidth + 'px';
                 
-                // Kolorowanie ikon:
-                // Aktywna ikona musi być BIAŁA (bo jest na pomarańczowym kółku)
-                // Nieaktywne ikony muszą być SZARE (bo są na szkle)
                 allBtns.forEach(btn => {
                     if(btn.id === 'nav-' + tabId) {
-                        btn.className = "nav-item relative z-10 flex flex-1 flex-col items-center justify-center h-full rounded-[30px] transition-colors duration-300 text-white";
+                        // === AKTYWNA (Na pomarańczowym kółku) ===
+                        // Używamy !text-white, żeby wymusić śnieżną biel
+                        // nawet jak tryb ciemny próbuje to zmienić na szary
+                        btn.className = "nav-item relative z-10 flex flex-1 flex-col items-center justify-center h-full rounded-[30px] transition-colors duration-300 !text-white font-bold";
                     } else {
-                        btn.className = "nav-item relative z-10 flex flex-1 flex-col items-center justify-center h-full rounded-[30px] transition-colors duration-300 text-gray-400 dark:text-gray-500";
+                        // === NIEAKTYWNA (Obok kółka) ===
+                        // Light: szary, Dark: jasny popiel (dla lepszej widoczności)
+                        btn.className = "nav-item relative z-10 flex flex-1 flex-col items-center justify-center h-full rounded-[30px] transition-colors duration-300 text-gray-400 dark:text-gray-300 hover:text-gray-600 dark:hover:text-white";
                     }
                 });
             }
 
-            // 3. Odświeżanie danych (stara logika)
+            // 3. Odświeżanie danych (bez zmian)
             if (tabId === 'calendar') {
                 renderCalendar();
             } else if (tabId === 'history') {
