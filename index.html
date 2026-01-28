@@ -84,7 +84,14 @@
             border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 4px 10px rgba(0,0,0,0.05);
         }
-
+        /* --- FIX: Przycisk Wyczyść (Czerwone tło) w Liquid Light --- */
+        /* To sprawi, że czerwone tło będzie szklane i półprzezroczyste */
+        .liquid-theme .bg-red-50 {
+            background-color: rgba(254, 242, 242, 0.4) !important; 
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(239, 68, 68, 0.2);
+        }
         /* Przycisk "Dodaj wydatek" w Liquid */
         .liquid-theme .ios-btn.bg-gray-900 {
              background-color: rgba(0, 0, 0, 0.6) !important; /* Półprzezroczysty czarny */
@@ -1062,9 +1069,17 @@
         <i class="fas fa-plus-circle text-green-500 text-lg"></i> Dodaj przychód
     </button>
 </div>
+        <div class="mb-6 bg-gray-50/50 dark:bg-gray-800/50 p-3 rounded-xl border border-gray-100 dark:border-gray-800 flex items-start gap-3">
+        <div class="text-green-500 mt-0.5"><i class="fas fa-check-circle"></i></div>
+        <div>
+            <p class="text-[10px] text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
+                Kliknij ikonę "ptaszka" (<i class="fas fa-check text-[9px]"></i>) przy wydatku, gdy rozporządzisz go na koncie bankowym. <br> Kwota zmieni kolor na <span class="text-green-600 font-bold">zielony</span>.
+            </p>
+        </div>
+    </div>
     
     <div class="flex justify-center mb-6">
-         <button onclick="resetBudgetForMonth()" class="text-xs text-red-400 hover:text-red-500 font-bold flex items-center gap-1 py-2 px-4 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 transition">
+         <button onclick="resetBudgetForMonth()" class="ios-btn text-xs text-red-500 dark:text-red-400 font-bold flex items-center gap-2 py-3 px-6 rounded-xl bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/30 transition shadow-sm">
             <i class="fas fa-trash-alt"></i> Wyczyść ten miesiąc
         </button>
     </div>
@@ -1758,7 +1773,7 @@
             const [y, m] = currentCalcMonth.split('-');
             document.getElementById('budget-month-label').innerText = `${monthsNominative[parseInt(m)-1]} ${y}`;
             
-            // 1. Ustal Podstawę (Wypłatę)
+            // --- 1. Ustal Podstawę (Wypłatę) ---
             let baseIncome = 0;
             let source = "Kalkulator";
             
@@ -1791,28 +1806,19 @@
             baseIncome = Math.round(baseIncome * 100) / 100;
             document.getElementById('budget-source-type').innerText = source;
 
-            // 2. Pobierz wszystkie pozycje
+            // --- 2. Pobierz pozycje ---
             const budgetItems = state.budgetData[currentCalcMonth] || [];
-            
-            // 3. Rozdziel na Wydatki i Przychody Dodatkowe
-            // type: 'income' -> to dodatkowe przychody
             const additionalIncomes = budgetItems.filter(e => e.type === 'income');
-            // type: 'fixed' lub 'percent' -> to wydatki
             const expenses = budgetItems.filter(e => e.type !== 'income');
 
-            // 4. Oblicz sumę dodatków
+            // --- 3. Oblicz sumy ---
             let totalAdditional = 0;
             additionalIncomes.forEach(inc => totalAdditional += inc.val);
-            totalAdditional = Math.round(totalAdditional * 100) / 100;
-
-            // 5. CAŁKOWITY PRZYCHÓD (Podstawa + Dodatki)
             const grandTotalIncome = baseIncome + totalAdditional;
 
-            // --- RENDEROWANIE LISTY PRZYCHODÓW W KARCIE ---
+            // --- 4. Renderowanie Przychodów ---
             const breakdownContainer = document.getElementById('income-breakdown-container');
-            
             if (additionalIncomes.length === 0) {
-                // Widok prosty (tylko podstawa)
                 breakdownContainer.innerHTML = `
                     <div class="flex justify-between items-center text-xs">
                          <span class="text-gray-400">Podstawa (Wypłata)</span>
@@ -1820,20 +1826,17 @@
                     </div>
                     <div class="h-px bg-gray-700 w-full my-1"></div>
                     <div class="flex justify-between items-center text-sm">
-                         <span class="text-gray-300 font-bold">Łączny przychód</span>
+                         <span class="text-gray-300 font-bold">Łącznie</span>
                          <span class="text-emerald-400 font-bold text-lg">${formatCurrency(grandTotalIncome)}</span>
                     </div>
                 `;
-                } else {
-                // Widok rozszerzony (lista dodatków)
-                // USTAWIENIE BAZOWE: Jasne napisy (dla ciemnej karty w trybie Standard)
+            } else {
                 let listHtml = `
                     <div class="flex justify-between items-center text-xs mb-2">
                          <span class="text-gray-400 font-medium">Podstawa (Wypłata)</span>
                          <span class="text-white font-bold">${formatCurrency(baseIncome)}</span>
                     </div>
                 `;
-                
                 additionalIncomes.forEach(inc => {
                     listHtml += `
                         <div class="flex justify-between items-center text-xs mb-2 group">
@@ -1843,14 +1846,12 @@
                              </div>
                              <div class="flex items-center gap-3">
                                  <span class="text-white font-bold">${formatCurrency(inc.val)}</span>
-                                 
                                  <button onclick="editBudgetItem('${inc.id}')" class="text-gray-400 hover:text-blue-400 transition p-1"><i class="fas fa-pen text-xs"></i></button>
                                  <button onclick="deleteBudgetItem('${inc.id}')" class="text-gray-400 hover:text-red-400 transition p-1"><i class="fas fa-trash-alt text-xs"></i></button>
                              </div>
                         </div>
                     `;
                 });
-                
                 listHtml += `
                     <div class="h-px bg-gray-600 w-full my-2"></div>
                     <div class="flex justify-between items-center">
@@ -1858,19 +1859,17 @@
                          <span class="text-emerald-400 font-bold text-xl">${formatCurrency(grandTotalIncome)}</span>
                     </div>
                 `;
-                
                 breakdownContainer.innerHTML = listHtml;
             }
-            // 6. Przetwarzanie Wydatków Stałych
+
+            // --- 5. Przetwarzanie Wydatków (Stałe i Procentowe) ---
             let sumFixed = 0;
             const fixedExpenses = expenses.filter(e => e.type === 'fixed');
             fixedExpenses.forEach(e => sumFixed += e.val);
 
-            // 7. Oblicz resztę dla procentów (Od CAŁKOWITEGO przychodu)
             let remainderAfterFixed = grandTotalIncome - sumFixed;
             if (remainderAfterFixed < 0) remainderAfterFixed = 0;
 
-            // 8. Przetwarzanie Wydatków Procentowych
             const percentExpenses = expenses.filter(e => e.type === 'percent');
             let sumPercentVal = 0;
             
@@ -1883,26 +1882,22 @@
 
             // Korekta groszowa
             let totalAllocated = sumFixed + sumPercentVal;
-            totalAllocated = Math.round(totalAllocated * 100) / 100;
             if (totalAllocated > grandTotalIncome && processedPercentItems.length > 0) {
                 const diff = totalAllocated - grandTotalIncome;
                 if (diff < 0.05) {
                     const lastItem = processedPercentItems[processedPercentItems.length - 1];
                     lastItem.calculatedVal -= diff;
-                    lastItem.calculatedVal = Math.round(lastItem.calculatedVal * 100) / 100;
                     sumPercentVal -= diff;
                 }
             }
 
-            // 9. Ostateczna kwota do rozdysponowania
-            let finalRemaining = grandTotalIncome - sumFixed - sumPercentVal;
-            finalRemaining = Math.round(finalRemaining * 100) / 100;
+            const finalRemaining = grandTotalIncome - sumFixed - sumPercentVal;
             
             document.getElementById('budget-remaining').innerText = finalRemaining.toLocaleString('pl-PL', {minimumFractionDigits: 2});
             document.getElementById('sum-fixed').innerText = formatCurrency(sumFixed);
             document.getElementById('base-for-percent').innerText = `Baza %: ${remainderAfterFixed.toLocaleString('pl-PL', {minimumFractionDigits:0})} zł`;
 
-            // --- RENDEROWANIE WYKRESU (PIE CHART) ---
+            // --- Wykres (Pie Chart) ---
             const chart = document.getElementById('budget-pie-chart');
             if(grandTotalIncome > 0) {
                 let gradientStr = '';
@@ -1922,8 +1917,8 @@
                         const deg = percent * 360;
                         const endDeg = currentDeg + deg;
                         const colorObj = colors.find(c => c.val === item.color);
-                        const colorHex = colorObj ? colorObj.hex : '#9CA3AF';
-                        parts.push(`${colorHex} ${currentDeg}deg ${endDeg}deg`);
+                        const partsHex = colorObj ? colorObj.hex : '#9CA3AF';
+                        parts.push(`${partsHex} ${currentDeg}deg ${endDeg}deg`);
                         currentDeg = endDeg;
                     });
                     parts.push(`#6B7280 ${currentDeg}deg 360deg`);
@@ -1934,23 +1929,43 @@
                 chart.style.setProperty('--chart-gradient', `#6B7280 0deg 360deg`);
             }
 
-            // --- RENDEROWANIE LIST WYDATKÓW ---
-            const listFixed = document.getElementById('list-fixed');
-            listFixed.innerHTML = '';
+            // ==========================================
+            // === RENDEROWANIE LIST Z CHECKAMI (NOWOŚĆ) ===
+            // ==========================================
             const bgColors = { 'red': 'bg-red-500', 'orange': 'bg-orange-500', 'amber': 'bg-amber-500', 'emerald': 'bg-emerald-500', 'green': 'bg-green-500', 'blue': 'bg-blue-500', 'purple': 'bg-purple-500', 'pink': 'bg-pink-500', 'indigo': 'bg-indigo-500' };
 
+            // --- Lista Stała ---
+            const listFixed = document.getElementById('list-fixed');
+            listFixed.innerHTML = '';
             if(fixedExpenses.length === 0) listFixed.innerHTML = '<div class="text-xs text-center text-gray-400 py-2">Brak wydatków stałych</div>';
 
             fixedExpenses.forEach(item => {
                 const el = document.createElement('div');
-                el.className = "flex justify-between items-center ios-card liquid-glass-card p-3 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm dark:bg-darkcard"; 
+                // Jeśli opłacone, dodajemy lekki zielony border
+                const borderClass = item.isPaid ? 'border-green-200 dark:border-green-900' : 'border-gray-100 dark:border-gray-800';
+                el.className = `flex justify-between items-center ios-card liquid-glass-card p-3 rounded-xl border ${borderClass} shadow-sm dark:bg-darkcard transition-all duration-300`; 
+                
+                // Logika kolorów dla stanu "Opłacone"
+                const isPaid = item.isPaid === true;
+                const valueColor = isPaid ? "text-green-500" : "text-gray-900 dark:text-white";
+                // Ikonka: jeśli opłacone to zielona, jeśli nie to szara
+                const checkBtnClass = isPaid ? "bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400" : "bg-gray-100 text-gray-300 hover:text-green-400 dark:bg-gray-700 dark:text-gray-500";
+
                 el.innerHTML = `
                     <div class="flex items-center gap-3">
                         <div class="w-2.5 h-2.5 rounded-full ${bgColors[item.color]}"></div>
                         <span class="font-bold text-gray-700 dark:text-gray-300 text-sm">${item.name}</span>
                     </div>
-                    <div class="flex items-center gap-3">
-                        <span class="font-bold text-gray-900 dark:text-white">${formatCurrency(item.val)}</span>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold ${valueColor} transition-colors mr-2">${formatCurrency(item.val)}</span>
+                        
+                        <!-- PRZYCISK CHECK -->
+                        <button onclick="toggleBudgetPaid('${item.id}')" class="w-8 h-8 rounded-full flex items-center justify-center transition-colors ${checkBtnClass}">
+                            <i class="fas fa-check text-xs"></i>
+                        </button>
+
+                        <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                        
                         <button onclick="editBudgetItem('${item.id}')" class="text-gray-400 hover:text-blue-500 w-6 h-6 flex items-center justify-center"><i class="fas fa-pen text-xs"></i></button>
                         <button onclick="deleteBudgetItem('${item.id}')" class="text-gray-400 hover:text-red-500 w-6 h-6 flex items-center justify-center"><i class="fas fa-trash-alt text-xs"></i></button>
                     </div>
@@ -1958,21 +1973,36 @@
                 listFixed.appendChild(el);
             });
 
+            // --- Lista Procentowa ---
             const listPercent = document.getElementById('list-percent');
             listPercent.innerHTML = '';
             if(processedPercentItems.length === 0) listPercent.innerHTML = '<div class="text-xs text-center text-gray-400 py-2">Brak budżetów procentowych</div>';
 
             processedPercentItems.forEach(item => {
                  const el = document.createElement('div');
-                el.className = "flex flex-col ios-card liquid-glass-card p-3 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm dark:bg-darkcard";
+                 const borderClass = item.isPaid ? 'border-green-200 dark:border-green-900' : 'border-gray-100 dark:border-gray-800';
+                el.className = `flex flex-col ios-card liquid-glass-card p-3 rounded-xl border ${borderClass} shadow-sm dark:bg-darkcard transition-all duration-300`;
+                
+                const isPaid = item.isPaid === true;
+                const valueColor = isPaid ? "text-green-500" : "text-gray-900 dark:text-white";
+                const checkBtnClass = isPaid ? "bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400" : "bg-gray-100 text-gray-300 hover:text-green-400 dark:bg-gray-700 dark:text-gray-500";
+
                 el.innerHTML = `
                     <div class="flex justify-between items-center mb-1">
                         <div class="flex items-center gap-3">
                             <div class="w-2.5 h-2.5 rounded-full ${bgColors[item.color]}"></div>
                             <span class="font-bold text-gray-700 dark:text-gray-300 text-sm">${item.name} (${item.val}%)</span>
                         </div>
-                        <div class="flex items-center gap-3">
-                            <span class="font-bold text-gray-900 dark:text-white">${formatCurrency(item.calculatedVal)}</span>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold ${valueColor} transition-colors mr-2">${formatCurrency(item.calculatedVal)}</span>
+                            
+                            <!-- PRZYCISK CHECK -->
+                            <button onclick="toggleBudgetPaid('${item.id}')" class="w-8 h-8 rounded-full flex items-center justify-center transition-colors ${checkBtnClass}">
+                                <i class="fas fa-check text-xs"></i>
+                            </button>
+
+                            <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+
                             <button onclick="editBudgetItem('${item.id}')" class="text-gray-400 hover:text-blue-500 w-6 h-6 flex items-center justify-center"><i class="fas fa-pen text-xs"></i></button>
                             <button onclick="deleteBudgetItem('${item.id}')" class="text-gray-400 hover:text-red-500 w-6 h-6 flex items-center justify-center"><i class="fas fa-trash-alt text-xs"></i></button>
                         </div>
@@ -1984,7 +2014,7 @@
                 listPercent.appendChild(el);
             });
             
-            // Toggle Button Styles
+            // Toggle Button Styles (Bez zmian)
             const btnGroups = document.getElementById('chart-mode-groups');
             const btnDetails = document.getElementById('chart-mode-details');
             const isLiquid = document.body.classList.contains('liquid-theme');
@@ -1998,6 +2028,17 @@
             } else {
                 btnGroups.className = `${baseBtn} ${inactiveClass}`;
                 btnDetails.className = `${baseBtn} ${activeClass}`;
+            }
+        }
+        // --- Nowa funkcja do odhaczania wydatków ---
+        function toggleBudgetPaid(id) {
+            // Znajdź element w aktualnym miesiącu
+            const item = state.budgetData[currentCalcMonth].find(i => i.id === id);
+            if (item) {
+                // Przełącz stan (jak nie ma, to ustawi na true)
+                item.isPaid = !item.isPaid; 
+                saveState();
+                renderBudget(); // Odśwież widok
             }
         }
         // --- Budget Modal & Actions ---
