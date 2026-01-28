@@ -818,6 +818,26 @@
         body.liquid-theme:not(.dark) #view-budget .ios-card .text-emerald-400 {
             color: #059669 !important; /* Ciemniejszy zielony dla czytelności */
         }
+
+        /* Animacja sprężysta dla nawigacji */
+        .ease-spring {
+            transition-timing-function: cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+        
+        /* Styl kontenera nawigacji */
+        .glass-nav-container {
+            background-color: rgba(255, 255, 255, 0.65); /* Jasny tryb - mocniejsze mleko */
+            backdrop-filter: blur(20px) saturate(180%);
+            -webkit-backdrop-filter: blur(20px) saturate(180%);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.15);
+        }
+        
+        /* Ciemny tryb nawigacji */
+        html.dark .glass-nav-container {
+            background-color: rgba(28, 28, 30, 0.75);
+            border: 1px solid rgba(255,255,255,0.1);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+        }
     </style>
 </head>
 <body class="bg-[#F5F5F7] text-[#1D1D1F] dark:bg-darkbg dark:text-gray-100 transition-colors duration-300">
@@ -1073,7 +1093,7 @@
         <div class="text-green-500 mt-0.5"><i class="fas fa-check-circle"></i></div>
         <div>
             <p class="text-[10px] text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
-                Kliknij ikonę "ptaszka" (<i class="fas fa-check text-[9px]"></i>) przy wydatku, gdy rozporządzisz go na koncie bankowym. <br> Kwota zmieni kolor na <span class="text-green-600 font-bold">zielony</span>.
+                Edytuj wydatek, aby zaznaczyć go jako "Opłacony". Kwota zmieni kolor na <span class="text-green-600 font-bold">zielony</span>.
             </p>
         </div>
     </div>
@@ -1386,6 +1406,20 @@
     <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2">Kolor</label>
     <div class="flex gap-2 justify-between" id="color-picker"></div>
 </div>
+                <!-- Nowy przełącznik w modalu -->
+                <!-- DODAŁEM ID="modal-paid-section" PONIŻEJ: -->
+                <div id="modal-paid-section" class="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-200 dark:border-gray-700 mt-2">
+                    <div class="flex items-center gap-3">
+                        <div class="w-8 h-8 bg-green-100 dark:bg-green-900 text-green-600 dark:text-green-300 rounded-full flex items-center justify-center">
+                            <i class="fas fa-check text-xs"></i>
+                        </div>
+                        <span class="text-sm font-bold text-gray-900 dark:text-white">Opłacone / Zrealizowane</span>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="new-cat-paid" class="sr-only peer">
+                        <div class="w-11 h-6 bg-gray-300 dark:bg-gray-600 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500 shadow-inner"></div>
+                    </label>
+                </div>
 
                 <button onclick="addCategory()" id="btn-save-category" class="ios-btn w-full py-3.5 bg-gray-900 dark:bg-white hover:bg-black text-white dark:text-black font-bold rounded-xl shadow-lg shadow-gray-300/50 mt-2">
                     Dodaj do listy
@@ -1409,30 +1443,56 @@
         </div>
     </div>
 
-    <!-- ================= BOTTOM NAVIGATION ================= -->
-    <div class="fixed bottom-0 left-0 w-full bg-white/80 dark:bg-darkcard/90 backdrop-blur-xl border-t border-gray-200 dark:border-gray-800 z-50 safe-area-bottom" 
-         style="position: fixed; bottom: 0; left: 0; width: 100%; z-index: 9999;">
+    <!-- ================= BOTTOM NAVIGATION (Floating Island) ================= -->
+    <!-- Kontener pozycjonujący na dole ekranu (lewitujący) -->
+    <div class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 w-[90%] max-w-[320px] safe-area-bottom">
          
-        <div class="flex justify-around items-center h-[70px] max-w-lg mx-auto pb-1">
-            <button onclick="switchTab('calendar')" id="nav-calendar" class="nav-item active-orange flex flex-col items-center gap-1 p-2 w-20 rounded-xl">
+        <!-- Właściwa "Pigułka" nawigacyjna -->
+        <div class="glass-nav-container relative flex justify-between items-center h-[70px] rounded-[35px] px-2">
+            
+            <!-- PŁYWAJĄCE KÓŁECZKO (WSKAŹNIK) -->
+            <!-- Jest absolutne, JS będzie zmieniał jego pozycję 'left' -->
+            <div id="nav-indicator" class="absolute top-2 bottom-2 w-[30%] bg-orange-500 rounded-[28px] shadow-lg shadow-orange-500/40 transition-all duration-500 ease-spring z-0"></div>
+
+            <!-- PRZYCISKI (Z-index 10, żeby były NAD kółeczkiem) -->
+            <!-- Usunąłem stąd kolory active-orange, bo kółeczko teraz robi za tło -->
+            
+            <button onclick="switchTab('calendar')" id="nav-calendar" class="nav-item relative z-10 flex flex-1 flex-col items-center justify-center h-full rounded-[30px] transition-colors duration-300 text-white">
                 <i class="fas fa-calendar-alt text-xl mb-0.5"></i>
                 <span class="text-[10px] font-bold">Grafik</span>
             </button>
-            <button onclick="switchTab('history')" id="nav-history" class="nav-item flex flex-col items-center gap-1 p-2 w-20 rounded-xl">
+
+            <button onclick="switchTab('history')" id="nav-history" class="nav-item relative z-10 flex flex-1 flex-col items-center justify-center h-full rounded-[30px] transition-colors duration-300 text-gray-400">
                 <i class="fas fa-wallet text-xl mb-0.5"></i>
                 <span class="text-[10px] font-bold">Wypłaty</span>
             </button>
-             <button onclick="switchTab('budget')" id="nav-budget" class="nav-item flex flex-col items-center gap-1 p-2 w-20 rounded-xl">
+            
+             <button onclick="switchTab('budget')" id="nav-budget" class="nav-item relative z-10 flex flex-1 flex-col items-center justify-center h-full rounded-[30px] transition-colors duration-300 text-gray-400">
                 <i class="fas fa-chart-pie text-xl mb-0.5"></i>
                 <span class="text-[10px] font-bold">Planer</span>
             </button>
+
         </div>
     </div>
-
     <div id="toast">Komunikat</div>
 
     <script>
-        const STORAGE_KEY = "mojgrafik_app_v2_1"; 
+        const STORAGE_KEY = "mojgrafik_app_v2_1";
+        // --- HELPERY (Wklej to na górze skryptu) ---
+        const $ = (id) => document.getElementById(id);
+        const $$ = (sel) => document.querySelectorAll(sel);
+        const html = (strings, ...values) => String.raw({ raw: strings }, ...values); 
+
+        function renderList(containerId, items, templateFn, emptyMsg = '') {
+            const container = $(containerId);
+            if (!container) return;
+            if (!items || items.length === 0) {
+                container.innerHTML = emptyMsg;
+                return;
+            }
+            container.innerHTML = items.map(templateFn).join('');
+        }
+        // ------------------------------------------
 
         // Global State
         let state = {
@@ -1486,8 +1546,7 @@
         // --- Core Functions ---
 
                 function init() {
-            // 1. Najpierw wymuś ukrycie Splash Screena po czasie, 
-            // niezależnie od tego czy wystąpi błąd w danych!
+            // 1. Najpierw wymuś ukrycie Splash Screena po czasie
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
                 if(splash) {
@@ -1498,15 +1557,14 @@
                 }
             }, 2000);
 
-            // 2. Wczytywanie danych
+            // 2. Wczytywanie danych z pamięci
             const stored = localStorage.getItem(STORAGE_KEY);
             if (stored) {
                 try {
                     const parsed = JSON.parse(stored);
-                    // Bezpieczne scalanie danych
                     state = { ...state, ...parsed };
                     
-                    // Naprawa brakujących struktur (zabezpieczenie przed starymi danymi)
+                    // Naprawa struktur danych
                     if(!state.paymentStatus) state.paymentStatus = {}; 
                     if(!state.actualSalary) state.actualSalary = {}; 
                     if(!state.monthlyRates) state.monthlyRates = {};
@@ -1518,25 +1576,27 @@
                     
                 } catch (e) { 
                     console.error("Błąd odczytu danych", e); 
-                    // Opcjonalnie: pokaż alert, że dane są uszkodzone, ale aplikacja ruszy
-                    alert("Wykryto problem z zapisanymi danymi, ale próbuję uruchomić aplikację.");
                 }
             }
 
+            // Ustawienie miesiąca
             const now = new Date();
             currentCalcMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
 
-            // 3. Próba narysowania interfejsu w bloku try-catch
+            // 3. Próba narysowania interfejsu
             try {
                 refreshUI(); 
             } catch (e) {
                 console.error("Błąd rysowania UI:", e);
-                alert("Błąd wyświetlania danych. Wejdź w Ustawienia i zrób Eksport (Pobierz kopię), aby uratować dane!");
+                alert("Błąd danych. Zrób backup w ustawieniach!");
             }
             
-            // Obsługa przycisku potwierdzenia
+            // Obsługa modala potwierdzenia
             const confirmBtn = document.getElementById('confirm-yes-btn');
             if(confirmBtn) confirmBtn.onclick = executeConfirm;
+
+            // 4. Inicjalizacja nawigacji (ustawia kółeczko na starcie)
+            switchTab('calendar');
         }
 
 
@@ -1650,19 +1710,36 @@
         }
 
         function switchTab(tabId) {
+            // 1. Przełączanie widoków (stara logika)
             document.querySelectorAll('.view-section').forEach(el => el.classList.remove('active'));
             document.getElementById('view-' + tabId).classList.add('active');
-            
-            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active-orange', 'active-dark')); 
-            const btn = document.getElementById('nav-' + tabId);
-            
-            if(btn) {
-                if(tabId === 'budget') btn.classList.add('active-dark'); 
-                else btn.classList.add('active-orange');
-            }
-            
             window.scrollTo(0, 0);
 
+            // 2. Logika PŁYWAJĄCEGO KÓŁECZKA (Nowość)
+            const activeBtn = document.getElementById('nav-' + tabId);
+            const indicator = document.getElementById('nav-indicator');
+            const allBtns = document.querySelectorAll('.nav-item');
+
+            if(activeBtn && indicator) {
+                // Oblicz pozycję: Przesuń kółko tam, gdzie jest przycisk
+                // activeBtn.offsetLeft daje nam odległość przycisku od lewej krawędzi pigułki
+                indicator.style.left = activeBtn.offsetLeft + 'px';
+                // Ustaw szerokość kółka taką samą jak przycisku (dla pewności)
+                indicator.style.width = activeBtn.offsetWidth + 'px';
+                
+                // Kolorowanie ikon:
+                // Aktywna ikona musi być BIAŁA (bo jest na pomarańczowym kółku)
+                // Nieaktywne ikony muszą być SZARE (bo są na szkle)
+                allBtns.forEach(btn => {
+                    if(btn.id === 'nav-' + tabId) {
+                        btn.className = "nav-item relative z-10 flex flex-1 flex-col items-center justify-center h-full rounded-[30px] transition-colors duration-300 text-white";
+                    } else {
+                        btn.className = "nav-item relative z-10 flex flex-1 flex-col items-center justify-center h-full rounded-[30px] transition-colors duration-300 text-gray-400 dark:text-gray-500";
+                    }
+                });
+            }
+
+            // 3. Odświeżanie danych (stara logika)
             if (tabId === 'calendar') {
                 renderCalendar();
             } else if (tabId === 'history') {
@@ -1770,266 +1847,181 @@
         }
 
         function renderBudget() {
-            const [y, m] = currentCalcMonth.split('-');
-            document.getElementById('budget-month-label').innerText = `${monthsNominative[parseInt(m)-1]} ${y}`;
-            
-            // --- 1. Ustal Podstawę (Wypłatę) ---
-            let baseIncome = 0;
-            let source = "Kalkulator";
-            
-            if(state.actualSalary[currentCalcMonth] && state.actualSalary[currentCalcMonth] > 0) {
-                baseIncome = state.actualSalary[currentCalcMonth];
-                source = "Wypłata (Historia)";
-            } else {
-                const savedRate = state.monthlyRates[currentCalcMonth] ? parseFloat(state.monthlyRates[currentCalcMonth]) : (parseFloat(state.hourlyRate) || 0);
-                const prefix = `${y}-${m}-`;
-                let sumHours = 0;
-                Object.keys(state.workLog).forEach(k => {
-                   if(k.startsWith(prefix)) sumHours += state.workLog[k].val || 0; 
-                });
-                
-                const gross = sumHours * savedRate;
-                let net = gross;
-                if(!state.isStudent && state.isZus) {
-                    const spoleczne = gross * 0.1371;
-                    const baseHealth = gross - spoleczne;
-                    const zdrav = baseHealth * 0.09;
-                    const kup = 250; 
-                    const taxBase = Math.round(baseHealth - kup);
-                    let tax = Math.round(taxBase * 0.12);
-                    if(state.isPit2) tax -= 300;
-                    if(tax < 0) tax = 0;
-                    net = gross - spoleczne - zdrav - tax;
-                }
-                baseIncome = net;
-            }
-            baseIncome = Math.round(baseIncome * 100) / 100;
-            document.getElementById('budget-source-type').innerText = source;
-
-            // --- 2. Pobierz pozycje ---
-            const budgetItems = state.budgetData[currentCalcMonth] || [];
-            const additionalIncomes = budgetItems.filter(e => e.type === 'income');
-            const expenses = budgetItems.filter(e => e.type !== 'income');
-
-            // --- 3. Oblicz sumy ---
-            let totalAdditional = 0;
-            additionalIncomes.forEach(inc => totalAdditional += inc.val);
-            const grandTotalIncome = baseIncome + totalAdditional;
-
-            // --- 4. Renderowanie Przychodów ---
-            const breakdownContainer = document.getElementById('income-breakdown-container');
-            if (additionalIncomes.length === 0) {
-                breakdownContainer.innerHTML = `
-                    <div class="flex justify-between items-center text-xs">
-                         <span class="text-gray-400">Podstawa (Wypłata)</span>
-                         <span class="text-white font-bold">${formatCurrency(baseIncome)}</span>
-                    </div>
-                    <div class="h-px bg-gray-700 w-full my-1"></div>
-                    <div class="flex justify-between items-center text-sm">
-                         <span class="text-gray-300 font-bold">Łącznie</span>
-                         <span class="text-emerald-400 font-bold text-lg">${formatCurrency(grandTotalIncome)}</span>
-                    </div>
-                `;
-            } else {
-                let listHtml = `
-                    <div class="flex justify-between items-center text-xs mb-2">
-                         <span class="text-gray-400 font-medium">Podstawa (Wypłata)</span>
-                         <span class="text-white font-bold">${formatCurrency(baseIncome)}</span>
-                    </div>
-                `;
-                additionalIncomes.forEach(inc => {
-                    listHtml += `
-                        <div class="flex justify-between items-center text-xs mb-2 group">
-                             <div class="flex items-center gap-2">
-                                <span class="text-emerald-400 font-bold">+</span>
-                                <span class="text-gray-300 font-medium truncate max-w-[120px]">${inc.name}</span>
-                             </div>
-                             <div class="flex items-center gap-3">
-                                 <span class="text-white font-bold">${formatCurrency(inc.val)}</span>
-                                 <button onclick="editBudgetItem('${inc.id}')" class="text-gray-400 hover:text-blue-400 transition p-1"><i class="fas fa-pen text-xs"></i></button>
-                                 <button onclick="deleteBudgetItem('${inc.id}')" class="text-gray-400 hover:text-red-400 transition p-1"><i class="fas fa-trash-alt text-xs"></i></button>
-                             </div>
-                        </div>
-                    `;
-                });
-                listHtml += `
-                    <div class="h-px bg-gray-600 w-full my-2"></div>
-                    <div class="flex justify-between items-center">
-                         <span class="text-gray-400 text-xs font-bold uppercase tracking-wider">Łącznie</span>
-                         <span class="text-emerald-400 font-bold text-xl">${formatCurrency(grandTotalIncome)}</span>
-                    </div>
-                `;
-                breakdownContainer.innerHTML = listHtml;
-            }
-
-            // --- 5. Przetwarzanie Wydatków (Stałe i Procentowe) ---
-            let sumFixed = 0;
-            const fixedExpenses = expenses.filter(e => e.type === 'fixed');
-            fixedExpenses.forEach(e => sumFixed += e.val);
-
-            let remainderAfterFixed = grandTotalIncome - sumFixed;
-            if (remainderAfterFixed < 0) remainderAfterFixed = 0;
-
-            const percentExpenses = expenses.filter(e => e.type === 'percent');
-            let sumPercentVal = 0;
-            
-            const processedPercentItems = percentExpenses.map(e => {
-                const rawVal = remainderAfterFixed * (e.val / 100);
-                const calculatedVal = Math.round(rawVal * 100) / 100;
-                sumPercentVal += calculatedVal;
-                return { ...e, calculatedVal };
-            });
-
-            // Korekta groszowa
-            let totalAllocated = sumFixed + sumPercentVal;
-            if (totalAllocated > grandTotalIncome && processedPercentItems.length > 0) {
-                const diff = totalAllocated - grandTotalIncome;
-                if (diff < 0.05) {
-                    const lastItem = processedPercentItems[processedPercentItems.length - 1];
-                    lastItem.calculatedVal -= diff;
-                    sumPercentVal -= diff;
-                }
-            }
-
-            const finalRemaining = grandTotalIncome - sumFixed - sumPercentVal;
-            
-            document.getElementById('budget-remaining').innerText = finalRemaining.toLocaleString('pl-PL', {minimumFractionDigits: 2});
-            document.getElementById('sum-fixed').innerText = formatCurrency(sumFixed);
-            document.getElementById('base-for-percent').innerText = `Baza %: ${remainderAfterFixed.toLocaleString('pl-PL', {minimumFractionDigits:0})} zł`;
-
-            // --- Wykres (Pie Chart) ---
-            const chart = document.getElementById('budget-pie-chart');
-            if(grandTotalIncome > 0) {
-                let gradientStr = '';
-                if (state.chartMode === 'groups') {
-                    const fixedPercent = (sumFixed / grandTotalIncome) * 100;
-                    const dynamicPercent = (sumPercentVal / grandTotalIncome) * 100;
-                    const degFixed = (fixedPercent / 100) * 360;
-                    const degPercent = degFixed + ((dynamicPercent / 100) * 360);
-                    gradientStr = `#EF4444 0deg ${degFixed}deg, #F59E0B ${degFixed}deg ${degPercent}deg, #6B7280 ${degPercent}deg 360deg`;
-                } else {
-                    const allItems = [...fixedExpenses, ...processedPercentItems];
-                    let currentDeg = 0;
-                    const parts = [];
-                    allItems.forEach(item => {
-                        const val = item.calculatedVal !== undefined ? item.calculatedVal : item.val;
-                        const percent = (val / grandTotalIncome);
-                        const deg = percent * 360;
-                        const endDeg = currentDeg + deg;
-                        const colorObj = colors.find(c => c.val === item.color);
-                        const partsHex = colorObj ? colorObj.hex : '#9CA3AF';
-                        parts.push(`${partsHex} ${currentDeg}deg ${endDeg}deg`);
-                        currentDeg = endDeg;
-                    });
-                    parts.push(`#6B7280 ${currentDeg}deg 360deg`);
-                    gradientStr = parts.join(', ');
-                }
-                chart.style.setProperty('--chart-gradient', gradientStr);
-            } else {
-                chart.style.setProperty('--chart-gradient', `#6B7280 0deg 360deg`);
-            }
-
-            // ==========================================
-            // === RENDEROWANIE LIST Z CHECKAMI (NOWOŚĆ) ===
-            // ==========================================
-            const bgColors = { 'red': 'bg-red-500', 'orange': 'bg-orange-500', 'amber': 'bg-amber-500', 'emerald': 'bg-emerald-500', 'green': 'bg-green-500', 'blue': 'bg-blue-500', 'purple': 'bg-purple-500', 'pink': 'bg-pink-500', 'indigo': 'bg-indigo-500' };
-
-            // --- Lista Stała ---
-            const listFixed = document.getElementById('list-fixed');
-            listFixed.innerHTML = '';
-            if(fixedExpenses.length === 0) listFixed.innerHTML = '<div class="text-xs text-center text-gray-400 py-2">Brak wydatków stałych</div>';
-
-            fixedExpenses.forEach(item => {
-                const el = document.createElement('div');
-                // Jeśli opłacone, dodajemy lekki zielony border
-                const borderClass = item.isPaid ? 'border-green-200 dark:border-green-900' : 'border-gray-100 dark:border-gray-800';
-                el.className = `flex justify-between items-center ios-card liquid-glass-card p-3 rounded-xl border ${borderClass} shadow-sm dark:bg-darkcard transition-all duration-300`; 
-                
-                // Logika kolorów dla stanu "Opłacone"
-                const isPaid = item.isPaid === true;
-                const valueColor = isPaid ? "text-green-500" : "text-gray-900 dark:text-white";
-                // Ikonka: jeśli opłacone to zielona, jeśli nie to szara
-                const checkBtnClass = isPaid ? "bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400" : "bg-gray-100 text-gray-300 hover:text-green-400 dark:bg-gray-700 dark:text-gray-500";
-
-                el.innerHTML = `
-                    <div class="flex items-center gap-3">
-                        <div class="w-2.5 h-2.5 rounded-full ${bgColors[item.color]}"></div>
-                        <span class="font-bold text-gray-700 dark:text-gray-300 text-sm">${item.name}</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="font-bold ${valueColor} transition-colors mr-2">${formatCurrency(item.val)}</span>
-                        
-                        <!-- PRZYCISK CHECK -->
-                        <button onclick="toggleBudgetPaid('${item.id}')" class="w-8 h-8 rounded-full flex items-center justify-center transition-colors ${checkBtnClass}">
-                            <i class="fas fa-check text-xs"></i>
-                        </button>
-
-                        <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-                        
-                        <button onclick="editBudgetItem('${item.id}')" class="text-gray-400 hover:text-blue-500 w-6 h-6 flex items-center justify-center"><i class="fas fa-pen text-xs"></i></button>
-                        <button onclick="deleteBudgetItem('${item.id}')" class="text-gray-400 hover:text-red-500 w-6 h-6 flex items-center justify-center"><i class="fas fa-trash-alt text-xs"></i></button>
-                    </div>
-                `;
-                listFixed.appendChild(el);
-            });
-
-            // --- Lista Procentowa ---
-            const listPercent = document.getElementById('list-percent');
-            listPercent.innerHTML = '';
-            if(processedPercentItems.length === 0) listPercent.innerHTML = '<div class="text-xs text-center text-gray-400 py-2">Brak budżetów procentowych</div>';
-
-            processedPercentItems.forEach(item => {
-                 const el = document.createElement('div');
-                 const borderClass = item.isPaid ? 'border-green-200 dark:border-green-900' : 'border-gray-100 dark:border-gray-800';
-                el.className = `flex flex-col ios-card liquid-glass-card p-3 rounded-xl border ${borderClass} shadow-sm dark:bg-darkcard transition-all duration-300`;
-                
-                const isPaid = item.isPaid === true;
-                const valueColor = isPaid ? "text-green-500" : "text-gray-900 dark:text-white";
-                const checkBtnClass = isPaid ? "bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400" : "bg-gray-100 text-gray-300 hover:text-green-400 dark:bg-gray-700 dark:text-gray-500";
-
-                el.innerHTML = `
-                    <div class="flex justify-between items-center mb-1">
-                        <div class="flex items-center gap-3">
-                            <div class="w-2.5 h-2.5 rounded-full ${bgColors[item.color]}"></div>
-                            <span class="font-bold text-gray-700 dark:text-gray-300 text-sm">${item.name} (${item.val}%)</span>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <span class="font-bold ${valueColor} transition-colors mr-2">${formatCurrency(item.calculatedVal)}</span>
-                            
-                            <!-- PRZYCISK CHECK -->
-                            <button onclick="toggleBudgetPaid('${item.id}')" class="w-8 h-8 rounded-full flex items-center justify-center transition-colors ${checkBtnClass}">
-                                <i class="fas fa-check text-xs"></i>
-                            </button>
-
-                            <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
-
-                            <button onclick="editBudgetItem('${item.id}')" class="text-gray-400 hover:text-blue-500 w-6 h-6 flex items-center justify-center"><i class="fas fa-pen text-xs"></i></button>
-                            <button onclick="deleteBudgetItem('${item.id}')" class="text-gray-400 hover:text-red-500 w-6 h-6 flex items-center justify-center"><i class="fas fa-trash-alt text-xs"></i></button>
-                        </div>
-                    </div>
-                    <div class="w-full bg-gray-100 dark:bg-gray-700 h-1.5 rounded-full overflow-hidden mt-1">
-                        <div class="${bgColors[item.color]} h-full" style="width: ${item.val}%"></div>
-                    </div>
-                `;
-                listPercent.appendChild(el);
-            });
-            
-            // Toggle Button Styles (Bez zmian)
-            const btnGroups = document.getElementById('chart-mode-groups');
-            const btnDetails = document.getElementById('chart-mode-details');
-            const isLiquid = document.body.classList.contains('liquid-theme');
-            const baseBtn = "px-2 py-1 rounded-md transition text-center text-[10px] font-bold";
-            let activeClass = isLiquid ? "toggle-active-style" : "bg-gray-900 text-white shadow dark:bg-gray-600";
-            let inactiveClass = isLiquid ? "toggle-inactive-style" : "text-gray-500 hover:bg-gray-200 dark:text-gray-400";
-            
-            if(state.chartMode === 'groups') {
-                btnGroups.className = `${baseBtn} ${activeClass}`;
-                btnDetails.className = `${baseBtn} ${inactiveClass}`;
-            } else {
-                btnGroups.className = `${baseBtn} ${inactiveClass}`;
-                btnDetails.className = `${baseBtn} ${activeClass}`;
-            }
+    // 1. Ustawienie nagłówka
+    const [y, m] = currentCalcMonth.split('-');
+    $('budget-month-label').innerText = `${monthsNominative[parseInt(m)-1]} ${y}`;
+    
+    // 2. Obliczenia
+    let baseIncome = 0;
+    let source = "Kalkulator";
+    
+    if(state.actualSalary[currentCalcMonth] > 0) {
+        baseIncome = state.actualSalary[currentCalcMonth];
+        source = "Wypłata (Historia)";
+    } else {
+        const savedRate = parseFloat(state.monthlyRates[currentCalcMonth]) || parseFloat(state.hourlyRate) || 0;
+        const prefix = `${y}-${m}-`;
+        let sumHours = 0;
+        Object.keys(state.workLog).forEach(k => { if(k.startsWith(prefix)) sumHours += state.workLog[k].val || 0; });
+        
+        let gross = sumHours * savedRate;
+        let net = gross;
+        if(!state.isStudent && state.isZus) {
+            const spoleczne = gross * 0.1371;
+            const health = (gross - spoleczne) * 0.09;
+            const taxBase = Math.round((gross - spoleczne) - 250);
+            let tax = Math.round(taxBase * 0.12) - (state.isPit2 ? 300 : 0);
+            net = gross - spoleczne - health - (tax < 0 ? 0 : tax);
         }
+        baseIncome = Math.round(net * 100) / 100;
+    }
+    $('budget-source-type').innerText = source;
+
+    // 3. Pobranie danych
+    const budgetItems = state.budgetData[currentCalcMonth] || [];
+    const incomes = budgetItems.filter(e => e.type === 'income');
+    const expenses = budgetItems.filter(e => e.type !== 'income');
+    
+    let totalAdd = incomes.reduce((acc, curr) => acc + curr.val, 0);
+    const grandTotal = baseIncome + totalAdd;
+
+    // 4. Renderowanie Przychodów
+    const incomeRows = incomes.map(inc => html`
+        <div class="flex justify-between items-center text-xs mb-2 group">
+             <div class="flex items-center gap-2">
+                <span class="text-emerald-400 font-bold">+</span>
+                <span class="text-gray-300 truncate max-w-[120px]">${inc.name}</span>
+             </div>
+             <div class="flex items-center gap-3">
+                 <span class="text-white font-bold">${formatCurrency(inc.val)}</span>
+                 <button onclick="editBudgetItem('${inc.id}')" class="text-gray-400 hover:text-blue-400 p-1"><i class="fas fa-pen text-xs"></i></button>
+                 <button onclick="deleteBudgetItem('${inc.id}')" class="text-gray-400 hover:text-red-400 p-1"><i class="fas fa-trash-alt text-xs"></i></button>
+             </div>
+        </div>
+    `).join('');
+
+    $('income-breakdown-container').innerHTML = `
+        <div class="flex justify-between items-center text-xs ${incomes.length ? 'mb-2' : ''}">
+             <span class="text-gray-400 font-medium">Podstawa</span>
+             <span class="text-white font-bold">${formatCurrency(baseIncome)}</span>
+        </div>
+        ${incomeRows}
+        <div class="h-px bg-gray-600 w-full my-2"></div>
+        <div class="flex justify-between items-center">
+             <span class="text-gray-400 text-xs font-bold uppercase tracking-wider">Łącznie</span>
+             <span class="text-emerald-400 font-bold text-xl">${formatCurrency(grandTotal)}</span>
+        </div>
+    `;
+
+    // 5. Przeliczanie Wydatków
+    const fixedExp = expenses.filter(e => e.type === 'fixed');
+    const percentExp = expenses.filter(e => e.type === 'percent');
+    
+    let sumFixed = fixedExp.reduce((acc, curr) => acc + curr.val, 0);
+    let remainder = Math.max(0, grandTotal - sumFixed);
+    
+    let sumPercent = 0;
+    const processedPercent = percentExp.map(e => {
+        const calc = Math.round((remainder * (e.val / 100)) * 100) / 100;
+        sumPercent += calc;
+        return { ...e, calculatedVal: calc };
+    });
+
+    $('budget-remaining').innerText = (grandTotal - sumFixed - sumPercent).toLocaleString('pl-PL', {minimumFractionDigits: 2});
+    $('sum-fixed').innerText = formatCurrency(sumFixed);
+    $('base-for-percent').innerText = `Baza %: ${remainder.toLocaleString('pl-PL', {minimumFractionDigits:0})} zł`;
+
+    // 6. Mapowanie kolorów
+    const bgColors = { 'red': 'bg-red-500', 'orange': 'bg-orange-500', 'amber': 'bg-amber-500', 'emerald': 'bg-emerald-500', 'blue': 'bg-blue-500', 'indigo': 'bg-indigo-500', 'purple': 'bg-purple-500', 'pink': 'bg-pink-500' };
+
+    // 7. Renderowanie Listy Stałej (BEZ PRZYCISKU CHECK, ale z efektem)
+    const fixedTemplate = (item) => {
+        const borderClass = item.isPaid ? 'border-green-200 dark:border-green-900' : 'border-gray-100 dark:border-gray-800';
+        const opacityClass = item.isPaid ? 'opacity-50 grayscale-[0.5]' : '';
+        const valueColor = item.isPaid ? "text-green-500" : "text-gray-900 dark:text-white";
+
+        return html`
+        <div class="flex justify-between items-center ios-card liquid-glass-card p-3 rounded-xl border ${borderClass} shadow-sm dark:bg-darkcard transition-all duration-300 ${opacityClass}">
+            <div class="flex items-center gap-3">
+                <div class="w-2.5 h-2.5 rounded-full ${bgColors[item.color] || 'bg-gray-500'}"></div>
+                <span class="font-bold text-gray-700 dark:text-gray-300 text-sm">${item.name}</span>
+            </div>
+            <div class="flex items-center gap-3">
+                <span class="font-bold ${valueColor} transition-colors">${formatCurrency(item.val)}</span>
+                <button onclick="editBudgetItem('${item.id}')" class="text-gray-400 hover:text-blue-500 w-6 h-6 flex justify-center items-center"><i class="fas fa-pen text-xs"></i></button>
+                <button onclick="deleteBudgetItem('${item.id}')" class="text-gray-400 hover:text-red-500 w-6 h-6 flex justify-center items-center"><i class="fas fa-trash-alt text-xs"></i></button>
+            </div>
+        </div>`;
+    };
+
+    renderList('list-fixed', fixedExp, fixedTemplate, '<div class="text-xs text-center text-gray-400 py-2">Brak wydatków stałych</div>');
+
+    // 8. Renderowanie Listy Procentowej
+    const percentTemplate = (item) => {
+        const borderClass = item.isPaid ? 'border-green-200 dark:border-green-900' : 'border-gray-100 dark:border-gray-800';
+        const opacityClass = item.isPaid ? 'opacity-50 grayscale-[0.5]' : '';
+        const valueColor = item.isPaid ? "text-green-500" : "text-gray-900 dark:text-white";
+
+        return html`
+        <div class="flex flex-col ios-card liquid-glass-card p-3 rounded-xl border ${borderClass} shadow-sm dark:bg-darkcard transition-all duration-300 ${opacityClass}">
+             <div class="flex justify-between items-center mb-1">
+                <div class="flex items-center gap-3">
+                    <div class="w-2.5 h-2.5 rounded-full ${bgColors[item.color] || 'bg-gray-500'}"></div>
+                    <span class="font-bold text-gray-700 dark:text-gray-300 text-sm">${item.name} (${item.val}%)</span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <span class="font-bold ${valueColor}">${formatCurrency(item.calculatedVal)}</span>
+                    <button onclick="editBudgetItem('${item.id}')" class="text-gray-400 hover:text-blue-500 w-6 h-6 flex justify-center items-center"><i class="fas fa-pen text-xs"></i></button>
+                    <button onclick="deleteBudgetItem('${item.id}')" class="text-gray-400 hover:text-red-500 w-6 h-6 flex justify-center items-center"><i class="fas fa-trash-alt text-xs"></i></button>
+                </div>
+             </div>
+             <div class="w-full bg-gray-100 dark:bg-gray-700 h-1.5 rounded-full overflow-hidden mt-1">
+                 <div class="${bgColors[item.color] || 'bg-gray-500'} h-full" style="width: ${item.val}%"></div>
+             </div>
+        </div>`;
+    };
+
+    renderList('list-percent', processedPercent, percentTemplate, '<div class="text-xs text-center text-gray-400 py-2">Brak budżetów %</div>');
+
+    // 9. Aktualizacja Wykresu (bez zmian)
+    const chart = $('budget-pie-chart');
+    if(grandTotal > 0) {
+        let gradientStr = '';
+        if (state.chartMode === 'groups') {
+            const degFixed = ((sumFixed / grandTotal) * 100 / 100) * 360;
+            const degPercent = degFixed + ((sumPercent / grandTotal) * 360);
+            gradientStr = `#EF4444 0deg ${degFixed}deg, #F59E0B ${degFixed}deg ${degPercent}deg, #6B7280 ${degPercent}deg 360deg`;
+        } else {
+            const allItems = [...fixedExp, ...processedPercent];
+            let currentDeg = 0;
+            const parts = allItems.map(item => {
+                const val = item.calculatedVal !== undefined ? item.calculatedVal : item.val;
+                const deg = (val / grandTotal) * 360;
+                const endDeg = currentDeg + deg;
+                const colorHex = (function(c){ switch(c){ case 'red': return '#EF4444'; case 'orange': return '#F97316'; case 'amber': return '#F59E0B'; case 'emerald': return '#10B981'; case 'blue': return '#3B82F6'; case 'indigo': return '#6366F1'; case 'purple': return '#A855F7'; case 'pink': return '#EC4899'; default: return '#9CA3AF'; }})(item.color);
+                const str = `${colorHex} ${currentDeg}deg ${endDeg}deg`;
+                currentDeg = endDeg;
+                return str;
+            });
+            parts.push(`#6B7280 ${currentDeg}deg 360deg`);
+            gradientStr = parts.join(', ');
+        }
+        chart.style.setProperty('--chart-gradient', gradientStr);
+    } else {
+        chart.style.setProperty('--chart-gradient', `#6B7280 0deg 360deg`);
+    }
+
+    // Aktualizacja guzików toggle
+    const btnG = $('chart-mode-groups');
+    const btnD = $('chart-mode-details');
+    const isLiquid = document.body.classList.contains('liquid-theme');
+    const baseClass = "px-2 py-1 rounded-md transition text-center text-[10px] font-bold";
+    const active = isLiquid ? "toggle-active-style" : "bg-gray-900 text-white shadow dark:bg-gray-600";
+    const inactive = isLiquid ? "toggle-inactive-style" : "text-gray-500 hover:bg-gray-200 dark:text-gray-400";
+    
+    btnG.className = `${baseClass} ${state.chartMode === 'groups' ? active : inactive}`;
+    btnD.className = `${baseClass} ${state.chartMode !== 'groups' ? active : inactive}`;
+}
         // --- Nowa funkcja do odhaczania wydatków ---
         function toggleBudgetPaid(id) {
             // Znajdź element w aktualnym miesiącu
@@ -2042,68 +2034,72 @@
             }
         }
         // --- Budget Modal & Actions ---
-        function openAddIncomeModal() {
-    setCategoryType('income');
-    document.getElementById('new-cat-name').value = '';
-    document.getElementById('new-cat-val').value = '';
-    setCategoryColor('emerald'); // Domyślny kolor dla przychodu (wewnętrznie)
-    editingBudgetId = null; 
-    
-    document.getElementById('modal-category-title').innerText = "Dodatkowy Przychód";
-    document.getElementById('lbl-cat-val').innerText = "Kwota (zł)";
-    document.getElementById('btn-save-category').innerText = "Dodaj przychód";
-    
-    // Ukryj wybór typu i wybór koloru
-    document.getElementById('category-type-selector').classList.add('hidden');
-    document.getElementById('modal-color-section').classList.add('hidden'); // <--- NOWE
-    
-    document.getElementById('add-category-modal').classList.add('show');
-}
+       function openAddIncomeModal() {
+            setCategoryType('income');
+            $('new-cat-name').value = '';
+            $('new-cat-val').value = '';
+            setCategoryColor('emerald');
+            editingBudgetId = null; 
+            
+            $('modal-category-title').innerText = "Dodatkowy Przychód";
+            $('lbl-cat-val').innerText = "Kwota (zł)";
+            $('btn-save-category').innerText = "Dodaj przychód";
+            
+            // Ukrywamy niepotrzebne rzeczy dla przychodu
+            $('category-type-selector').classList.add('hidden');
+            $('modal-color-section').classList.add('hidden');
+            $('modal-paid-section').classList.add('hidden'); // <--- TO UKRYWA PRZEŁĄCZNIK
+            
+            $('add-category-modal').classList.add('show');
+        }
 
-        // ZMODYFIKOWANA - Dodawanie wydatku (musi pokazać selektor)
         function openAddCategoryModal() {
-    setCategoryType('fixed');
-    document.getElementById('new-cat-name').value = '';
-    document.getElementById('new-cat-val').value = '';
-    setCategoryColor('blue');
-    editingBudgetId = null;
-    document.getElementById('modal-category-title').innerText = "Nowy Wydatek";
-    document.getElementById('btn-save-category').innerText = "Dodaj do listy";
-    
-    // Pokaż wybór typu i wybór koloru
-    document.getElementById('category-type-selector').classList.remove('hidden');
-    document.getElementById('modal-color-section').classList.remove('hidden'); // <--- NOWE
+            setCategoryType('fixed');
+            $('new-cat-name').value = '';
+            $('new-cat-val').value = '';
+            $('new-cat-paid').checked = false; 
+            
+            setCategoryColor('blue');
+            editingBudgetId = null;
+            $('modal-category-title').innerText = "Nowy Wydatek";
+            $('btn-save-category').innerText = "Dodaj do listy";
+            
+            // Pokazujemy wszystko dla wydatku
+            $('category-type-selector').classList.remove('hidden');
+            $('modal-color-section').classList.remove('hidden');
+            $('modal-paid-section').classList.remove('hidden'); // <--- TO POKAZUJE PRZEŁĄCZNIK
 
-    document.getElementById('add-category-modal').classList.add('show');
-}
+            $('add-category-modal').classList.add('show');
+        }
 
-        // ZMODYFIKOWANA - Edycja (musi sprawdzić czy to income czy wydatek)
         function editBudgetItem(id) {
-    const item = state.budgetData[currentCalcMonth].find(i => i.id === id);
-    if(!item) return;
+            const item = state.budgetData[currentCalcMonth].find(i => i.id === id);
+            if(!item) return;
 
-    editingBudgetId = id;
-    setCategoryType(item.type);
-    document.getElementById('new-cat-name').value = item.name;
-    document.getElementById('new-cat-val').value = item.val;
-    setCategoryColor(item.color);
-    
-    document.getElementById('modal-category-title').innerText = item.type === 'income' ? "Edytuj Przychód" : "Edytuj Wydatek";
-    document.getElementById('btn-save-category').innerText = "Zapisz zmiany";
+            editingBudgetId = id;
+            setCategoryType(item.type);
+            $('new-cat-name').value = item.name;
+            $('new-cat-val').value = item.val;
+            $('new-cat-paid').checked = item.isPaid || false;
+            
+            setCategoryColor(item.color);
+            
+            $('modal-category-title').innerText = item.type === 'income' ? "Edytuj Przychód" : "Edytuj Wydatek";
+            $('btn-save-category').innerText = "Zapisz zmiany";
 
-    // Ukryj selektor i kolor dla income, pokaż dla reszty
-    if (item.type === 'income') {
-         document.getElementById('category-type-selector').classList.add('hidden');
-         document.getElementById('modal-color-section').classList.add('hidden'); // <--- NOWE
-         document.getElementById('lbl-cat-val').innerText = "Kwota (zł)";
-    } else {
-         document.getElementById('category-type-selector').classList.remove('hidden');
-         document.getElementById('modal-color-section').classList.remove('hidden'); // <--- NOWE
-    }
+            if (item.type === 'income') {
+                 $('category-type-selector').classList.add('hidden');
+                 $('modal-color-section').classList.add('hidden');
+                 $('modal-paid-section').classList.add('hidden'); // <--- UKRYJ DLA PRZYCHODU
+                 $('lbl-cat-val').innerText = "Kwota (zł)";
+            } else {
+                 $('category-type-selector').classList.remove('hidden');
+                 $('modal-color-section').classList.remove('hidden');
+                 $('modal-paid-section').classList.remove('hidden'); // <--- POKAŻ DLA WYDATKU
+            }
 
-    document.getElementById('add-category-modal').classList.add('show');
-}
-
+            $('add-category-modal').classList.add('show');
+        }
         function closeAddCategoryModal() {
             document.getElementById('add-category-modal').classList.remove('show');
         }
@@ -2145,8 +2141,9 @@
         }
 
         function addCategory() {
-            const name = document.getElementById('new-cat-name').value;
-            const val = parseFloat(document.getElementById('new-cat-val').value);
+            const name = $('new-cat-name').value;
+            const val = parseFloat($('new-cat-val').value);
+            const isPaid = $('new-cat-paid').checked; // Pobierz stan
             
             if(!name || isNaN(val)) {
                 showToast("Wypełnij nazwę i wartość!");
@@ -2156,7 +2153,7 @@
             if(!state.budgetData[currentCalcMonth]) state.budgetData[currentCalcMonth] = [];
             
             if (editingBudgetId) {
-                // Update existing
+                // Update
                 const index = state.budgetData[currentCalcMonth].findIndex(i => i.id === editingBudgetId);
                 if(index !== -1) {
                     state.budgetData[currentCalcMonth][index] = {
@@ -2164,19 +2161,20 @@
                         name: name,
                         type: newCategoryType,
                         val: Math.round(val * 100) / 100,
-                        color: newCategoryColor
+                        color: newCategoryColor,
+                        isPaid: isPaid // Zapisz
                     };
                     showToast("Zapisano zmiany");
                 }
             } else {
-                // Create new
+                // Create
                 state.budgetData[currentCalcMonth].push({
                     id: Date.now().toString(),
                     name: name,
                     type: newCategoryType,
-                    // Ensure input value is rounded to 2 decimals before saving
                     val: Math.round(val * 100) / 100,
-                    color: newCategoryColor
+                    color: newCategoryColor,
+                    isPaid: isPaid // Zapisz
                 });
                 showToast("Dodano wydatek");
             }
