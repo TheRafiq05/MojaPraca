@@ -1032,6 +1032,12 @@
             <h1 class="text-3xl font-extrabold text-gray-900 dark:text-white">Planer</h1>
         </div>
         <div class="flex gap-3">
+            <!-- Nowy przycisk KOSZ -->
+            <button onclick="resetBudgetForMonth()" class="ios-btn w-10 h-10 bg-white dark:bg-darkcard border border-gray-100 dark:border-gray-800 text-red-500 rounded-full flex items-center justify-center hover:bg-red-50 dark:hover:bg-red-900/20 transition shadow-sm">
+                <i class="fas fa-trash-alt"></i>
+            </button>
+            
+            <!-- Przycisk Ustawienia (bez zmian) -->
             <button onclick="openSettings()" class="ios-btn w-10 h-10 bg-white dark:bg-darkcard border border-gray-100 dark:border-gray-800 text-gray-500 dark:text-gray-300 rounded-full flex items-center justify-center hover:text-gray-800 transition shadow-sm">
                 <i class="fas fa-cog"></i>
             </button>
@@ -1099,20 +1105,6 @@
         <i class="fas fa-plus-circle text-green-500 text-lg"></i> Dodaj przychód
     </button>
 </div>
-        <div class="mb-6 bg-gray-50/50 dark:bg-gray-800/50 p-3 rounded-xl border border-gray-100 dark:border-gray-800 flex items-start gap-3">
-        <div class="text-green-500 mt-0.5"><i class="fas fa-check-circle"></i></div>
-        <div>
-            <p class="text-[10px] text-gray-500 dark:text-gray-400 font-medium leading-relaxed">
-                Edytuj wydatek, aby zaznaczyć go jako "Opłacony". Kwota zmieni kolor na <span class="text-green-600 font-bold">zielony</span>.
-            </p>
-        </div>
-    </div>
-    
-    <div class="flex justify-center mb-6">
-         <button onclick="resetBudgetForMonth()" class="ios-btn text-xs text-red-500 dark:text-red-400 font-bold flex items-center gap-2 py-3 px-6 rounded-xl bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/30 hover:bg-red-100 dark:hover:bg-red-900/30 transition shadow-sm">
-            <i class="fas fa-trash-alt"></i> Wyczyść ten miesiąc
-        </button>
-    </div>
 
     <div id="budget-categories-list" class="space-y-6 pb-20">
         <div id="section-fixed">
@@ -1416,6 +1408,13 @@
     <label class="block text-[10px] font-bold text-gray-400 uppercase mb-2">Kolor</label>
     <div class="flex gap-2 justify-between" id="color-picker"></div>
 </div>
+                <!-- Notka informacyjna w modalu -->
+                <div id="modal-paid-info" class="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-xl border border-blue-100 dark:border-blue-800 flex gap-2 mb-2">
+                    <i class="fas fa-info-circle text-blue-500 mt-0.5 text-xs"></i>
+                    <p class="text-[10px] text-gray-600 dark:text-gray-300 leading-tight">
+                        Zaznacz poniżej, aby oznaczyć wydatek jako zrealizowany. Kwota w planerze zmieni kolor na <span class="text-green-600 font-bold">zielony</span>.
+                    </p>
+                </div>
                 <!-- Nowy przełącznik w modalu -->
                 <!-- DODAŁEM ID="modal-paid-section" PONIŻEJ: -->
                 <div id="modal-paid-section" class="flex items-center justify-between bg-gray-50 dark:bg-gray-800 p-3 rounded-xl border border-gray-200 dark:border-gray-700 mt-2">
@@ -1946,12 +1945,11 @@
             // 6. Mapowanie kolorów
             const bgColors = { 'red': 'bg-red-500', 'orange': 'bg-orange-500', 'amber': 'bg-amber-500', 'emerald': 'bg-emerald-500', 'blue': 'bg-blue-500', 'indigo': 'bg-indigo-500', 'purple': 'bg-purple-500', 'pink': 'bg-pink-500' };
 
-            // 7. Renderowanie Listy Stałej
+            // 7. Renderowanie Listy Stałej (BEZ PRZYCISKU CHECK)
             const fixedTemplate = (item) => {
                 const borderClass = item.isPaid ? 'border-green-200 dark:border-green-900' : 'border-gray-100 dark:border-gray-800';
                 const opacityClass = item.isPaid ? 'opacity-50 grayscale-[0.5]' : '';
                 const valueColor = item.isPaid ? "text-green-500" : "text-gray-900 dark:text-white";
-                const checkBtnClass = item.isPaid ? "bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400" : "bg-gray-100 text-gray-300 hover:text-green-400 dark:bg-gray-700 dark:text-gray-500";
 
                 return html`
                 <div class="flex justify-between items-center ios-card liquid-glass-card p-3 rounded-xl border ${borderClass} shadow-sm dark:bg-darkcard transition-all duration-300 ${opacityClass}">
@@ -1959,12 +1957,8 @@
                         <div class="w-2.5 h-2.5 rounded-full ${bgColors[item.color] || 'bg-gray-500'}"></div>
                         <span class="font-bold text-gray-700 dark:text-gray-300 text-sm">${item.name}</span>
                     </div>
-                    <div class="flex items-center gap-2">
-                        <span class="font-bold ${valueColor} transition-colors mr-2">${formatCurrency(item.val)}</span>
-                        <button onclick="toggleBudgetPaid('${item.id}')" class="w-8 h-8 rounded-full flex items-center justify-center transition-colors ${checkBtnClass}">
-                            <i class="fas fa-check text-xs"></i>
-                        </button>
-                        <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                    <div class="flex items-center gap-3">
+                        <span class="font-bold ${valueColor} transition-colors">${formatCurrency(item.val)}</span>
                         <button onclick="editBudgetItem('${item.id}')" class="text-gray-400 hover:text-blue-500 w-6 h-6 flex justify-center items-center"><i class="fas fa-pen text-xs"></i></button>
                         <button onclick="deleteBudgetItem('${item.id}')" class="text-gray-400 hover:text-red-500 w-6 h-6 flex justify-center items-center"><i class="fas fa-trash-alt text-xs"></i></button>
                     </div>
@@ -1973,12 +1967,11 @@
 
             renderList('list-fixed', fixedExp, fixedTemplate, '<div class="text-xs text-center text-gray-400 py-2">Brak wydatków stałych</div>');
 
-            // 8. Renderowanie Listy Procentowej
+            // 8. Renderowanie Listy Procentowej (BEZ PRZYCISKU CHECK)
             const percentTemplate = (item) => {
                 const borderClass = item.isPaid ? 'border-green-200 dark:border-green-900' : 'border-gray-100 dark:border-gray-800';
                 const opacityClass = item.isPaid ? 'opacity-50 grayscale-[0.5]' : '';
                 const valueColor = item.isPaid ? "text-green-500" : "text-gray-900 dark:text-white";
-                const checkBtnClass = item.isPaid ? "bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400" : "bg-gray-100 text-gray-300 hover:text-green-400 dark:bg-gray-700 dark:text-gray-500";
 
                 return html`
                 <div class="flex flex-col ios-card liquid-glass-card p-3 rounded-xl border ${borderClass} shadow-sm dark:bg-darkcard transition-all duration-300 ${opacityClass}">
@@ -1987,12 +1980,8 @@
                             <div class="w-2.5 h-2.5 rounded-full ${bgColors[item.color] || 'bg-gray-500'}"></div>
                             <span class="font-bold text-gray-700 dark:text-gray-300 text-sm">${item.name} (${item.val}%)</span>
                         </div>
-                        <div class="flex items-center gap-2">
+                        <div class="flex items-center gap-3">
                             <span class="font-bold ${valueColor}">${formatCurrency(item.calculatedVal)}</span>
-                            <button onclick="toggleBudgetPaid('${item.id}')" class="w-8 h-8 rounded-full flex items-center justify-center transition-colors ${checkBtnClass}">
-                                <i class="fas fa-check text-xs"></i>
-                            </button>
-                            <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
                             <button onclick="editBudgetItem('${item.id}')" class="text-gray-400 hover:text-blue-500 w-6 h-6 flex justify-center items-center"><i class="fas fa-pen text-xs"></i></button>
                             <button onclick="deleteBudgetItem('${item.id}')" class="text-gray-400 hover:text-red-500 w-6 h-6 flex justify-center items-center"><i class="fas fa-trash-alt text-xs"></i></button>
                         </div>
@@ -2086,10 +2075,11 @@
             $('lbl-cat-val').innerText = "Kwota (zł)";
             $('btn-save-category').innerText = "Dodaj przychód";
             
-            // Ukrywamy niepotrzebne rzeczy dla przychodu
+            // Ukrywamy niepotrzebne rzeczy dla przychodu (W TYM NOWĄ NOTKĘ)
             $('category-type-selector').classList.add('hidden');
             $('modal-color-section').classList.add('hidden');
-            $('modal-paid-section').classList.add('hidden'); // <--- TO UKRYWA PRZEŁĄCZNIK
+            $('modal-paid-section').classList.add('hidden');
+            $('modal-paid-info').classList.add('hidden'); // <--- UKRYWAMY NOTKĘ
             
             $('add-category-modal').classList.add('show');
         }
@@ -2108,7 +2098,8 @@
             // Pokazujemy wszystko dla wydatku
             $('category-type-selector').classList.remove('hidden');
             $('modal-color-section').classList.remove('hidden');
-            $('modal-paid-section').classList.remove('hidden'); // <--- TO POKAZUJE PRZEŁĄCZNIK
+            $('modal-paid-section').classList.remove('hidden');
+            $('modal-paid-info').classList.remove('hidden'); // <--- POKAZUJEMY NOTKĘ
 
             $('add-category-modal').classList.add('show');
         }
@@ -2145,16 +2136,19 @@
             if (item.type === 'income') {
                  $('category-type-selector').classList.add('hidden');
                  $('modal-color-section').classList.add('hidden');
-                 $('modal-paid-section').classList.add('hidden'); // <--- UKRYJ DLA PRZYCHODU
+                 $('modal-paid-section').classList.add('hidden');
+                 $('modal-paid-info').classList.add('hidden'); // <--- UKRYJ DLA PRZYCHODU
                  $('lbl-cat-val').innerText = "Kwota (zł)";
             } else {
                  $('category-type-selector').classList.remove('hidden');
                  $('modal-color-section').classList.remove('hidden');
-                 $('modal-paid-section').classList.remove('hidden'); // <--- POKAŻ DLA WYDATKU
+                 $('modal-paid-section').classList.remove('hidden'); 
+                 $('modal-paid-info').classList.remove('hidden'); // <--- POKAŻ DLA WYDATKU
             }
 
             $('add-category-modal').classList.add('show');
         }
+        
         function closeAddCategoryModal() {
             document.getElementById('add-category-modal').classList.remove('show');
         }
@@ -2248,13 +2242,19 @@
             });
         }
 
+        // Funkcja usuwania z dynamiczną nazwą miesiąca
         function resetBudgetForMonth() {
-             showConfirm("Wyczyścić planera dla tego miesiąca?", () => {
+            const [y, m] = currentCalcMonth.split('-');
+            const monthName = monthsNominative[parseInt(m) - 1];
+            // Tworzymy napis np. "styczeń 2026"
+            const dateString = `${monthName} ${y}`;
+
+            showConfirm(`Czy usunąć wszystkie dane z planera dla: ${dateString}?`, () => {
                 state.budgetData[currentCalcMonth] = [];
                 saveState();
                 renderBudget();
                 showToast("Wyczyszczono planer");
-             });
+            });
         }
         
         function deleteMonthlyRecord(mKey) {
