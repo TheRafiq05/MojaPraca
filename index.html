@@ -1039,16 +1039,26 @@
     </header>
 
     <div class="mb-4 px-2 flex justify-between items-center">
-        <div>
-            <h3 id="budget-month-label" class="text-lg font-bold text-gray-800 dark:text-white capitalize"></h3>
-            <p class="text-[10px] text-gray-400 mt-0.5 flex items-start gap-1">
-                <i class="fas fa-info-circle mt-0.5"></i> 
-                <span class="leading-tight">Dotyczy miesiąca<br/>wybranego w Grafiku.</span>
-            </p>
-        </div>
-        <div class="text-right">
-             <div class="text-[10px] text-gray-400 uppercase font-bold">Baza</div>
-            <div id="budget-source-type" class="text-xs font-bold bg-gray-200 dark:bg-gray-700 px-2 py-1 rounded text-gray-700 dark:text-gray-300 inline-block mt-1">Kalkulator</div>
+        <!-- Nawigacja Miesiącami (Pełna szerokość) -->
+        <div class="flex justify-between items-center ios-card liquid-glass-card p-3 mb-5 w-full shadow-sm transition-all duration-300 border border-gray-100 dark:border-gray-800">
+            <!-- Lewa strzałka -->
+            <button onclick="changeBudgetMonth(-1)" class="w-12 h-10 flex items-center justify-center rounded-xl bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-300 hover:bg-orange-100 hover:text-orange-500 transition-colors">
+                <i class="fas fa-chevron-left"></i>
+            </button>
+    
+            <!-- Środek -->
+            <div class="text-center w-36">
+                <h3 id="budget-month-label" class="text-lg font-bold text-gray-900 dark:text-white capitalize leading-none transition-colors"></h3>
+                <div class="flex items-center justify-center gap-1.5 mt-1">
+                    <span class="text-[9px] text-gray-400 font-bold uppercase tracking-wide">Baza:</span>
+                    <span id="budget-source-type" class="text-[10px] font-bold bg-gray-100/50 dark:bg-white/10 px-1.5 py-0.5 rounded text-gray-600 dark:text-gray-300 backdrop-blur-sm">Kalkulator</span>
+                </div>
+            </div>
+    
+            <!-- Prawa strzałka -->
+            <button onclick="changeBudgetMonth(1)" class="w-12 h-10 flex items-center justify-center rounded-xl bg-gray-50 dark:bg-gray-700/50 text-gray-500 dark:text-gray-300 hover:bg-orange-100 hover:text-orange-500 transition-colors">
+                <i class="fas fa-chevron-right"></i>
+            </button>
         </div>
     </div>
 
@@ -1445,7 +1455,7 @@
 
     <!-- ================= BOTTOM NAVIGATION (Floating Island) ================= -->
     <!-- Kontener pozycjonujący na dole ekranu (lewitujący) -->
-    <div class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 w-[90%] max-w-[320px] safe-area-bottom">
+    <div id="main-nav" style="display: none;" class="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-50 w-[90%] max-w-[320px] safe-area-bottom">
          
         <!-- Właściwa "Pigułka" nawigacyjna -->
         <div class="glass-nav-container relative flex justify-between items-center h-[70px] rounded-[35px] px-2">
@@ -1546,7 +1556,7 @@
         // --- Core Functions ---
 
                 function init() {
-            // 1. Najpierw wymuś ukrycie Splash Screena po czasie
+            // 1. Splash Screen
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
                 if(splash) {
@@ -1557,14 +1567,14 @@
                 }
             }, 2000);
 
-            // 2. Wczytywanie danych z pamięci
+            // 2. Wczytywanie danych
             const stored = localStorage.getItem(STORAGE_KEY);
             if (stored) {
                 try {
                     const parsed = JSON.parse(stored);
                     state = { ...state, ...parsed };
                     
-                    // Naprawa struktur danych
+                    // Fixy struktur
                     if(!state.paymentStatus) state.paymentStatus = {}; 
                     if(!state.actualSalary) state.actualSalary = {}; 
                     if(!state.monthlyRates) state.monthlyRates = {};
@@ -1573,30 +1583,32 @@
                     if(!state.theme) state.theme = 'light';
                     if(!state.themeStyle) state.themeStyle = 'classic';
                     if(!state.chartMode) state.chartMode = 'groups';
-                    
                 } catch (e) { 
                     console.error("Błąd odczytu danych", e); 
                 }
             }
 
-            // Ustawienie miesiąca
             const now = new Date();
             currentCalcMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
 
-            // 3. Próba narysowania interfejsu
             try {
                 refreshUI(); 
             } catch (e) {
-                console.error("Błąd rysowania UI:", e);
-                alert("Błąd danych. Zrób backup w ustawieniach!");
+                console.error("Błąd UI:", e);
             }
             
-            // Obsługa modala potwierdzenia
             const confirmBtn = document.getElementById('confirm-yes-btn');
             if(confirmBtn) confirmBtn.onclick = executeConfirm;
 
-            // 4. Inicjalizacja nawigacji (ustawia kółeczko na starcie)
-            switchTab('calendar');
+            // --- FIX GLITCHA STOPKI ---
+            // 1. Najpierw pokaż stopkę (była display:none)
+            const nav = document.getElementById('main-nav');
+            if(nav) nav.style.display = 'block';
+
+            // 2. Daj przeglądarce 10ms na przeliczenie wymiarów, potem ustaw kółko
+            setTimeout(() => {
+                switchTab('calendar');
+            }, 10);
         }
 
 
@@ -1847,181 +1859,210 @@
         }
 
         function renderBudget() {
-    // 1. Ustawienie nagłówka
-    const [y, m] = currentCalcMonth.split('-');
-    $('budget-month-label').innerText = `${monthsNominative[parseInt(m)-1]} ${y}`;
-    
-    // 2. Obliczenia
-    let baseIncome = 0;
-    let source = "Kalkulator";
-    
-    if(state.actualSalary[currentCalcMonth] > 0) {
-        baseIncome = state.actualSalary[currentCalcMonth];
-        source = "Wypłata (Historia)";
-    } else {
-        const savedRate = parseFloat(state.monthlyRates[currentCalcMonth]) || parseFloat(state.hourlyRate) || 0;
-        const prefix = `${y}-${m}-`;
-        let sumHours = 0;
-        Object.keys(state.workLog).forEach(k => { if(k.startsWith(prefix)) sumHours += state.workLog[k].val || 0; });
-        
-        let gross = sumHours * savedRate;
-        let net = gross;
-        if(!state.isStudent && state.isZus) {
-            const spoleczne = gross * 0.1371;
-            const health = (gross - spoleczne) * 0.09;
-            const taxBase = Math.round((gross - spoleczne) - 250);
-            let tax = Math.round(taxBase * 0.12) - (state.isPit2 ? 300 : 0);
-            net = gross - spoleczne - health - (tax < 0 ? 0 : tax);
-        }
-        baseIncome = Math.round(net * 100) / 100;
-    }
-    $('budget-source-type').innerText = source;
+            // 1. Ustawienie nagłówka
+            const [y, m] = currentCalcMonth.split('-');
+            $('budget-month-label').innerText = `${monthsNominative[parseInt(m)-1]} ${y}`;
+            
+            // 2. Obliczenia
+            let baseIncome = 0;
+            let source = "Kalkulator";
+            
+            if(state.actualSalary[currentCalcMonth] > 0) {
+                baseIncome = state.actualSalary[currentCalcMonth];
+                source = "Wypłata (Historia)";
+            } else {
+                const savedRate = parseFloat(state.monthlyRates[currentCalcMonth]) || parseFloat(state.hourlyRate) || 0;
+                const prefix = `${y}-${m}-`;
+                let sumHours = 0;
+                Object.keys(state.workLog).forEach(k => { if(k.startsWith(prefix)) sumHours += state.workLog[k].val || 0; });
+                
+                let gross = sumHours * savedRate;
+                let net = gross;
+                if(!state.isStudent && state.isZus) {
+                    const spoleczne = gross * 0.1371;
+                    const health = (gross - spoleczne) * 0.09;
+                    const taxBase = Math.round((gross - spoleczne) - 250);
+                    let tax = Math.round(taxBase * 0.12) - (state.isPit2 ? 300 : 0);
+                    net = gross - spoleczne - health - (tax < 0 ? 0 : tax);
+                }
+                baseIncome = Math.round(net * 100) / 100;
+            }
+            $('budget-source-type').innerText = source;
 
-    // 3. Pobranie danych
-    const budgetItems = state.budgetData[currentCalcMonth] || [];
-    const incomes = budgetItems.filter(e => e.type === 'income');
-    const expenses = budgetItems.filter(e => e.type !== 'income');
-    
-    let totalAdd = incomes.reduce((acc, curr) => acc + curr.val, 0);
-    const grandTotal = baseIncome + totalAdd;
+            // 3. Pobranie danych
+            const budgetItems = state.budgetData[currentCalcMonth] || [];
+            const incomes = budgetItems.filter(e => e.type === 'income');
+            const expenses = budgetItems.filter(e => e.type !== 'income');
+            
+            let totalAdd = incomes.reduce((acc, curr) => acc + curr.val, 0);
+            const grandTotal = baseIncome + totalAdd;
 
-    // 4. Renderowanie Przychodów
-    const incomeRows = incomes.map(inc => html`
-        <div class="flex justify-between items-center text-xs mb-2 group">
-             <div class="flex items-center gap-2">
-                <span class="text-emerald-400 font-bold">+</span>
-                <span class="text-gray-300 truncate max-w-[120px]">${inc.name}</span>
-             </div>
-             <div class="flex items-center gap-3">
-                 <span class="text-white font-bold">${formatCurrency(inc.val)}</span>
-                 <button onclick="editBudgetItem('${inc.id}')" class="text-gray-400 hover:text-blue-400 p-1"><i class="fas fa-pen text-xs"></i></button>
-                 <button onclick="deleteBudgetItem('${inc.id}')" class="text-gray-400 hover:text-red-400 p-1"><i class="fas fa-trash-alt text-xs"></i></button>
-             </div>
-        </div>
-    `).join('');
-
-    $('income-breakdown-container').innerHTML = `
-        <div class="flex justify-between items-center text-xs ${incomes.length ? 'mb-2' : ''}">
-             <span class="text-gray-400 font-medium">Podstawa</span>
-             <span class="text-white font-bold">${formatCurrency(baseIncome)}</span>
-        </div>
-        ${incomeRows}
-        <div class="h-px bg-gray-600 w-full my-2"></div>
-        <div class="flex justify-between items-center">
-             <span class="text-gray-400 text-xs font-bold uppercase tracking-wider">Łącznie</span>
-             <span class="text-emerald-400 font-bold text-xl">${formatCurrency(grandTotal)}</span>
-        </div>
-    `;
-
-    // 5. Przeliczanie Wydatków
-    const fixedExp = expenses.filter(e => e.type === 'fixed');
-    const percentExp = expenses.filter(e => e.type === 'percent');
-    
-    let sumFixed = fixedExp.reduce((acc, curr) => acc + curr.val, 0);
-    let remainder = Math.max(0, grandTotal - sumFixed);
-    
-    let sumPercent = 0;
-    const processedPercent = percentExp.map(e => {
-        const calc = Math.round((remainder * (e.val / 100)) * 100) / 100;
-        sumPercent += calc;
-        return { ...e, calculatedVal: calc };
-    });
-
-    $('budget-remaining').innerText = (grandTotal - sumFixed - sumPercent).toLocaleString('pl-PL', {minimumFractionDigits: 2});
-    $('sum-fixed').innerText = formatCurrency(sumFixed);
-    $('base-for-percent').innerText = `Baza %: ${remainder.toLocaleString('pl-PL', {minimumFractionDigits:0})} zł`;
-
-    // 6. Mapowanie kolorów
-    const bgColors = { 'red': 'bg-red-500', 'orange': 'bg-orange-500', 'amber': 'bg-amber-500', 'emerald': 'bg-emerald-500', 'blue': 'bg-blue-500', 'indigo': 'bg-indigo-500', 'purple': 'bg-purple-500', 'pink': 'bg-pink-500' };
-
-    // 7. Renderowanie Listy Stałej (BEZ PRZYCISKU CHECK, ale z efektem)
-    const fixedTemplate = (item) => {
-        const borderClass = item.isPaid ? 'border-green-200 dark:border-green-900' : 'border-gray-100 dark:border-gray-800';
-        const opacityClass = item.isPaid ? 'opacity-50 grayscale-[0.5]' : '';
-        const valueColor = item.isPaid ? "text-green-500" : "text-gray-900 dark:text-white";
-
-        return html`
-        <div class="flex justify-between items-center ios-card liquid-glass-card p-3 rounded-xl border ${borderClass} shadow-sm dark:bg-darkcard transition-all duration-300 ${opacityClass}">
-            <div class="flex items-center gap-3">
-                <div class="w-2.5 h-2.5 rounded-full ${bgColors[item.color] || 'bg-gray-500'}"></div>
-                <span class="font-bold text-gray-700 dark:text-gray-300 text-sm">${item.name}</span>
-            </div>
-            <div class="flex items-center gap-3">
-                <span class="font-bold ${valueColor} transition-colors">${formatCurrency(item.val)}</span>
-                <button onclick="editBudgetItem('${item.id}')" class="text-gray-400 hover:text-blue-500 w-6 h-6 flex justify-center items-center"><i class="fas fa-pen text-xs"></i></button>
-                <button onclick="deleteBudgetItem('${item.id}')" class="text-gray-400 hover:text-red-500 w-6 h-6 flex justify-center items-center"><i class="fas fa-trash-alt text-xs"></i></button>
-            </div>
-        </div>`;
-    };
-
-    renderList('list-fixed', fixedExp, fixedTemplate, '<div class="text-xs text-center text-gray-400 py-2">Brak wydatków stałych</div>');
-
-    // 8. Renderowanie Listy Procentowej
-    const percentTemplate = (item) => {
-        const borderClass = item.isPaid ? 'border-green-200 dark:border-green-900' : 'border-gray-100 dark:border-gray-800';
-        const opacityClass = item.isPaid ? 'opacity-50 grayscale-[0.5]' : '';
-        const valueColor = item.isPaid ? "text-green-500" : "text-gray-900 dark:text-white";
-
-        return html`
-        <div class="flex flex-col ios-card liquid-glass-card p-3 rounded-xl border ${borderClass} shadow-sm dark:bg-darkcard transition-all duration-300 ${opacityClass}">
-             <div class="flex justify-between items-center mb-1">
-                <div class="flex items-center gap-3">
-                    <div class="w-2.5 h-2.5 rounded-full ${bgColors[item.color] || 'bg-gray-500'}"></div>
-                    <span class="font-bold text-gray-700 dark:text-gray-300 text-sm">${item.name} (${item.val}%)</span>
+            // 4. Renderowanie Przychodów
+            const incomeRows = incomes.map(inc => html`
+                <div class="flex justify-between items-center text-xs mb-2 group">
+                     <div class="flex items-center gap-2">
+                        <span class="text-emerald-400 font-bold">+</span>
+                        <span class="text-gray-300 truncate max-w-[120px]">${inc.name}</span>
+                     </div>
+                     <div class="flex items-center gap-3">
+                         <span class="text-white font-bold">${formatCurrency(inc.val)}</span>
+                         <button onclick="editBudgetItem('${inc.id}')" class="text-gray-400 hover:text-blue-400 p-1"><i class="fas fa-pen text-xs"></i></button>
+                         <button onclick="deleteBudgetItem('${inc.id}')" class="text-gray-400 hover:text-red-400 p-1"><i class="fas fa-trash-alt text-xs"></i></button>
+                     </div>
                 </div>
-                <div class="flex items-center gap-3">
-                    <span class="font-bold ${valueColor}">${formatCurrency(item.calculatedVal)}</span>
-                    <button onclick="editBudgetItem('${item.id}')" class="text-gray-400 hover:text-blue-500 w-6 h-6 flex justify-center items-center"><i class="fas fa-pen text-xs"></i></button>
-                    <button onclick="deleteBudgetItem('${item.id}')" class="text-gray-400 hover:text-red-500 w-6 h-6 flex justify-center items-center"><i class="fas fa-trash-alt text-xs"></i></button>
+            `).join('');
+
+            $('income-breakdown-container').innerHTML = `
+                <div class="flex justify-between items-center text-xs ${incomes.length ? 'mb-2' : ''}">
+                     <span class="text-gray-400 font-medium">Podstawa</span>
+                     <span class="text-white font-bold">${formatCurrency(baseIncome)}</span>
                 </div>
-             </div>
-             <div class="w-full bg-gray-100 dark:bg-gray-700 h-1.5 rounded-full overflow-hidden mt-1">
-                 <div class="${bgColors[item.color] || 'bg-gray-500'} h-full" style="width: ${item.val}%"></div>
-             </div>
-        </div>`;
-    };
+                ${incomeRows}
+                <div class="h-px bg-gray-600 w-full my-2"></div>
+                <div class="flex justify-between items-center">
+                     <span class="text-gray-400 text-xs font-bold uppercase tracking-wider">Łącznie</span>
+                     <span class="text-emerald-400 font-bold text-xl">${formatCurrency(grandTotal)}</span>
+                </div>
+            `;
 
-    renderList('list-percent', processedPercent, percentTemplate, '<div class="text-xs text-center text-gray-400 py-2">Brak budżetów %</div>');
-
-    // 9. Aktualizacja Wykresu (bez zmian)
-    const chart = $('budget-pie-chart');
-    if(grandTotal > 0) {
-        let gradientStr = '';
-        if (state.chartMode === 'groups') {
-            const degFixed = ((sumFixed / grandTotal) * 100 / 100) * 360;
-            const degPercent = degFixed + ((sumPercent / grandTotal) * 360);
-            gradientStr = `#EF4444 0deg ${degFixed}deg, #F59E0B ${degFixed}deg ${degPercent}deg, #6B7280 ${degPercent}deg 360deg`;
-        } else {
-            const allItems = [...fixedExp, ...processedPercent];
-            let currentDeg = 0;
-            const parts = allItems.map(item => {
-                const val = item.calculatedVal !== undefined ? item.calculatedVal : item.val;
-                const deg = (val / grandTotal) * 360;
-                const endDeg = currentDeg + deg;
-                const colorHex = (function(c){ switch(c){ case 'red': return '#EF4444'; case 'orange': return '#F97316'; case 'amber': return '#F59E0B'; case 'emerald': return '#10B981'; case 'blue': return '#3B82F6'; case 'indigo': return '#6366F1'; case 'purple': return '#A855F7'; case 'pink': return '#EC4899'; default: return '#9CA3AF'; }})(item.color);
-                const str = `${colorHex} ${currentDeg}deg ${endDeg}deg`;
-                currentDeg = endDeg;
-                return str;
+            // 5. Przeliczanie Wydatków
+            const fixedExp = expenses.filter(e => e.type === 'fixed');
+            const percentExp = expenses.filter(e => e.type === 'percent');
+            
+            let sumFixed = fixedExp.reduce((acc, curr) => acc + curr.val, 0);
+            let remainder = Math.max(0, grandTotal - sumFixed);
+            
+            let sumPercent = 0;
+            const processedPercent = percentExp.map(e => {
+                const calc = Math.round((remainder * (e.val / 100)) * 100) / 100;
+                sumPercent += calc;
+                return { ...e, calculatedVal: calc };
             });
-            parts.push(`#6B7280 ${currentDeg}deg 360deg`);
-            gradientStr = parts.join(', ');
-        }
-        chart.style.setProperty('--chart-gradient', gradientStr);
-    } else {
-        chart.style.setProperty('--chart-gradient', `#6B7280 0deg 360deg`);
-    }
 
-    // Aktualizacja guzików toggle
-    const btnG = $('chart-mode-groups');
-    const btnD = $('chart-mode-details');
-    const isLiquid = document.body.classList.contains('liquid-theme');
-    const baseClass = "px-2 py-1 rounded-md transition text-center text-[10px] font-bold";
-    const active = isLiquid ? "toggle-active-style" : "bg-gray-900 text-white shadow dark:bg-gray-600";
-    const inactive = isLiquid ? "toggle-inactive-style" : "text-gray-500 hover:bg-gray-200 dark:text-gray-400";
-    
-    btnG.className = `${baseClass} ${state.chartMode === 'groups' ? active : inactive}`;
-    btnD.className = `${baseClass} ${state.chartMode !== 'groups' ? active : inactive}`;
-}
+            $('budget-remaining').innerText = (grandTotal - sumFixed - sumPercent).toLocaleString('pl-PL', {minimumFractionDigits: 2});
+            $('sum-fixed').innerText = formatCurrency(sumFixed);
+            $('base-for-percent').innerText = `Baza %: ${remainder.toLocaleString('pl-PL', {minimumFractionDigits:0})} zł`;
+
+            // 6. Mapowanie kolorów
+            const bgColors = { 'red': 'bg-red-500', 'orange': 'bg-orange-500', 'amber': 'bg-amber-500', 'emerald': 'bg-emerald-500', 'blue': 'bg-blue-500', 'indigo': 'bg-indigo-500', 'purple': 'bg-purple-500', 'pink': 'bg-pink-500' };
+
+            // 7. Renderowanie Listy Stałej
+            const fixedTemplate = (item) => {
+                const borderClass = item.isPaid ? 'border-green-200 dark:border-green-900' : 'border-gray-100 dark:border-gray-800';
+                const opacityClass = item.isPaid ? 'opacity-50 grayscale-[0.5]' : '';
+                const valueColor = item.isPaid ? "text-green-500" : "text-gray-900 dark:text-white";
+                const checkBtnClass = item.isPaid ? "bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400" : "bg-gray-100 text-gray-300 hover:text-green-400 dark:bg-gray-700 dark:text-gray-500";
+
+                return html`
+                <div class="flex justify-between items-center ios-card liquid-glass-card p-3 rounded-xl border ${borderClass} shadow-sm dark:bg-darkcard transition-all duration-300 ${opacityClass}">
+                    <div class="flex items-center gap-3">
+                        <div class="w-2.5 h-2.5 rounded-full ${bgColors[item.color] || 'bg-gray-500'}"></div>
+                        <span class="font-bold text-gray-700 dark:text-gray-300 text-sm">${item.name}</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="font-bold ${valueColor} transition-colors mr-2">${formatCurrency(item.val)}</span>
+                        <button onclick="toggleBudgetPaid('${item.id}')" class="w-8 h-8 rounded-full flex items-center justify-center transition-colors ${checkBtnClass}">
+                            <i class="fas fa-check text-xs"></i>
+                        </button>
+                        <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                        <button onclick="editBudgetItem('${item.id}')" class="text-gray-400 hover:text-blue-500 w-6 h-6 flex justify-center items-center"><i class="fas fa-pen text-xs"></i></button>
+                        <button onclick="deleteBudgetItem('${item.id}')" class="text-gray-400 hover:text-red-500 w-6 h-6 flex justify-center items-center"><i class="fas fa-trash-alt text-xs"></i></button>
+                    </div>
+                </div>`;
+            };
+
+            renderList('list-fixed', fixedExp, fixedTemplate, '<div class="text-xs text-center text-gray-400 py-2">Brak wydatków stałych</div>');
+
+            // 8. Renderowanie Listy Procentowej
+            const percentTemplate = (item) => {
+                const borderClass = item.isPaid ? 'border-green-200 dark:border-green-900' : 'border-gray-100 dark:border-gray-800';
+                const opacityClass = item.isPaid ? 'opacity-50 grayscale-[0.5]' : '';
+                const valueColor = item.isPaid ? "text-green-500" : "text-gray-900 dark:text-white";
+                const checkBtnClass = item.isPaid ? "bg-green-100 text-green-600 dark:bg-green-900 dark:text-green-400" : "bg-gray-100 text-gray-300 hover:text-green-400 dark:bg-gray-700 dark:text-gray-500";
+
+                return html`
+                <div class="flex flex-col ios-card liquid-glass-card p-3 rounded-xl border ${borderClass} shadow-sm dark:bg-darkcard transition-all duration-300 ${opacityClass}">
+                     <div class="flex justify-between items-center mb-1">
+                        <div class="flex items-center gap-3">
+                            <div class="w-2.5 h-2.5 rounded-full ${bgColors[item.color] || 'bg-gray-500'}"></div>
+                            <span class="font-bold text-gray-700 dark:text-gray-300 text-sm">${item.name} (${item.val}%)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <span class="font-bold ${valueColor}">${formatCurrency(item.calculatedVal)}</span>
+                            <button onclick="toggleBudgetPaid('${item.id}')" class="w-8 h-8 rounded-full flex items-center justify-center transition-colors ${checkBtnClass}">
+                                <i class="fas fa-check text-xs"></i>
+                            </button>
+                            <div class="w-px h-4 bg-gray-200 dark:bg-gray-700 mx-1"></div>
+                            <button onclick="editBudgetItem('${item.id}')" class="text-gray-400 hover:text-blue-500 w-6 h-6 flex justify-center items-center"><i class="fas fa-pen text-xs"></i></button>
+                            <button onclick="deleteBudgetItem('${item.id}')" class="text-gray-400 hover:text-red-500 w-6 h-6 flex justify-center items-center"><i class="fas fa-trash-alt text-xs"></i></button>
+                        </div>
+                     </div>
+                     <div class="w-full bg-gray-100 dark:bg-gray-700 h-1.5 rounded-full overflow-hidden mt-1">
+                         <div class="${bgColors[item.color] || 'bg-gray-500'} h-full" style="width: ${item.val}%"></div>
+                     </div>
+                </div>`;
+            };
+
+            renderList('list-percent', processedPercent, percentTemplate, '<div class="text-xs text-center text-gray-400 py-2">Brak budżetów %</div>');
+
+            // 9. Aktualizacja Wykresu (bez zmian)
+            const chart = $('budget-pie-chart');
+            if(grandTotal > 0) {
+                let gradientStr = '';
+                if (state.chartMode === 'groups') {
+                    const degFixed = ((sumFixed / grandTotal) * 100 / 100) * 360;
+                    const degPercent = degFixed + ((sumPercent / grandTotal) * 360);
+                    gradientStr = `#EF4444 0deg ${degFixed}deg, #F59E0B ${degFixed}deg ${degPercent}deg, #6B7280 ${degPercent}deg 360deg`;
+                } else {
+                    const allItems = [...fixedExp, ...processedPercent];
+                    let currentDeg = 0;
+                    const parts = allItems.map(item => {
+                        const val = item.calculatedVal !== undefined ? item.calculatedVal : item.val;
+                        const deg = (val / grandTotal) * 360;
+                        const endDeg = currentDeg + deg;
+                        const colorHex = (function(c){ switch(c){ case 'red': return '#EF4444'; case 'orange': return '#F97316'; case 'amber': return '#F59E0B'; case 'emerald': return '#10B981'; case 'blue': return '#3B82F6'; case 'indigo': return '#6366F1'; case 'purple': return '#A855F7'; case 'pink': return '#EC4899'; default: return '#9CA3AF'; }})(item.color);
+                        const str = `${colorHex} ${currentDeg}deg ${endDeg}deg`;
+                        currentDeg = endDeg;
+                        return str;
+                    });
+                    parts.push(`#6B7280 ${currentDeg}deg 360deg`);
+                    gradientStr = parts.join(', ');
+                }
+                chart.style.setProperty('--chart-gradient', gradientStr);
+            } else {
+                chart.style.setProperty('--chart-gradient', `#6B7280 0deg 360deg`);
+            }
+
+            // --- Aktualizacja guzików toggle (NAPRAWIONA) ---
+            const btnG = $('chart-mode-groups');
+            const btnD = $('chart-mode-details');
+            const isLiquid = document.body.classList.contains('liquid-theme');
+            
+            const baseClass = "px-3 py-1.5 rounded-md transition text-center text-[10px] font-bold flex-1";
+            let activeClass = "";
+            let inactiveClass = "";
+
+            if (isLiquid) {
+                if (document.documentElement.classList.contains('dark')) {
+                     // Dark Liquid
+                     activeClass = "bg-white/20 text-white shadow-md backdrop-blur-md border border-white/10";
+                     inactiveClass = "text-gray-400 hover:bg-white/10";
+                } else {
+                     // Light Liquid - POPRAWKA: Tło prawie czarne, tekst BIAŁY
+                     activeClass = "bg-gray-800 !text-white shadow-md backdrop-blur-md border border-white/10"; 
+                     inactiveClass = "text-gray-600 hover:bg-white/20";
+                }
+            } else {
+                // Classic
+                activeClass = "bg-gray-900 text-white shadow dark:bg-gray-600";
+                inactiveClass = "text-gray-500 hover:bg-gray-200 dark:text-gray-400";
+            }
+            
+            if(btnG && btnD) {
+                btnG.className = `${baseClass} ${state.chartMode === 'groups' ? activeClass : inactiveClass}`;
+                btnD.className = `${baseClass} ${state.chartMode !== 'groups' ? activeClass : inactiveClass}`;
+            }
+        }
         // --- Nowa funkcja do odhaczania wydatków ---
         function toggleBudgetPaid(id) {
             // Znajdź element w aktualnym miesiącu
@@ -2072,6 +2113,20 @@
             $('add-category-modal').classList.add('show');
         }
 
+        function changeBudgetMonth(delta) {
+            // Zmień datę w kalendarzu
+            calendarDate.setMonth(calendarDate.getMonth() + delta);
+            
+            // Zaktualizuj klucz miesiąca (np. "2024-05")
+            const y = calendarDate.getFullYear();
+            const m = String(calendarDate.getMonth() + 1).padStart(2, '0');
+            currentCalcMonth = `${y}-${m}`;
+            
+            // Odśwież oba widoki, żeby były zsynchronizowane
+            renderCalendar(); // Grafik też się zmieni!
+            renderBudget();   // Planer pokaże nowe dane
+        }
+        
         function editBudgetItem(id) {
             const item = state.budgetData[currentCalcMonth].find(i => i.id === id);
             if(!item) return;
