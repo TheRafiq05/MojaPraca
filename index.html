@@ -11,6 +11,9 @@
     <meta name="theme-color" content="#ffffff">
     <title>MojaPraca</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Biblioteki do generowania PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -1316,7 +1319,21 @@
                         <button onclick="exportData()" class="w-full bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-300 text-xs font-bold py-2.5 rounded-lg border border-blue-200 dark:border-blue-800 shadow-sm flex items-center justify-center gap-2">
                             <i class="fas fa-download"></i> Pobierz kopię (Eksport)
                         </button>
-                        
+                        <!-- Przycisk PDF -->
+                        <div class="bg-gray-50 dark:bg-gray-700/50 p-3 rounded-xl border border-gray-200 dark:border-gray-600 mb-3">
+    <div class="flex items-center justify-between mb-2">
+        <label class="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Eksport Danych</label>
+        <span class="text-[9px] bg-blue-100 text-blue-600 px-1.5 py-0.5 rounded font-bold">PDF</span>
+    </div>
+    
+    <p class="text-[10px] text-gray-400 mb-3 leading-tight">
+        Raport zostanie wygenerowany dla miesiąca aktualnie wybranego w zakładce <strong>Grafik</strong>.
+    </p>
+
+    <button onclick="generatePDF()" class="w-full bg-gray-900 dark:bg-white text-white dark:text-gray-900 text-xs font-bold py-3 rounded-lg shadow-md hover:bg-black transition flex items-center justify-center gap-2">
+        <i class="fas fa-file-invoice text-sm"></i> Pobierz Kartę Ewidencji
+    </button>
+</div>
                         <div class="pt-2 border-t border-blue-100 dark:border-blue-800">
                             <label class="block w-full text-center bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-200 text-xs font-bold py-2.5 rounded-lg cursor-pointer hover:bg-blue-200 transition mb-2">
                                 <i class="fas fa-folder-open mr-1"></i> <span id="import-label">Wybierz plik kopii...</span>
@@ -1559,66 +1576,248 @@
             return parseFloat(value).toLocaleString('pl-PL', { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' zł';
         }
 
+        // --- PERFECT CLEAN PDF (FIXED WEEKEND COLORS & NOCKA) ---
+async function generatePDF() {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF();
+
+    // 1. POBIERZ DATĘ Z WIDOKU KALENDARZA
+    const y = calendarDate.getFullYear();
+    const m = String(calendarDate.getMonth() + 1).padStart(2, '0');
+    const monthName = monthsNominative[parseInt(m)-1];
+    const daysInMonth = new Date(y, m, 0).getDate();
+    const prefix = `${y}-${m}-`;
+
+    // Helper do polskich znaków
+    const safe = (str) => {
+        const map = {'ą':'a','ć':'c','ę':'e','ł':'l','ń':'n','ó':'o','ś':'s','ź':'z','ż':'z','Ą':'A','Ć':'C','Ę':'E','Ł':'L','Ń':'N','Ó':'O','Ś':'S','Ź':'Z','Ż':'Z'};
+        return str.replace(/[ąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/g, match => map[match]);
+    };
+
+    // --- PRZYGOTOWANIE DANYCH ---
+    let tableData = [];
+    let totalHours = 0;
+    let daysWorked = 0;
+
+    for(let i=1; i<=daysInMonth; i++) {
+        const dayKey = `${prefix}${String(i).padStart(2,'0')}`;
+        const entry = state.workLog[dayKey];
+        
+        if(entry && entry.val > 0) {
+            const dateObj = new Date(y, parseInt(m)-1, i);
+            const dayOfWeek = dateObj.toLocaleDateString('pl-PL', {weekday: 'long'});
+            
+            totalHours += entry.val;
+            daysWorked++;
+
+            let hoursStr = "";
+            if(entry.type === 'range') hoursStr = `${entry.start} - ${entry.end}`;
+            else hoursStr = `${entry.val}`;
+
+            // Uwagi: Tylko "Nocka", bez weekendów (bo są w dacie)
+            let notes = [];
+            if(entry.isNight) notes.push("Nocka");
+
+            tableData.push([
+                `${String(i).padStart(2,'0')}.${m}.${y}`, 
+                safe(dayOfWeek.charAt(0).toUpperCase() + dayOfWeek.slice(1)), // Dzień Tygodnia
+                hoursStr,
+                entry.val.toFixed(2), 
+                safe(notes.join(', ')) 
+            ]);
+        }
+    }
+    
+    // Sortowanie
+    tableData.sort((a,b) => parseInt(a[0].slice(0,2)) - parseInt(b[0].slice(0,2)));
+
+    // ================= DESIGN DOKUMENTU =================
+
+    // 1. NAGŁÓWEK
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(20);
+    doc.setTextColor(20, 20, 20);
+    doc.text(safe("KARTA EWIDENCJI CZASU PRACY"), 14, 20);
+    
+    // Data wygenerowania
+    doc.setFontSize(9);
+    doc.setFont("helvetica", "normal");
+    doc.setTextColor(120);
+    doc.text(safe(`Data wygenerowania: ${new Date().toLocaleDateString()}`), 14, 26);
+
+    // Okres (Prawa strona)
+    doc.setFontSize(10);
+    doc.setTextColor(100);
+    doc.text(safe("Okres:"), 196, 20, null, null, "right");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.setTextColor(0);
+    doc.text(safe(`${monthName} ${y}`), 196, 26, null, null, "right");
+
+    doc.setDrawColor(220);
+    doc.line(14, 32, 196, 32);
+
+    // 2. PODSUMOWANIE (KPI BOX)
+    doc.setFillColor(250, 250, 252);
+    doc.setDrawColor(230);
+    doc.roundedRect(14, 38, 182, 24, 2, 2, 'FD');
+
+    // Dni pracy
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(100);
+    doc.text(safe("Dni pracy"), 30, 46);
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(14);
+    doc.setTextColor(0);
+    doc.text(`${daysWorked}`, 30, 54);
+
+    // Suma Godzin (Poprawione pozycjonowanie 'h')
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(9);
+    doc.setTextColor(100);
+    doc.text(safe("Suma godzin"), 100, 46);
+    
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(18); 
+    doc.setTextColor(249, 115, 22); // Orange
+    
+    const hoursString = totalHours.toFixed(2);
+    const hoursWidth = doc.getTextWidth(hoursString); 
+    
+    doc.text(hoursString, 100, 55); 
+    
+    doc.setFontSize(10);
+    doc.text("h", 100 + hoursWidth + 2, 55); 
+
+    // 3. TABELA
+    doc.autoTable({
+        startY: 70,
+        head: [['Data', 'Dzien', 'Godziny Pracy', 'Ilosc (h)', 'Typ / Uwagi']],
+        body: tableData,
+        theme: 'grid',
+        headStyles: { 
+            fillColor: [240, 240, 242], 
+            textColor: [60, 60, 60], 
+            fontStyle: 'bold',
+            fontSize: 9,
+            lineColor: [200, 200, 200],
+            lineWidth: 0.1
+        },
+        bodyStyles: { 
+            textColor: [50, 50, 50],
+            fontSize: 10,
+            cellPadding: 3,
+            valign: 'middle'
+        },
+        columnStyles: {
+            0: { fontStyle: 'bold', cellWidth: 25 },
+            3: { fontStyle: 'bold', halign: 'center', fontSize: 10 },
+            4: { fontSize: 9 }
+        },
+        didParseCell: function(data) {
+            // A. Kolorowanie "Nocka" na niebiesko (Naprawione)
+            if (data.section === 'body' && data.column.index === 4) {
+                const text = data.cell.raw || "";
+                if (text.includes('Nocka')) {
+                    data.cell.styles.textColor = [59, 130, 246]; // Blue-500
+                    data.cell.styles.fontStyle = 'bold';
+                }
+            }
+
+            // B. Kolorowanie Dni Tygodnia (Sobota/Niedziela)
+            if (data.section === 'body' && data.column.index === 1) {
+                const dayName = data.cell.raw || "";
+                
+                // Sobota -> Szary Pogrubiony
+                if (dayName.includes('Sobota')) {
+                    data.cell.styles.textColor = [150, 150, 150]; // Szary
+                    data.cell.styles.fontStyle = 'bold';
+                }
+                // Niedziela -> Czerwony Pogrubiony
+                else if (dayName.includes('Niedziela')) {
+                    data.cell.styles.textColor = [239, 68, 68]; // Czerwony
+                    data.cell.styles.fontStyle = 'bold';
+                }
+            }
+        }
+    });
+
+    // 4. STOPKA
+    const finalY = doc.lastAutoTable.finalY + 25;
+    
+    doc.setDrawColor(150);
+    doc.setLineWidth(0.5);
+    doc.line(130, finalY, 196, finalY);
+    
+    doc.setFontSize(8);
+    doc.setTextColor(150);
+    doc.setFont("helvetica", "normal");
+    doc.text(safe("Podpis Pracownika"), 163, finalY + 5, null, null, "center");
+
+    // --- ZAPIS ---
+    doc.save(`Ewidencja_${y}_${m}.pdf`);
+    showToast("Pobrano PDF!");
+}
         // --- Core Functions ---
 
                 function init() {
-            // 1. Splash Screen
+    // 1. Splash Screen
+    setTimeout(() => {
+        const splash = document.getElementById('splash-screen');
+        const wrapper = document.getElementById('main-content-wrapper');
+        if(splash) {
+            splash.classList.add('hide-splash');
+            if(wrapper) wrapper.classList.add('content-visible');
             setTimeout(() => {
-                const splash = document.getElementById('splash-screen');
-                const wrapper = document.getElementById('main-content-wrapper'); // pobieramy wrapper
-                if(splash) {
-                    splash.classList.add('hide-splash');
-                    if(wrapper) wrapper.classList.add('content-visible'); // pokazujemy treść
-                    setTimeout(() => {
-                        if(splash.parentNode) splash.parentNode.removeChild(splash);
-                    }, 600);
-                }
-            }, 2000);
-
-            // 2. Wczytywanie danych
-            const stored = localStorage.getItem(STORAGE_KEY);
-            if (stored) {
-                try {
-                    const parsed = JSON.parse(stored);
-                    state = { ...state, ...parsed };
-                    
-                    // Fixy struktur
-                    if(!state.paymentStatus) state.paymentStatus = {}; 
-                    if(!state.actualSalary) state.actualSalary = {}; 
-                    if(!state.monthlyRates) state.monthlyRates = {};
-                    if(!state.budgetData) state.budgetData = {};
-                    if(state.isPit2 === undefined) state.isPit2 = true;
-                    if(!state.theme) state.theme = 'light';
-                    if(!state.themeStyle) state.themeStyle = 'classic';
-                    if(!state.chartMode) state.chartMode = 'groups';
-                } catch (e) { 
-                    console.error("Błąd odczytu danych", e); 
-                }
-            }
-
-            const now = new Date();
-            currentCalcMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
-
-            try {
-                refreshUI(); 
-            } catch (e) {
-                console.error("Błąd UI:", e);
-            }
-            
-            const confirmBtn = document.getElementById('confirm-yes-btn');
-            if(confirmBtn) confirmBtn.onclick = executeConfirm;
-
-            // --- FIX GLITCHA STOPKI ---
-            // 1. Najpierw pokaż stopkę (była display:none)
-            const nav = document.getElementById('main-nav');
-            if(nav) nav.style.display = 'block';
-
-            // 2. Daj przeglądarce 10ms na przeliczenie wymiarów, potem ustaw kółko
-            setTimeout(() => {
-                switchTab('calendar');
-            }, 10);
+                if(splash.parentNode) splash.parentNode.removeChild(splash);
+            }, 600);
         }
+    }, 2000);
 
+    // 2. Wczytywanie danych
+    const stored = localStorage.getItem(STORAGE_KEY);
+    if (stored) {
+        try {
+            const parsed = JSON.parse(stored);
+            state = { ...state, ...parsed };
+            
+            // Fixy struktur
+            if(!state.paymentStatus) state.paymentStatus = {}; 
+            if(!state.actualSalary) state.actualSalary = {}; 
+            if(!state.monthlyRates) state.monthlyRates = {};
+            if(!state.budgetData) state.budgetData = {};
+            if(state.isPit2 === undefined) state.isPit2 = true;
+            if(!state.theme) state.theme = 'light';
+            if(!state.themeStyle) state.themeStyle = 'classic';
+            if(!state.chartMode) state.chartMode = 'groups';
+        } catch (e) { 
+            console.error("Błąd odczytu danych", e); 
+        }
+    }
+
+    const now = new Date();
+    currentCalcMonth = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+
+    try {
+        refreshUI(); 
+    } catch (e) {
+        console.error("Błąd UI:", e);
+    }
+
+    // USUNIĘTO KOD OD SELECTÓW PDF - TERAZ JEST AUTOMATYCZNIE
+
+    const confirmBtn = document.getElementById('confirm-yes-btn');
+    if(confirmBtn) confirmBtn.onclick = executeConfirm;
+
+    // --- FIX GLITCHA STOPKI ---
+    const nav = document.getElementById('main-nav');
+    if(nav) nav.style.display = 'block';
+
+    setTimeout(() => {
+        switchTab('calendar');
+    }, 10);
+}
 
         
         // Unified UI Refresh Function
