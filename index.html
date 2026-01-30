@@ -53,7 +53,14 @@
             transition: background-color 0.3s ease;
             -webkit-overflow-scrolling: touch;
         }
-
+        /* Ukrywamy treść na starcie, aby nie prześwitywała pod splashem */
+        #main-content-wrapper {
+            opacity: 0;
+            transition: opacity 0.5s ease-in;
+        }
+        #main-content-wrapper.content-visible {
+            opacity: 1;
+        }
         /* ================= LIQUID GLASS THEME CONFIGURATION ================= */
         
         /* KARTY W STYLU SZKŁA (Base Card) */
@@ -840,6 +847,7 @@
         }
     </style>
 </head>
+<div id="main-content-wrapper">   
 <body class="bg-[#F5F5F7] text-[#1D1D1F] dark:bg-darkbg dark:text-gray-100 transition-colors duration-300">
 
     <!-- Liquid Background Elements (Visible only in Liquid mode to provide blur content) -->
@@ -1558,8 +1566,10 @@
             // 1. Splash Screen
             setTimeout(() => {
                 const splash = document.getElementById('splash-screen');
+                const wrapper = document.getElementById('main-content-wrapper'); // pobieramy wrapper
                 if(splash) {
                     splash.classList.add('hide-splash');
+                    if(wrapper) wrapper.classList.add('content-visible'); // pokazujemy treść
                     setTimeout(() => {
                         if(splash.parentNode) splash.parentNode.removeChild(splash);
                     }, 600);
@@ -2105,18 +2115,21 @@
         }
 
         function changeBudgetMonth(delta) {
-            // Zmień datę w kalendarzu
-            calendarDate.setMonth(calendarDate.getMonth() + delta);
-            
-            // Zaktualizuj klucz miesiąca (np. "2024-05")
-            const y = calendarDate.getFullYear();
-            const m = String(calendarDate.getMonth() + 1).padStart(2, '0');
-            currentCalcMonth = `${y}-${m}`;
-            
-            // Odśwież oba widoki, żeby były zsynchronizowane
-            renderCalendar(); // Grafik też się zmieni!
-            renderBudget();   // Planer pokaże nowe dane
-        }
+    // FIX: Ustaw dzień na 1, aby uniknąć przeskoku (np. z 30 stycznia na marzec, bo luty jest krótszy)
+    calendarDate.setDate(1); 
+    
+    // Zmień datę w kalendarzu
+    calendarDate.setMonth(calendarDate.getMonth() + delta);
+    
+    // Zaktualizuj klucz miesiąca (np. "2024-05")
+    const y = calendarDate.getFullYear();
+    const m = String(calendarDate.getMonth() + 1).padStart(2, '0');
+    currentCalcMonth = `${y}-${m}`;
+    
+    // Odśwież oba widoki, żeby były zsynchronizowane
+    renderCalendar(); // Grafik też się zmieni!
+    renderBudget();   // Planer pokaże nowe dane
+}
         
         function editBudgetItem(id) {
             const item = state.budgetData[currentCalcMonth].find(i => i.id === id);
@@ -3154,9 +3167,12 @@ function renderHistoryChart() {
         }
 
         function changeMonth(delta) {
-            calendarDate.setMonth(calendarDate.getMonth() + delta);
-            renderCalendar();
-        }
+    // FIX: Zabezpieczenie przed przeskakiwaniem krótszych miesięcy
+    calendarDate.setDate(1);
+    
+    calendarDate.setMonth(calendarDate.getMonth() + delta);
+    renderCalendar();
+}
 
         function loadMonthToCalendar(year, month) {
             calendarDate.setFullYear(parseInt(year));
@@ -3219,4 +3235,5 @@ function renderHistoryChart() {
 
     </script>
 </body>
+</div>
 </html>
